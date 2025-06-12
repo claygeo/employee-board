@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "Sarah Johnson",
+    "department": "HR",
+    "description": "Human Resources Manager responsible for employee relations, recruitment, and policy development.",
+    "photo": "sarah_johnson.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Michael Chen",
+    "department": "Logistics",
+    "description": "Senior Logistics Coordinator managing supply chain operations and vendor relationships.",
+    "photo": "michael_chen.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Emily Davis",
+    "department": "Warehouse",
+    "description": "Warehouse Supervisor overseeing inventory management and shipping operations.",
+    "photo": "emily_davis.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Robert Martinez",
+    "department": "HR",
+    "description": "HR Specialist focusing on employee benefits and compensation analysis.",
+    "photo": "robert_martinez.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Lisa Thompson",
+    "department": "Logistics",
+    "description": "Transportation Manager coordinating fleet operations and delivery schedules.",
+    "photo": "lisa_thompson.jpg"
+  },
+  {
+    "id": 6,
+    "name": "David Wilson",
+    "department": "Warehouse",
+    "description": "Warehouse Associate handling receiving, storage, and order fulfillment.",
+    "photo": "david_wilson.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Jennifer Brown",
+    "department": "HR",
+    "description": "Talent Acquisition Specialist responsible for recruiting and onboarding new employees.",
+    "photo": "jennifer_brown.jpg"
+  },
+  {
+    "id": 8,
+    "name": "James Anderson",
+    "department": "Logistics",
+    "description": "Logistics Analyst optimizing routes and analyzing supply chain efficiency.",
+    "photo": "james_anderson.jpg"
+  }
+]

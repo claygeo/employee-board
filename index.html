@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Board System</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Employee Directory</h1>
+            <p>Digital Employee Board System</p>
+        </div>
+
+        <div class="controls">
+            <div class="filter-section">
+                <button class="filter-btn active" data-department="all">All Employees</button>
+                <button class="filter-btn" data-department="HR">HR</button>
+                <button class="filter-btn" data-department="Logistics">Logistics</button>
+                <button class="filter-btn" data-department="Warehouse">Warehouse</button>
+            </div>
+            
+            <input type="text" class="search-box" placeholder="Search employees..." id="searchBox">
+            
+            <div class="admin-section">
+                <button class="admin-btn" id="adminBtn">Admin Mode</button>
+            </div>
+        </div>
+
+        <div class="employee-grid" id="employeeGrid">
+            <!-- Employee cards will be dynamically generated here -->
+        </div>
+
+        <div class="employee-count" id="employeeCount"></div>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add New Employee</h2>
+            <form id="employeeForm">
+                <div class="form-group">
+                    <label for="employeeName">Full Name</label>
+                    <input type="text" id="employeeName" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeDepartment">Department</label>
+                    <select id="employeeDepartment" required>
+                        <option value="">Select Department</option>
+                        <option value="HR">HR</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Warehouse">Warehouse</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="employeeDescription">Job Description</label>
+                    <textarea id="employeeDescription" placeholder="Enter job description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="employeePhoto">Photo Filename</label>
+                    <input type="text" id="employeePhoto" placeholder="e.g., john_doe.jpg">
+                    <small style="color: #7f8c8d; margin-top: 5px; display: block;">
+                        Place photo files in the 'photos' folder and enter the filename here
+                    </small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="modal-btn primary" id="saveBtn">Save Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>
