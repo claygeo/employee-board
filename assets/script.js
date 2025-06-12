@@ -98,56 +98,56 @@ class EmployeeBoardSystem {
                 id: 1,
                 name: "Sarah Johnson",
                 department: "HR",
-                description: "Human Resources Manager responsible for employee relations, recruitment, and policy development.",
+                position: "HR Manager",
                 photo: "sarah_johnson.jpg"
             },
             {
                 id: 2,
                 name: "Michael Chen",
                 department: "Logistics",
-                description: "Senior Logistics Coordinator managing supply chain operations and vendor relationships.",
+                position: "Senior Logistics Coordinator",
                 photo: "michael_chen.jpg"
             },
             {
                 id: 3,
                 name: "Emily Davis",
                 department: "Warehouse",
-                description: "Warehouse Supervisor overseeing inventory management and shipping operations.",
+                position: "Warehouse Supervisor",
                 photo: "emily_davis.jpg"
             },
             {
                 id: 4,
                 name: "Robert Martinez",
                 department: "HR",
-                description: "HR Specialist focusing on employee benefits and compensation analysis.",
+                position: "HR Specialist",
                 photo: "robert_martinez.jpg"
             },
             {
                 id: 5,
                 name: "Lisa Thompson",
                 department: "Logistics",
-                description: "Transportation Manager coordinating fleet operations and delivery schedules.",
+                position: "Transportation Manager",
                 photo: "lisa_thompson.jpg"
             },
             {
                 id: 6,
                 name: "David Wilson",
                 department: "Warehouse",
-                description: "Warehouse Associate handling receiving, storage, and order fulfillment.",
+                position: "Warehouse Associate",
                 photo: "david_wilson.jpg"
             },
             {
                 id: 7,
                 name: "Jennifer Brown",
                 department: "HR",
-                description: "Talent Acquisition Specialist responsible for recruiting and onboarding new employees.",
+                position: "Talent Acquisition Specialist",
                 photo: "jennifer_brown.jpg"
             },
             {
                 id: 8,
                 name: "James Anderson",
                 department: "Logistics",
-                description: "Logistics Analyst optimizing routes and analyzing supply chain efficiency.",
+                position: "Logistics Analyst",
                 photo: "james_anderson.jpg"
             }
         ];
@@ -207,7 +207,7 @@ class EmployeeBoardSystem {
             const matchesDepartment = this.currentFilter === 'all' || employee.department === this.currentFilter;
             const matchesSearch = this.currentSearch === '' || 
                 employee.name.toLowerCase().includes(this.currentSearch) ||
-                employee.description.toLowerCase().includes(this.currentSearch);
+                employee.position.toLowerCase().includes(this.currentSearch);
             
             return matchesDepartment && matchesSearch;
         });
@@ -274,8 +274,7 @@ class EmployeeBoardSystem {
                 ` : ''}
                 ${photoElement}
                 <div class="employee-name">${employee.name}</div>
-                <div class="employee-department">${employee.department}</div>
-                <div class="employee-description">${employee.description}</div>
+                <div class="employee-position">${employee.position || 'Position Not Set'}</div>
             `;
             
             grid.appendChild(card);
@@ -335,7 +334,7 @@ class EmployeeBoardSystem {
         
         document.getElementById('employeeName').value = this.editingEmployee.name;
         document.getElementById('employeeDepartment').value = this.editingEmployee.department;
-        document.getElementById('employeeDescription').value = this.editingEmployee.description;
+        document.getElementById('employeePosition').value = this.editingEmployee.position;
         document.getElementById('employeePhoto').value = this.editingEmployee.photo || '';
         
         document.getElementById('employeeModal').style.display = 'block';
@@ -356,7 +355,7 @@ class EmployeeBoardSystem {
     saveEmployee() {
         const name = document.getElementById('employeeName').value.trim();
         const department = document.getElementById('employeeDepartment').value;
-        const description = document.getElementById('employeeDescription').value.trim();
+        const position = document.getElementById('employeePosition').value.trim();
         const photo = document.getElementById('employeePhoto').value.trim();
 
         if (!name || !department) {
@@ -368,7 +367,7 @@ class EmployeeBoardSystem {
             // Update existing employee
             this.editingEmployee.name = name;
             this.editingEmployee.department = department;
-            this.editingEmployee.description = description;
+            this.editingEmployee.position = position;
             this.editingEmployee.photo = photo;
         } else {
             // Add new employee
@@ -376,7 +375,7 @@ class EmployeeBoardSystem {
                 id: Math.max(...this.employees.map(emp => emp.id), 0) + 1,
                 name: name,
                 department: department,
-                description: description,
+                position: position,
                 photo: photo
             };
             this.employees.push(newEmployee);
