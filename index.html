@@ -3,75 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Board System</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <title>Visual Org Chart Builder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-section {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 0 auto;
+            max-width: 600px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .upload-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-btn:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: none;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .department-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .department-btn:hover, .department-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .chart-container {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            display: none;
+        }
+
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100%;
+        }
+
+        .director-level {
+            margin-bottom: 60px;
+        }
+
+        .departments-level {
+            display: flex;
+            gap: 80px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .department {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 300px;
+        }
+
+        .department-title {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .employee-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .employee-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .employee-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .employee-position {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .level {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .director-card {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            transform: scale(1.1);
+        }
+
+        .supervisor-card {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+        }
+
+        .lead-card {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+        }
+
+        .connection-line {
+            width: 2px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 0 auto;
+        }
+
+        .horizontal-line {
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Employee Directory</h1>
-            <p>Digital Employee Board System</p>
-        </div>
-
-        <div class="controls">
-            <div class="filter-section">
-                <button class="filter-btn active" data-department="all">All Employees</button>
-                <button class="filter-btn" data-department="HR">HR</button>
-                <button class="filter-btn" data-department="Logistics">Logistics</button>
-                <button class="filter-btn" data-department="Warehouse">Warehouse</button>
-            </div>
-            
-            <input type="text" class="search-box" placeholder="Search employees..." id="searchBox">
-            
-            <div class="admin-section">
-                <button class="admin-btn" id="adminBtn">Admin Mode</button>
-            </div>
-        </div>
-
-        <div class="employee-grid" id="employeeGrid">
-            <!-- Employee cards will be dynamically generated here -->
-        </div>
-
-        <div class="employee-count" id="employeeCount"></div>
+    <div class="header">
+        <h1>📊 Visual Org Chart Builder</h1>
+        <p>Drop your Excel file to generate an interactive organizational chart</p>
     </div>
 
-    <!-- Add/Edit Employee Modal -->
-    <div class="modal" id="employeeModal">
-        <div class="modal-content">
-            <h2 id="modalTitle">Add New Employee</h2>
-            <form id="employeeForm">
-                <div class="form-group">
-                    <label for="employeeName">Full Name</label>
-                    <input type="text" id="employeeName" required>
-                </div>
-                <div class="form-group">
-                    <label for="employeeDepartment">Department</label>
-                    <select id="employeeDepartment" required>
-                        <option value="">Select Department</option>
-                        <option value="HR">HR</option>
-                        <option value="Logistics">Logistics</option>
-                        <option value="Warehouse">Warehouse</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="employeePosition">Position/Job Title</label>
-                    <input type="text" id="employeePosition" placeholder="e.g., HR Manager, Warehouse Supervisor" required>
-                </div>
-                <div class="form-group">
-                    <label for="employeePhoto">Photo Filename</label>
-                    <input type="text" id="employeePhoto" placeholder="e.g., john_doe.jpg">
-                    <small style="color: #7f8c8d; margin-top: 5px; display: block;">
-                        Place photo files in the 'photos' folder and enter the filename here
-                    </small>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="modal-btn secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="modal-btn primary" id="saveBtn">Save Employee</button>
-                </div>
-            </form>
+    <div class="upload-section" id="uploadSection">
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-text">
+                <strong>📁 Drag & Drop Excel File Here</strong><br>
+                or click to browse
+            </div>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Choose File
+            </button>
+            <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls" />
         </div>
     </div>
 
-    <script src="assets/script.js"></script>
+    <div class="controls" id="controls">
+        <button class="department-btn active" data-dept="all">All Departments</button>
+        <button class="department-btn" data-dept="Logistics">Logistics</button>
+        <button class="department-btn" data-dept="Packaging">Packaging</button>
+        <button class="department-btn" data-dept="Lab">Lab</button>
+        <button class="department-btn" data-dept="HR">HR</button>
+    </div>
+
+    <div class="chart-container" id="chartContainer">
+        <div class="org-chart" id="orgChart"></div>
+    </div>
+
+    <script>
+        let employeeData = [];
+        let currentFilter = 'all';
+
+        // Demo data that matches the expected Excel structure
+        const demoData = [
+            { Name: "Sarah Williams", Position: "Director", Department: "Management", Photo: "SW" },
+            { Name: "Mike Chen", Position: "Supervisor", Department: "Logistics", Photo: "MC" },
+            { Name: "Anna Rodriguez", Position: "Supervisor", Department: "Packaging", Photo: "AR" },
+            { Name: "David Kim", Position: "Supervisor", Department: "Lab", Photo: "DK" },
+            { Name: "Lisa Thompson", Position: "Supervisor", Department: "HR", Photo: "LT" },
+            { Name: "John Mitchell", Position: "Lead", Department: "Logistics", Photo: "JM" },
+            { Name: "Emma Davis", Position: "Lead", Department: "Logistics", Photo: "ED" },
+            { Name: "Carlos Lopez", Position: "Lead", Department: "Packaging", Photo: "CL" },
+            { Name: "Rachel Green", Position: "Lead", Department: "Packaging", Photo: "RG" },
+            { Name: "Alex Park", Position: "Lead", Department: "Lab", Photo: "AP" },
+            { Name: "Maria Garcia", Position: "Lead", Department: "Lab", Photo: "MG" },
+            { Name: "Tom Wilson", Position: "Lead", Department: "HR", Photo: "TW" },
+            { Name: "Jennifer Lee", Position: "Employee", Department: "Logistics", Photo: "JL" },
+            { Name: "Mark Johnson", Position: "Employee", Department: "Logistics", Photo: "MJ" },
+            { Name: "Sophie Brown", Position: "Employee", Department: "Logistics", Photo: "SB" },
+            { Name: "Ryan Taylor", Position: "Employee", Department: "Logistics", Photo: "RT" },
+            { Name: "Nicole White", Position: "Employee", Department: "Packaging", Photo: "NW" },
+            { Name: "Kevin Zhang", Position: "Employee", Department: "Packaging", Photo: "KZ" },
+            { Name: "Amanda Clark", Position: "Employee", Department: "Packaging", Photo: "AC" },
+            { Name: "James Miller", Position: "Employee", Department: "Lab", Photo: "JMr" },
+            { Name: "Laura Anderson", Position: "Employee", Department: "Lab", Photo: "LA" },
+            { Name: "Chris Martin", Position: "Employee", Department: "Lab", Photo: "CM" },
+            { Name: "Diana Ross", Position: "Employee", Department: "HR", Photo: "DR" },
+            { Name: "Peter Smith", Position: "Employee", Department: "HR", Photo: "PS" }
+        ];
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleFileDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processExcelFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processExcelFile(files[0]);
+            }
+        }
+
+        function processExcelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    employeeData = jsonData.map(row => ({
+                        Name: row.Name || row.name || '',
+                        Position: row.Position || row.position || '',
+                        Department: row.Department || row.department || '',
+                        Photo: row.Photo || row.photo || getInitials(row.Name || row.name || '')
+                    }));
+                    
+                    if (employeeData.length === 0) {
+                        alert('No data found in Excel file. Loading demo data instead.');
+                        employeeData = demoData;
+                    }
+                    
+                    showChart();
+                } catch (error) {
+                    console.error('Error processing Excel file:', error);
+                    alert('Error reading Excel file. Loading demo data instead.');
+                    employeeData = demoData;
+                    showChart();
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase();
+        }
+
+        function showChart() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('controls').style.display = 'flex';
+            document.getElementById('chartContainer').style.display = 'block';
+            renderOrgChart();
+        }
+
+        function renderOrgChart() {
+            const orgChart = document.getElementById('orgChart');
+            orgChart.innerHTML = '';
+
+            const filteredData = currentFilter === 'all' 
+                ? employeeData 
+                : employeeData.filter(emp => emp.Department === currentFilter || emp.Position === 'Director');
+
+            // Group employees by position and department
+            const director = filteredData.find(emp => emp.Position === 'Director');
+            const supervisors = filteredData.filter(emp => emp.Position === 'Supervisor');
+            const leads = filteredData.filter(emp => emp.Position === 'Lead');
+            const employees = filteredData.filter(emp => emp.Position === 'Employee');
+
+            // Render Director (only if showing all departments)
+            if (currentFilter === 'all' && director) {
+                const directorLevel = document.createElement('div');
+                directorLevel.className = 'director-level';
+                directorLevel.appendChild(createEmployeeCard(director, 'director-card'));
+                orgChart.appendChild(directorLevel);
+
+                if (supervisors.length > 0) {
+                    orgChart.appendChild(createConnectionLine());
+                }
+            }
+
+            // Render Departments
+            if (supervisors.length > 0) {
+                const departmentsLevel = document.createElement('div');
+                departmentsLevel.className = 'departments-level';
+
+                const departments = currentFilter === 'all' 
+                    ? ['Logistics', 'Packaging', 'Lab', 'HR']
+                    : [currentFilter];
+
+                departments.forEach(deptName => {
+                    const deptSupervisor = supervisors.find(s => s.Department === deptName);
+                    if (!deptSupervisor) return;
+
+                    const department = document.createElement('div');
+                    department.className = 'department';
+
+                    if (currentFilter === 'all') {
+                        const deptTitle = document.createElement('div');
+                        deptTitle.className = 'department-title';
+                        deptTitle.textContent = deptName;
+                        department.appendChild(deptTitle);
+                    }
+
+                    // Supervisor
+                    department.appendChild(createEmployeeCard(deptSupervisor, 'supervisor-card'));
+                    
+                    const deptLeads = leads.filter(l => l.Department === deptName);
+                    const deptEmployees = employees.filter(e => e.Department === deptName);
+
+                    if (deptLeads.length > 0) {
+                        department.appendChild(createConnectionLine());
+                        
+                        const leadsLevel = document.createElement('div');
+                        leadsLevel.className = 'level';
+                        deptLeads.forEach(lead => {
+                            leadsLevel.appendChild(createEmployeeCard(lead, 'lead-card'));
+                        });
+                        department.appendChild(leadsLevel);
+                    }
+
+                    if (deptEmployees.length > 0) {
+                        department.appendChild(createConnectionLine());
+                        
+                        const employeesLevel = document.createElement('div');
+                        employeesLevel.className = 'level';
+                        deptEmployees.forEach(employee => {
+                            employeesLevel.appendChild(createEmployeeCard(employee, ''));
+                        });
+                        department.appendChild(employeesLevel);
+                    }
+
+                    departmentsLevel.appendChild(department);
+                });
+
+                orgChart.appendChild(departmentsLevel);
+            }
+        }
+
+        function createEmployeeCard(employee, additionalClass) {
+            const card = document.createElement('div');
+            card.className = `employee-card ${additionalClass}`;
+
+            const photo = document.createElement('div');
+            photo.className = 'employee-photo';
+            photo.textContent = employee.Photo || getInitials(employee.Name);
+
+            const name = document.createElement('div');
+            name.className = 'employee-name';
+            name.textContent = employee.Name;
+
+            const position = document.createElement('div');
+            position.className = 'employee-position';
+            position.textContent = employee.Position;
+
+            card.appendChild(photo);
+            card.appendChild(name);
+            card.appendChild(position);
+
+            return card;
+        }
+
+        function createConnectionLine() {
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+            return line;
+        }
+
+        // Department filter handling
+        document.getElementById('controls').addEventListener('click', (e) => {
+            if (e.target.classList.contains('department-btn')) {
+                document.querySelectorAll('.department-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.dept;
+                renderOrgChart();
+            }
+        });
+
+        // Load demo data on page load for demonstration
+        document.addEventListener('DOMContentLoaded', () => {
+            // Uncomment the line below to auto-load demo data
+            // employeeData = demoData; showChart();
+        });
+    </script>
 </body>
 </html>
