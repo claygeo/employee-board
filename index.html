@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Org Chart Builder - Enhanced Visibility</title>
+    <title>Visual Org Chart Builder - Department Towers</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -15,6 +15,30 @@
             --font-medium: clamp(1rem, 2.5vw, 1.3rem);
             --font-large: clamp(1.2rem, 3vw, 1.6rem);
             --zoom-factor: 1;
+            --header-height: 60px;
+        }
+
+        /* Horizontal Department Rows Mode Variables - Maximum screen efficiency */
+        .towers-mode {
+            --tower-card-width: clamp(90px, 8.5vw, 150px);
+            --tower-card-height: clamp(70px, 6.5vw, 110px);
+            --tower-gap: clamp(3px, 0.5vw, 8px);
+            --tower-row-gap: clamp(8px, 1.5vw, 20px);
+            --tower-font-name: clamp(1rem, 2.5vw, 1.6rem);
+            --tower-font-position: clamp(0.75rem, 2vw, 1.2rem);
+            --tower-font-initials: clamp(0.8rem, 2.2vw, 1.3rem);
+            --tower-dept-header: clamp(1.1rem, 2.8vw, 1.8rem);
+        }
+
+        /* Ultra-large dataset optimizations for horizontal rows */
+        .towers-mode.ultra-large {
+            --tower-card-width: clamp(80px, 7.5vw, 130px);
+            --tower-card-height: clamp(60px, 5.5vw, 90px);
+            --tower-gap: clamp(2px, 0.4vw, 6px);
+            --tower-row-gap: clamp(6px, 1.2vw, 15px);
+            --tower-font-name: clamp(0.9rem, 2.2vw, 1.4rem);
+            --tower-font-position: clamp(0.7rem, 1.8vw, 1.1rem);
+            --tower-font-initials: clamp(0.75rem, 2vw, 1.2rem);
         }
 
         * {
@@ -35,23 +59,91 @@
         .header {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: clamp(10px, 2vw, 20px);
-            text-align: center;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             color: white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
+            height: var(--header-height);
         }
 
         .header h1 {
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            margin-bottom: 5px;
+            font-size: 1.4rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
         }
 
-        .header p {
-            font-size: var(--font-medium);
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .view-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .view-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            font-weight: bold;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .department-filter {
+            position: relative;
+        }
+
+        .department-dropdown {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            min-width: 120px;
+        }
+
+        .department-dropdown:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .upload-section {
@@ -104,94 +196,12 @@
             transform: translateY(-2px);
         }
 
-        .controls {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: clamp(10px, 2vw, 20px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            gap: clamp(10px, 2vw, 20px);
-            flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .zoom-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .zoom-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: var(--font-medium);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .zoom-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-
-        .auto-fit-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: var(--font-small);
-            white-space: nowrap;
-        }
-
-        .auto-fit-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: translateY(-1px);
-        }
-
-        .zoom-level {
-            color: white;
-            font-size: var(--font-small);
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .department-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: var(--font-small);
-        }
-
-        .department-btn:hover, .department-btn.active {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: translateY(-2px);
-        }
-
         .chart-container {
             flex: 1;
-            padding: clamp(10px, 2vw, 20px);
+            padding: clamp(5px, 1vw, 15px);
             overflow: auto;
             display: none;
+            height: calc(100vh - var(--header-height));
         }
 
         .org-chart {
@@ -204,6 +214,189 @@
             transition: transform 0.3s ease;
         }
 
+        /* Horizontal Department Rows Layout */
+        .towers-display {
+            display: flex;
+            flex-direction: column;
+            gap: var(--tower-row-gap);
+            padding: var(--tower-gap);
+            min-height: 100%;
+            max-width: 100%;
+        }
+
+        .towers-directors-row {
+            display: flex;
+            justify-content: center;
+            gap: var(--tower-gap);
+            margin-bottom: var(--tower-row-gap);
+            flex-wrap: wrap;
+        }
+
+        .towers-directors-row .employee-card {
+            width: calc(var(--tower-card-width) * 1.2);
+            min-height: calc(var(--tower-card-height) * 1.1);
+        }
+
+        .towers-departments-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--tower-row-gap);
+        }
+
+        .department-row {
+            display: flex;
+            align-items: center;
+            gap: var(--tower-gap);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: var(--tower-gap);
+            overflow-x: auto;
+            min-height: calc(var(--tower-card-height) + (var(--tower-gap) * 2));
+        }
+
+        .department-row-header {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: var(--tower-dept-header);
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            min-width: calc(var(--tower-card-width) * 1.5);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .department-row-employees {
+            display: flex;
+            gap: var(--tower-gap);
+            align-items: center;
+            flex: 1;
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        .towers-display .employee-card {
+            width: var(--tower-card-width);
+            min-height: var(--tower-card-height);
+            margin: 0;
+            padding: clamp(4px, 1vw, 10px);
+            border-width: 2px;
+            border-style: solid;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .towers-display .employee-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .towers-display .employee-photo {
+            width: calc(var(--tower-card-width) * 0.3);
+            height: calc(var(--tower-card-width) * 0.3);
+            font-size: var(--tower-font-initials);
+            margin-bottom: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .towers-display .employee-name {
+            font-size: var(--tower-font-name);
+            font-weight: 900;
+            margin-bottom: 2px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            line-height: 1;
+            text-align: center;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .towers-display .employee-position {
+            font-size: var(--tower-font-position);
+            font-weight: 600;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+            line-height: 1;
+            text-align: center;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        /* Enhanced Department Color Coding */
+        .dept-packaging { 
+            border-color: #FF6B6B; 
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.05));
+        }
+        .dept-engineering { 
+            border-color: #4ECDC4; 
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.15), rgba(78, 205, 196, 0.05));
+        }
+        .dept-sales { 
+            border-color: #45B7D1; 
+            background: linear-gradient(135deg, rgba(69, 183, 209, 0.15), rgba(69, 183, 209, 0.05));
+        }
+        .dept-marketing { 
+            border-color: #96CEB4; 
+            background: linear-gradient(135deg, rgba(150, 206, 180, 0.15), rgba(150, 206, 180, 0.05));
+        }
+        .dept-hr { 
+            border-color: #FFEAA7; 
+            background: linear-gradient(135deg, rgba(255, 234, 167, 0.15), rgba(255, 234, 167, 0.05));
+        }
+        .dept-finance { 
+            border-color: #DDA0DD; 
+            background: linear-gradient(135deg, rgba(221, 160, 221, 0.15), rgba(221, 160, 221, 0.05));
+        }
+        .dept-operations { 
+            border-color: #98D8C8; 
+            background: linear-gradient(135deg, rgba(152, 216, 200, 0.15), rgba(152, 216, 200, 0.05));
+        }
+        .dept-it { 
+            border-color: #F7DC6F; 
+            background: linear-gradient(135deg, rgba(247, 220, 111, 0.15), rgba(247, 220, 111, 0.05));
+        }
+        .dept-admin { 
+            border-color: #BB8FCE; 
+            background: linear-gradient(135deg, rgba(187, 143, 206, 0.15), rgba(187, 143, 206, 0.05));
+        }
+        .dept-default { 
+            border-color: rgba(255, 255, 255, 0.4); 
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        }
+
+        /* Position Hierarchy Styling for Towers */
+        .towers-display .director-card {
+            border-width: 4px !important;
+            border-color: #FFD700 !important;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.15)) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .towers-display .supervisor-card {
+            border-width: 3px !important;
+            border-color: #FF8C00 !important;
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.25), rgba(255, 140, 0, 0.1)) !important;
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+        }
+
+        .towers-display .lead-card {
+            border-width: 3px !important;
+            border-color: #32CD32 !important;
+            background: linear-gradient(135deg, rgba(50, 205, 50, 0.25), rgba(50, 205, 50, 0.1)) !important;
+            box-shadow: 0 0 10px rgba(50, 205, 50, 0.3);
+        }
+
+        /* Original Org Chart Styles */
         .director-level {
             margin-bottom: var(--level-gap);
         }
@@ -334,12 +527,14 @@
 
         .employee-count {
             color: white;
-            font-size: var(--font-small);
-            margin-left: 20px;
+            font-size: 0.8rem;
             opacity: 0.8;
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
         }
 
-        /* Responsive adjustments for large datasets */
+        /* Responsive adjustments */
         .large-dataset {
             --card-size: clamp(130px, 7vw, 170px);
             --card-gap: clamp(10px, 2vw, 25px);
@@ -352,28 +547,6 @@
             --dept-gap: clamp(30px, 4vw, 60px);
         }
 
-        /* Enhanced readability mode for 75+ employees */
-        .enhanced-readability .employee-card {
-            min-height: calc(var(--card-size) * 1.35);
-            padding: clamp(14px, 3vw, 26px);
-        }
-
-        .enhanced-readability .employee-photo {
-            width: calc(var(--card-size) * 0.32);
-            height: calc(var(--card-size) * 0.32);
-            margin-bottom: 10px;
-        }
-
-        .enhanced-readability .employee-name {
-            font-size: calc(var(--font-medium) * 1.05);
-            margin-bottom: 6px;
-        }
-
-        .enhanced-readability .employee-position {
-            font-size: calc(var(--font-small) * 1.05);
-        }
-
-        /* Compact mode for 100+ employees but maintain readability */
         .compact-mode .employee-card {
             min-height: calc(var(--card-size) * 1.25);
             padding: clamp(10px, 2vw, 20px);
@@ -395,6 +568,17 @@
         }
 
         @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                height: auto;
+                padding: 10px;
+            }
+            
+            .header-controls {
+                justify-content: center;
+            }
+
             .departments-level {
                 flex-direction: column;
                 align-items: center;
@@ -406,18 +590,39 @@
                 max-width: 90vw;
             }
 
-            /* Increase font sizes for mobile to maintain readability */
-            :root {
-                --font-small: clamp(1rem, 3vw, 1.2rem);
-                --font-medium: clamp(1.1rem, 3.5vw, 1.4rem);
+            .department-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--tower-gap);
+            }
+
+            .department-row-header {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .department-row-employees {
+                justify-content: center;
+                flex-wrap: wrap;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>📊 Visual Org Chart Builder</h1>
-        <p>Enhanced visibility organizational chart • Alt+F to auto-fit</p>
+        <h1>📊 Visual Org Chart</h1>
+        <div class="header-controls">
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="org">🏢 Org Chart</button>
+                <button class="view-btn" data-view="towers">📋 Department Rows</button>
+            </div>
+            <button class="control-btn" id="autoFit">📐 Auto Fit</button>
+            <div class="department-filter">
+                <select class="department-dropdown" id="departmentFilter">
+                    <option value="all">All Departments</option>
+                </select>
+            </div>
+        </div>
     </div>
 
     <div class="upload-section" id="uploadSection">
@@ -433,27 +638,15 @@
         </div>
     </div>
 
-    <div class="controls" id="controls">
-        <div class="zoom-controls">
-            <button class="zoom-btn" id="zoomOut">−</button>
-            <div class="zoom-level" id="zoomLevel">100%</div>
-            <button class="zoom-btn" id="zoomIn">+</button>
-            <button class="auto-fit-btn" id="autoFit">📐 Auto Fit</button>
-        </div>
-        
-        <button class="department-btn active" data-dept="all">All Departments</button>
-        <div id="departmentButtons"></div>
-        
-        <div class="employee-count" id="employeeCount"></div>
-    </div>
-
     <div class="chart-container" id="chartContainer">
         <div class="org-chart" id="orgChart"></div>
+        <div class="employee-count" id="employeeCount"></div>
     </div>
 
     <script>
         let employeeData = [];
         let currentFilter = 'all';
+        let currentView = 'org'; // 'org' or 'towers'
         let zoomFactor = 1;
         let columnMapping = {};
 
@@ -489,30 +682,24 @@
 
         function detectColumns(headers) {
             const mapping = {};
-            const requiredFields = ['name', 'position', 'department', 'photo'];
             
             headers.forEach(header => {
                 const lowerHeader = header.toLowerCase().trim();
                 
-                // Name detection
                 if (['name', 'full name', 'employee name', 'fullname'].includes(lowerHeader)) {
                     mapping.name = header;
                 }
-                // Position detection
                 else if (['position', 'title', 'job title', 'role', 'job role'].includes(lowerHeader)) {
                     mapping.position = header;
                 }
-                // Department detection
                 else if (['department', 'dept', 'division', 'team', 'group'].includes(lowerHeader)) {
                     mapping.department = header;
                 }
-                // Photo detection
                 else if (['photo', 'picture', 'image', 'avatar', 'initials'].includes(lowerHeader)) {
                     mapping.photo = header;
                 }
             });
 
-            // Fallback to exact matches if fuzzy matching didn't work
             if (Object.keys(mapping).length < 3) {
                 headers.forEach(header => {
                     if (header.toLowerCase().includes('name') && !mapping.name) mapping.name = header;
@@ -540,8 +727,6 @@
 
                     const headers = jsonData[0];
                     columnMapping = detectColumns(headers);
-                    
-                    console.log('Detected columns:', columnMapping);
                     
                     if (!columnMapping.name || !columnMapping.position || !columnMapping.department) {
                         throw new Error('Required columns not found. Please ensure your Excel has Name, Position, and Department columns.');
@@ -587,31 +772,49 @@
                 .substring(0, 3);
         }
 
-        function showChart() {
-            document.getElementById('uploadSection').style.display = 'none';
-            document.getElementById('controls').style.display = 'flex';
-            document.getElementById('chartContainer').style.display = 'block';
-            
-            generateDepartmentButtons();
-            applyDatasetSizeOptimizations();
-            renderOrgChart();
-            updateEmployeeCount();
-            
-            // Auto-fit after everything is rendered
-            triggerAutoFitAfterRender();
+        function getDepartmentClass(department) {
+            const deptLower = department.toLowerCase().replace(/[^a-z]/g, '');
+            const deptMap = {
+                'packaging': 'dept-packaging',
+                'engineering': 'dept-engineering',
+                'sales': 'dept-sales',
+                'marketing': 'dept-marketing',
+                'hr': 'dept-hr',
+                'humanresources': 'dept-hr',
+                'finance': 'dept-finance',
+                'operations': 'dept-operations',
+                'it': 'dept-it',
+                'informationtechnology': 'dept-it',
+                'admin': 'dept-admin',
+                'administration': 'dept-admin'
+            };
+            return deptMap[deptLower] || 'dept-default';
         }
 
-        function generateDepartmentButtons() {
+        function showChart() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('chartContainer').style.display = 'block';
+            
+            generateDepartmentOptions();
+            applyDatasetSizeOptimizations();
+            renderChart();
+            updateEmployeeCount();
+            
+            setTimeout(autoFit, 300);
+        }
+
+        function generateDepartmentOptions() {
             const departments = [...new Set(employeeData.map(emp => emp.Department))].filter(dept => dept);
-            const container = document.getElementById('departmentButtons');
-            container.innerHTML = '';
+            const select = document.getElementById('departmentFilter');
+            
+            // Clear existing options except "All Departments"
+            select.innerHTML = '<option value="all">All Departments</option>';
             
             departments.forEach(dept => {
-                const btn = document.createElement('button');
-                btn.className = 'department-btn';
-                btn.dataset.dept = dept;
-                btn.textContent = dept;
-                container.appendChild(btn);
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                select.appendChild(option);
             });
         }
 
@@ -619,39 +822,199 @@
             const body = document.body;
             const totalEmployees = employeeData.length;
             
-            // Remove existing size classes
-            body.classList.remove('large-dataset', 'huge-dataset', 'compact-mode', 'enhanced-readability');
+            body.classList.remove('large-dataset', 'huge-dataset', 'compact-mode', 'ultra-large', 'towers-mode');
             
-            if (totalEmployees > 100) {
+            if (totalEmployees > 150) {
+                body.classList.add('huge-dataset', 'compact-mode', 'ultra-large');
+            } else if (totalEmployees > 100) {
                 body.classList.add('huge-dataset', 'compact-mode');
-            } else if (totalEmployees > 75) {
-                body.classList.add('large-dataset', 'enhanced-readability');
             } else if (totalEmployees > 50) {
                 body.classList.add('large-dataset');
-            } else {
-                // For smaller datasets, use enhanced readability
-                body.classList.add('enhanced-readability');
+            }
+
+            // Add towers mode class when in towers view
+            if (currentView === 'towers') {
+                body.classList.add('towers-mode');
+                if (totalEmployees > 120) {
+                    body.classList.add('ultra-large');
+                }
             }
         }
 
         function updateEmployeeCount() {
-            const filteredData = currentFilter === 'all' 
+            const filteredData = getFilteredData();
+            document.getElementById('employeeCount').textContent = 
+                `${filteredData.length} employees ${currentFilter !== 'all' ? `(${currentFilter})` : ''}`;
+        }
+
+        function getFilteredData() {
+            return currentFilter === 'all' 
                 ? employeeData 
                 : employeeData.filter(emp => emp.Department === currentFilter || emp.Position.toLowerCase().includes('director'));
+        }
+
+        function renderChart() {
+            if (currentView === 'towers') {
+                renderTowersDisplay();
+            } else {
+                renderOrgChart();
+            }
+        }
+
+        function splitLargeDepartment(employees, maxPerTower = 15) {
+            if (employees.length <= maxPerTower) {
+                return [employees];
+            }
             
-            document.getElementById('employeeCount').textContent = 
-                `${filteredData.length} employees ${currentFilter !== 'all' ? `(${currentFilter})` : '(total)'}`;
+            const towers = [];
+            for (let i = 0; i < employees.length; i += maxPerTower) {
+                towers.push(employees.slice(i, i + maxPerTower));
+            }
+            return towers;
+        }
+
+        function renderTowersDisplay() {
+            const orgChart = document.getElementById('orgChart');
+            orgChart.className = 'towers-display';
+            orgChart.innerHTML = '';
+
+            const filteredData = getFilteredData();
+            
+            // Separate directors from department employees
+            const directors = filteredData.filter(emp => emp.Position.toLowerCase().includes('director'));
+            const nonDirectors = filteredData.filter(emp => !emp.Position.toLowerCase().includes('director'));
+            
+            // Render Directors Row (if showing all departments and directors exist)
+            if (currentFilter === 'all' && directors.length > 0) {
+                const directorsRow = document.createElement('div');
+                directorsRow.className = 'towers-directors-row';
+                
+                directors.forEach(director => {
+                    const card = createTowersEmployeeCard(director);
+                    card.classList.add('director-card');
+                    directorsRow.appendChild(card);
+                });
+                
+                orgChart.appendChild(directorsRow);
+            }
+
+            // Render Department Rows (horizontal)
+            if (nonDirectors.length > 0) {
+                const departmentsContainer = document.createElement('div');
+                departmentsContainer.className = 'towers-departments-container';
+
+                // Group employees by department
+                const departments = [...new Set(nonDirectors.map(emp => emp.Department))].filter(dept => dept);
+                
+                departments.forEach(deptName => {
+                    const deptEmployees = nonDirectors
+                        .filter(emp => emp.Department === deptName)
+                        .sort((a, b) => {
+                            // Sort by hierarchy within department (left-to-right)
+                            const aIsSupervisor = a.Position.toLowerCase().includes('supervisor');
+                            const bIsSupervisor = b.Position.toLowerCase().includes('supervisor');
+                            const aIsLead = a.Position.toLowerCase().includes('lead');
+                            const bIsLead = b.Position.toLowerCase().includes('lead');
+                            
+                            if (aIsSupervisor && !bIsSupervisor) return -1;
+                            if (!aIsSupervisor && bIsSupervisor) return 1;
+                            if (aIsLead && !bIsLead && !bIsSupervisor) return -1;
+                            if (!aIsLead && bIsLead && !aIsSupervisor) return 1;
+                            
+                            return a.Name.localeCompare(b.Name);
+                        });
+
+                    if (deptEmployees.length === 0) return;
+
+                    // Create department row
+                    const departmentRow = document.createElement('div');
+                    departmentRow.className = 'department-row';
+                    departmentRow.style.borderLeft = `4px solid ${getDepartmentBorderColor(deptName)}`;
+
+                    // Department header (only show for "All Departments" view)
+                    if (currentFilter === 'all') {
+                        const deptHeader = document.createElement('div');
+                        deptHeader.className = 'department-row-header';
+                        deptHeader.textContent = deptName;
+                        deptHeader.style.borderColor = getDepartmentBorderColor(deptName);
+                        departmentRow.appendChild(deptHeader);
+                    }
+
+                    // Department employees flowing horizontally
+                    const employeesContainer = document.createElement('div');
+                    employeesContainer.className = 'department-row-employees';
+
+                    deptEmployees.forEach(employee => {
+                        const card = createTowersEmployeeCard(employee);
+                        employeesContainer.appendChild(card);
+                    });
+
+                    departmentRow.appendChild(employeesContainer);
+                    departmentsContainer.appendChild(departmentRow);
+                });
+
+                orgChart.appendChild(departmentsContainer);
+            }
+
+            updateEmployeeCount();
+        }
+
+        function getDepartmentBorderColor(department) {
+            const deptClass = getDepartmentClass(department);
+            const colorMap = {
+                'dept-packaging': '#FF6B6B',
+                'dept-engineering': '#4ECDC4',
+                'dept-sales': '#45B7D1',
+                'dept-marketing': '#96CEB4',
+                'dept-hr': '#FFEAA7',
+                'dept-finance': '#DDA0DD',
+                'dept-operations': '#98D8C8',
+                'dept-it': '#F7DC6F',
+                'dept-admin': '#BB8FCE',
+                'dept-default': 'rgba(255, 255, 255, 0.4)'
+            };
+            return colorMap[deptClass] || 'rgba(255, 255, 255, 0.4)';
+        }
+
+        function createTowersEmployeeCard(employee) {
+            const card = document.createElement('div');
+            card.className = `employee-card ${getDepartmentClass(employee.Department)}`;
+            
+            // Add position-based styling
+            if (employee.Position.toLowerCase().includes('director')) {
+                card.classList.add('director-card');
+            } else if (employee.Position.toLowerCase().includes('supervisor')) {
+                card.classList.add('supervisor-card');
+            } else if (employee.Position.toLowerCase().includes('lead')) {
+                card.classList.add('lead-card');
+            }
+
+            const photo = document.createElement('div');
+            photo.className = 'employee-photo';
+            photo.textContent = employee.Photo || getInitials(employee.Name);
+
+            const name = document.createElement('div');
+            name.className = 'employee-name';
+            name.textContent = employee.Name;
+
+            const position = document.createElement('div');
+            position.className = 'employee-position';
+            position.textContent = employee.Position;
+
+            card.appendChild(photo);
+            card.appendChild(name);
+            card.appendChild(position);
+
+            return card;
         }
 
         function renderOrgChart() {
             const orgChart = document.getElementById('orgChart');
+            orgChart.className = 'org-chart';
             orgChart.innerHTML = '';
 
-            const filteredData = currentFilter === 'all' 
-                ? employeeData 
-                : employeeData.filter(emp => emp.Department === currentFilter || emp.Position.toLowerCase().includes('director'));
+            const filteredData = getFilteredData();
 
-            // Group employees by position and department
             const directors = filteredData.filter(emp => emp.Position.toLowerCase().includes('director'));
             const supervisors = filteredData.filter(emp => emp.Position.toLowerCase().includes('supervisor'));
             const leads = filteredData.filter(emp => emp.Position.toLowerCase().includes('lead'));
@@ -661,7 +1024,6 @@
                 !emp.Position.toLowerCase().includes('lead')
             );
 
-            // Render Directors (only if showing all departments)
             if (currentFilter === 'all' && directors.length > 0) {
                 const directorLevel = document.createElement('div');
                 directorLevel.className = 'director-level';
@@ -680,7 +1042,6 @@
                 }
             }
 
-            // Render Departments
             if (supervisors.length > 0 || leads.length > 0 || employees.length > 0) {
                 const departmentsLevel = document.createElement('div');
                 departmentsLevel.className = 'departments-level';
@@ -706,7 +1067,6 @@
                         department.appendChild(deptTitle);
                     }
 
-                    // Supervisors
                     if (deptSupervisors.length > 0) {
                         const supervisorLevel = document.createElement('div');
                         supervisorLevel.className = 'level';
@@ -716,7 +1076,6 @@
                         department.appendChild(supervisorLevel);
                     }
 
-                    // Leads
                     if (deptLeads.length > 0) {
                         if (deptSupervisors.length > 0) {
                             department.appendChild(createConnectionLine());
@@ -730,7 +1089,6 @@
                         department.appendChild(leadsLevel);
                     }
 
-                    // Employees
                     if (deptEmployees.length > 0) {
                         if (deptSupervisors.length > 0 || deptLeads.length > 0) {
                             department.appendChild(createConnectionLine());
@@ -782,48 +1140,34 @@
             return line;
         }
 
-        // Zoom controls
-        document.getElementById('zoomIn').addEventListener('click', () => {
-            zoomFactor = Math.min(zoomFactor + 0.1, 2);
-            updateZoom();
+        // View toggle handling
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentView = e.target.dataset.view;
+                applyDatasetSizeOptimizations();
+                renderChart();
+                setTimeout(autoFit, 100);
+            });
         });
-
-        document.getElementById('zoomOut').addEventListener('click', () => {
-            zoomFactor = Math.max(zoomFactor - 0.1, 0.3);
-            updateZoom();
-        });
-
-        document.getElementById('autoFit').addEventListener('click', () => {
-            autoFit();
-        });
-
-        function updateZoom() {
-            document.documentElement.style.setProperty('--zoom-factor', zoomFactor);
-            document.getElementById('zoomLevel').textContent = `${Math.round(zoomFactor * 100)}%`;
-        }
 
         // Department filter handling
-        document.getElementById('controls').addEventListener('click', (e) => {
-            if (e.target.classList.contains('department-btn')) {
-                document.querySelectorAll('.department-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                currentFilter = e.target.dataset.dept;
-                renderOrgChart();
-                
-                // Auto-fit after filter change
-                triggerAutoFitAfterRender();
-            }
+        document.getElementById('departmentFilter').addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            renderChart();
+            setTimeout(autoFit, 100);
         });
 
         // Auto-fit functionality
+        document.getElementById('autoFit').addEventListener('click', autoFit);
+
         function autoFit() {
             const container = document.getElementById('chartContainer');
             const chart = document.getElementById('orgChart');
             
             if (!chart.firstChild) return;
             
-            // Reset zoom first to get true dimensions
-            const originalZoom = zoomFactor;
             zoomFactor = 1;
             document.documentElement.style.setProperty('--zoom-factor', zoomFactor);
             
@@ -831,50 +1175,39 @@
                 const containerRect = container.getBoundingClientRect();
                 const chartRect = chart.getBoundingClientRect();
                 
-                // Add some padding (95% of container size)
                 const scaleX = (containerRect.width * 0.95) / chartRect.width;
                 const scaleY = (containerRect.height * 0.95) / chartRect.height;
                 
-                // Use the smaller scale to ensure everything fits
-                zoomFactor = Math.min(scaleX, scaleY, 1.5); // Cap at 150% to avoid too large
-                zoomFactor = Math.max(zoomFactor, 0.2); // Minimum 20% to keep readable
+                zoomFactor = Math.min(scaleX, scaleY, 1.5);
+                zoomFactor = Math.max(zoomFactor, 0.2);
                 
-                updateZoom();
+                document.documentElement.style.setProperty('--zoom-factor', zoomFactor);
                 
                 // Visual feedback
                 const btn = document.getElementById('autoFit');
                 btn.style.transform = 'scale(1.1)';
-                setTimeout(() => {
-                    btn.style.transform = '';
-                }, 150);
+                setTimeout(() => btn.style.transform = '', 150);
             }, 10);
         }
 
-        // Auto-fit on window resize and after chart rendering
+        // Auto-fit on window resize
         window.addEventListener('resize', () => {
             setTimeout(autoFit, 200);
         });
 
-        // Auto-fit after chart is rendered
-        function triggerAutoFitAfterRender() {
-            setTimeout(autoFit, 300);
-        }
-
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                if (e.key === '=' || e.key === '+') {
-                    e.preventDefault();
-                    document.getElementById('zoomIn').click();
-                } else if (e.key === '-') {
-                    e.preventDefault();
-                    document.getElementById('zoomOut').click();
-                }
-            }
-            // Alt+F for auto-fit (doesn't conflict with browser shortcuts)
             if (e.altKey && e.key === 'f') {
                 e.preventDefault();
                 autoFit();
+            }
+            if (e.altKey && e.key === 't') {
+                e.preventDefault();
+                // Toggle view mode
+                const currentBtn = document.querySelector('.view-btn.active');
+                const nextView = currentView === 'org' ? 'towers' : 'org';
+                const nextBtn = document.querySelector(`[data-view="${nextView}"]`);
+                nextBtn.click();
             }
         });
     </script>
