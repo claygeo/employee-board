@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Org Chart Builder - Optimized</title>
+    <title>Visual Org Chart Builder - Enhanced Visibility</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --card-size: clamp(120px, 8vw, 180px);
-            --card-gap: clamp(10px, 2vw, 30px);
-            --dept-gap: clamp(40px, 6vw, 100px);
-            --level-gap: clamp(20px, 3vw, 60px);
-            --font-small: clamp(0.7rem, 1.5vw, 0.9rem);
-            --font-medium: clamp(0.8rem, 1.8vw, 1.1rem);
-            --font-large: clamp(1rem, 2.2vw, 1.4rem);
+            --card-size: clamp(140px, 9vw, 200px);
+            --card-gap: clamp(12px, 2.5vw, 35px);
+            --dept-gap: clamp(50px, 7vw, 120px);
+            --level-gap: clamp(25px, 4vw, 70px);
+            --font-small: clamp(0.85rem, 2vw, 1.1rem);
+            --font-medium: clamp(1rem, 2.5vw, 1.3rem);
+            --font-large: clamp(1.2rem, 3vw, 1.6rem);
             --zoom-factor: 1;
         }
 
@@ -145,6 +145,24 @@
             border-color: rgba(255, 255, 255, 0.6);
         }
 
+        .auto-fit-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-small);
+            white-space: nowrap;
+        }
+
+        .auto-fit-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-1px);
+        }
+
         .zoom-level {
             color: white;
             font-size: var(--font-small);
@@ -220,7 +238,7 @@
         .employee-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
-            padding: clamp(10px, 2vw, 20px);
+            padding: clamp(12px, 2.5vw, 24px);
             margin: calc(var(--card-gap) / 2);
             text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -228,7 +246,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
             width: var(--card-size);
-            min-height: calc(var(--card-size) * 1.2);
+            min-height: calc(var(--card-size) * 1.3);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -240,31 +258,36 @@
         }
 
         .employee-photo {
-            width: calc(var(--card-size) * 0.4);
-            height: calc(var(--card-size) * 0.4);
+            width: calc(var(--card-size) * 0.35);
+            height: calc(var(--card-size) * 0.35);
             border-radius: 50%;
-            margin: 0 auto 10px;
+            margin: 0 auto 12px;
             background: linear-gradient(45deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: calc(var(--card-size) * 0.2);
+            font-size: calc(var(--card-size) * 0.18);
             font-weight: bold;
         }
 
         .employee-name {
-            font-size: var(--font-small);
+            font-size: var(--font-medium);
             font-weight: bold;
             color: #333;
-            margin-bottom: 5px;
-            line-height: 1.2;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            word-wrap: break-word;
+            hyphens: auto;
         }
 
         .employee-position {
-            color: #666;
-            font-size: calc(var(--font-small) * 0.9);
-            line-height: 1.1;
+            color: #555;
+            font-size: var(--font-small);
+            line-height: 1.2;
+            word-wrap: break-word;
+            hyphens: auto;
+            font-weight: 500;
         }
 
         .level {
@@ -287,8 +310,18 @@
             color: white;
         }
 
+        .supervisor-card .employee-name,
+        .supervisor-card .employee-position {
+            color: white;
+        }
+
         .lead-card {
             background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+        }
+
+        .lead-card .employee-name,
+        .lead-card .employee-position {
             color: white;
         }
 
@@ -306,37 +339,59 @@
             opacity: 0.8;
         }
 
-        /* Responsive adjustments for very large datasets */
+        /* Responsive adjustments for large datasets */
         .large-dataset {
-            --card-size: clamp(100px, 6vw, 140px);
+            --card-size: clamp(130px, 7vw, 170px);
+            --card-gap: clamp(10px, 2vw, 25px);
+            --dept-gap: clamp(40px, 5vw, 80px);
+        }
+
+        .huge-dataset {
+            --card-size: clamp(120px, 6vw, 150px);
             --card-gap: clamp(8px, 1.5vw, 20px);
             --dept-gap: clamp(30px, 4vw, 60px);
         }
 
-        .huge-dataset {
-            --card-size: clamp(80px, 5vw, 120px);
-            --card-gap: clamp(5px, 1vw, 15px);
-            --dept-gap: clamp(20px, 3vw, 40px);
+        /* Enhanced readability mode for 75+ employees */
+        .enhanced-readability .employee-card {
+            min-height: calc(var(--card-size) * 1.35);
+            padding: clamp(14px, 3vw, 26px);
         }
 
-        /* Compact mode for 200+ employees */
+        .enhanced-readability .employee-photo {
+            width: calc(var(--card-size) * 0.32);
+            height: calc(var(--card-size) * 0.32);
+            margin-bottom: 10px;
+        }
+
+        .enhanced-readability .employee-name {
+            font-size: calc(var(--font-medium) * 1.05);
+            margin-bottom: 6px;
+        }
+
+        .enhanced-readability .employee-position {
+            font-size: calc(var(--font-small) * 1.05);
+        }
+
+        /* Compact mode for 100+ employees but maintain readability */
         .compact-mode .employee-card {
-            min-height: calc(var(--card-size) * 1.1);
-            padding: clamp(8px, 1.5vw, 15px);
+            min-height: calc(var(--card-size) * 1.25);
+            padding: clamp(10px, 2vw, 20px);
         }
 
         .compact-mode .employee-photo {
-            width: calc(var(--card-size) * 0.35);
-            height: calc(var(--card-size) * 0.35);
+            width: calc(var(--card-size) * 0.3);
+            height: calc(var(--card-size) * 0.3);
             margin-bottom: 8px;
         }
 
         .compact-mode .employee-name {
-            font-size: calc(var(--font-small) * 0.9);
+            font-size: var(--font-small);
+            margin-bottom: 6px;
         }
 
         .compact-mode .employee-position {
-            font-size: calc(var(--font-small) * 0.8);
+            font-size: calc(var(--font-small) * 0.95);
         }
 
         @media (max-width: 768px) {
@@ -350,13 +405,19 @@
                 width: 100%;
                 max-width: 90vw;
             }
+
+            /* Increase font sizes for mobile to maintain readability */
+            :root {
+                --font-small: clamp(1rem, 3vw, 1.2rem);
+                --font-medium: clamp(1.1rem, 3.5vw, 1.4rem);
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>📊 Visual Org Chart Builder</h1>
-        <p>Auto-scaling organizational chart for any screen size</p>
+        <p>Enhanced visibility organizational chart • Alt+F to auto-fit</p>
     </div>
 
     <div class="upload-section" id="uploadSection">
@@ -377,6 +438,7 @@
             <button class="zoom-btn" id="zoomOut">−</button>
             <div class="zoom-level" id="zoomLevel">100%</div>
             <button class="zoom-btn" id="zoomIn">+</button>
+            <button class="auto-fit-btn" id="autoFit">📐 Auto Fit</button>
         </div>
         
         <button class="department-btn active" data-dept="all">All Departments</button>
@@ -534,6 +596,9 @@
             applyDatasetSizeOptimizations();
             renderOrgChart();
             updateEmployeeCount();
+            
+            // Auto-fit after everything is rendered
+            triggerAutoFitAfterRender();
         }
 
         function generateDepartmentButtons() {
@@ -555,14 +620,17 @@
             const totalEmployees = employeeData.length;
             
             // Remove existing size classes
-            body.classList.remove('large-dataset', 'huge-dataset', 'compact-mode');
+            body.classList.remove('large-dataset', 'huge-dataset', 'compact-mode', 'enhanced-readability');
             
-            if (totalEmployees > 150) {
+            if (totalEmployees > 100) {
                 body.classList.add('huge-dataset', 'compact-mode');
             } else if (totalEmployees > 75) {
-                body.classList.add('large-dataset', 'compact-mode');
+                body.classList.add('large-dataset', 'enhanced-readability');
             } else if (totalEmployees > 50) {
                 body.classList.add('large-dataset');
+            } else {
+                // For smaller datasets, use enhanced readability
+                body.classList.add('enhanced-readability');
             }
         }
 
@@ -725,6 +793,10 @@
             updateZoom();
         });
 
+        document.getElementById('autoFit').addEventListener('click', () => {
+            autoFit();
+        });
+
         function updateZoom() {
             document.documentElement.style.setProperty('--zoom-factor', zoomFactor);
             document.getElementById('zoomLevel').textContent = `${Math.round(zoomFactor * 100)}%`;
@@ -737,6 +809,9 @@
                 e.target.classList.add('active');
                 currentFilter = e.target.dataset.dept;
                 renderOrgChart();
+                
+                // Auto-fit after filter change
+                triggerAutoFitAfterRender();
             }
         });
 
@@ -747,34 +822,59 @@
             
             if (!chart.firstChild) return;
             
-            const containerRect = container.getBoundingClientRect();
-            const chartRect = chart.getBoundingClientRect();
+            // Reset zoom first to get true dimensions
+            const originalZoom = zoomFactor;
+            zoomFactor = 1;
+            document.documentElement.style.setProperty('--zoom-factor', zoomFactor);
             
-            const scaleX = (containerRect.width * 0.95) / chartRect.width;
-            const scaleY = (containerRect.height * 0.95) / chartRect.height;
-            
-            zoomFactor = Math.min(scaleX, scaleY, 1);
-            updateZoom();
+            setTimeout(() => {
+                const containerRect = container.getBoundingClientRect();
+                const chartRect = chart.getBoundingClientRect();
+                
+                // Add some padding (95% of container size)
+                const scaleX = (containerRect.width * 0.95) / chartRect.width;
+                const scaleY = (containerRect.height * 0.95) / chartRect.height;
+                
+                // Use the smaller scale to ensure everything fits
+                zoomFactor = Math.min(scaleX, scaleY, 1.5); // Cap at 150% to avoid too large
+                zoomFactor = Math.max(zoomFactor, 0.2); // Minimum 20% to keep readable
+                
+                updateZoom();
+                
+                // Visual feedback
+                const btn = document.getElementById('autoFit');
+                btn.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 150);
+            }, 10);
         }
 
-        // Auto-fit on window resize
+        // Auto-fit on window resize and after chart rendering
         window.addEventListener('resize', () => {
-            setTimeout(autoFit, 100);
+            setTimeout(autoFit, 200);
         });
+
+        // Auto-fit after chart is rendered
+        function triggerAutoFitAfterRender() {
+            setTimeout(autoFit, 300);
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
-                if (e.key === '=') {
+                if (e.key === '=' || e.key === '+') {
                     e.preventDefault();
                     document.getElementById('zoomIn').click();
                 } else if (e.key === '-') {
                     e.preventDefault();
                     document.getElementById('zoomOut').click();
-                } else if (e.key === '0') {
-                    e.preventDefault();
-                    autoFit();
                 }
+            }
+            // Alt+F for auto-fit (doesn't conflict with browser shortcuts)
+            if (e.altKey && e.key === 'f') {
+                e.preventDefault();
+                autoFit();
             }
         });
     </script>
