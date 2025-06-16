@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Org Chart Builder</title>
+    <title>Visual Org Chart Builder - Optimized</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        :root {
+            --card-size: clamp(120px, 8vw, 180px);
+            --card-gap: clamp(10px, 2vw, 30px);
+            --dept-gap: clamp(40px, 6vw, 100px);
+            --level-gap: clamp(20px, 3vw, 60px);
+            --font-small: clamp(0.7rem, 1.5vw, 0.9rem);
+            --font-medium: clamp(0.8rem, 1.8vw, 1.1rem);
+            --font-large: clamp(1rem, 2.2vw, 1.4rem);
+            --zoom-factor: 1;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,36 +29,44 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: auto;
         }
 
         .header {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 20px;
+            padding: clamp(10px, 2vw, 20px);
             text-align: center;
             color: white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
+        .header p {
+            font-size: var(--font-medium);
+        }
+
         .upload-section {
-            padding: 40px 20px;
+            padding: clamp(20px, 4vw, 40px);
             text-align: center;
         }
 
         .upload-area {
             border: 3px dashed rgba(255, 255, 255, 0.5);
             border-radius: 20px;
-            padding: 60px 40px;
+            padding: clamp(30px, 6vw, 60px) clamp(20px, 4vw, 40px);
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             margin: 0 auto;
-            max-width: 600px;
+            max-width: 90vw;
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -60,7 +79,7 @@
 
         .upload-text {
             color: white;
-            font-size: 1.2rem;
+            font-size: var(--font-medium);
             margin-bottom: 20px;
         }
 
@@ -72,9 +91,9 @@
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
             border-radius: 25px;
-            font-size: 1.1rem;
+            font-size: var(--font-medium);
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -88,22 +107,60 @@
         .controls {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 20px;
+            padding: clamp(10px, 2vw, 20px);
             display: none;
             justify-content: center;
-            gap: 20px;
+            align-items: center;
+            gap: clamp(10px, 2vw, 20px);
             flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-medium);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .zoom-level {
+            color: white;
+            font-size: var(--font-small);
+            min-width: 60px;
+            text-align: center;
         }
 
         .department-btn {
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 10px 20px;
+            padding: clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);
             border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1rem;
+            font-size: var(--font-small);
         }
 
         .department-btn:hover, .department-btn.active {
@@ -114,7 +171,7 @@
 
         .chart-container {
             flex: 1;
-            padding: 20px;
+            padding: clamp(10px, 2vw, 20px);
             overflow: auto;
             display: none;
         }
@@ -124,86 +181,99 @@
             flex-direction: column;
             align-items: center;
             min-height: 100%;
+            transform: scale(var(--zoom-factor));
+            transform-origin: top center;
+            transition: transform 0.3s ease;
         }
 
         .director-level {
-            margin-bottom: 60px;
+            margin-bottom: var(--level-gap);
         }
 
         .departments-level {
             display: flex;
-            gap: 80px;
+            gap: var(--dept-gap);
             flex-wrap: wrap;
             justify-content: center;
+            width: 100%;
         }
 
         .department {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 300px;
+            min-width: calc(var(--card-size) * 2);
+            flex: 1;
         }
 
         .department-title {
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 10px 20px;
+            padding: clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px);
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: var(--card-gap);
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: var(--font-medium);
+            white-space: nowrap;
         }
 
         .employee-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
-            padding: 20px;
-            margin: 10px;
+            padding: clamp(10px, 2vw, 20px);
+            margin: calc(var(--card-gap) / 2);
             text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
-            min-width: 200px;
+            width: var(--card-size);
+            min-height: calc(var(--card-size) * 1.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .employee-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px) scale(1.02);
             box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
         }
 
         .employee-photo {
-            width: 80px;
-            height: 80px;
+            width: calc(var(--card-size) * 0.4);
+            height: calc(var(--card-size) * 0.4);
             border-radius: 50%;
-            margin: 0 auto 15px;
+            margin: 0 auto 10px;
             background: linear-gradient(45deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2rem;
+            font-size: calc(var(--card-size) * 0.2);
             font-weight: bold;
         }
 
         .employee-name {
-            font-size: 1.1rem;
+            font-size: var(--font-small);
             font-weight: bold;
             color: #333;
             margin-bottom: 5px;
+            line-height: 1.2;
         }
 
         .employee-position {
             color: #666;
-            font-size: 0.9rem;
+            font-size: calc(var(--font-small) * 0.9);
+            line-height: 1.1;
         }
 
         .level {
             display: flex;
-            gap: 20px;
-            margin: 20px 0;
+            gap: var(--card-gap);
+            margin: calc(var(--card-gap) / 2) 0;
             flex-wrap: wrap;
             justify-content: center;
+            max-width: 100%;
         }
 
         .director-card {
@@ -224,29 +294,76 @@
 
         .connection-line {
             width: 2px;
-            height: 40px;
+            height: calc(var(--card-gap) * 0.8);
             background: rgba(255, 255, 255, 0.5);
             margin: 0 auto;
         }
 
-        .horizontal-line {
-            height: 2px;
-            background: rgba(255, 255, 255, 0.5);
-            margin: 20px 0;
+        .employee-count {
+            color: white;
+            font-size: var(--font-small);
+            margin-left: 20px;
+            opacity: 0.8;
+        }
+
+        /* Responsive adjustments for very large datasets */
+        .large-dataset {
+            --card-size: clamp(100px, 6vw, 140px);
+            --card-gap: clamp(8px, 1.5vw, 20px);
+            --dept-gap: clamp(30px, 4vw, 60px);
+        }
+
+        .huge-dataset {
+            --card-size: clamp(80px, 5vw, 120px);
+            --card-gap: clamp(5px, 1vw, 15px);
+            --dept-gap: clamp(20px, 3vw, 40px);
+        }
+
+        /* Compact mode for 200+ employees */
+        .compact-mode .employee-card {
+            min-height: calc(var(--card-size) * 1.1);
+            padding: clamp(8px, 1.5vw, 15px);
+        }
+
+        .compact-mode .employee-photo {
+            width: calc(var(--card-size) * 0.35);
+            height: calc(var(--card-size) * 0.35);
+            margin-bottom: 8px;
+        }
+
+        .compact-mode .employee-name {
+            font-size: calc(var(--font-small) * 0.9);
+        }
+
+        .compact-mode .employee-position {
+            font-size: calc(var(--font-small) * 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .departments-level {
+                flex-direction: column;
+                align-items: center;
+                gap: var(--level-gap);
+            }
+            
+            .department {
+                width: 100%;
+                max-width: 90vw;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>📊 Visual Org Chart Builder</h1>
-        <p>Drop your Excel file to generate an interactive organizational chart</p>
+        <p>Auto-scaling organizational chart for any screen size</p>
     </div>
 
     <div class="upload-section" id="uploadSection">
         <div class="upload-area" id="uploadArea">
             <div class="upload-text">
                 <strong>📁 Drag & Drop Excel File Here</strong><br>
-                or click to browse
+                Expected columns: Name, Position, Department, Photo
             </div>
             <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                 Choose File
@@ -256,11 +373,16 @@
     </div>
 
     <div class="controls" id="controls">
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="zoomOut">−</button>
+            <div class="zoom-level" id="zoomLevel">100%</div>
+            <button class="zoom-btn" id="zoomIn">+</button>
+        </div>
+        
         <button class="department-btn active" data-dept="all">All Departments</button>
-        <button class="department-btn" data-dept="Logistics">Logistics</button>
-        <button class="department-btn" data-dept="Packaging">Packaging</button>
-        <button class="department-btn" data-dept="Lab">Lab</button>
-        <button class="department-btn" data-dept="HR">HR</button>
+        <div id="departmentButtons"></div>
+        
+        <div class="employee-count" id="employeeCount"></div>
     </div>
 
     <div class="chart-container" id="chartContainer">
@@ -270,34 +392,8 @@
     <script>
         let employeeData = [];
         let currentFilter = 'all';
-
-        // Demo data that matches the expected Excel structure
-        const demoData = [
-            { Name: "Sarah Williams", Position: "Director", Department: "Management", Photo: "SW" },
-            { Name: "Mike Chen", Position: "Supervisor", Department: "Logistics", Photo: "MC" },
-            { Name: "Anna Rodriguez", Position: "Supervisor", Department: "Packaging", Photo: "AR" },
-            { Name: "David Kim", Position: "Supervisor", Department: "Lab", Photo: "DK" },
-            { Name: "Lisa Thompson", Position: "Supervisor", Department: "HR", Photo: "LT" },
-            { Name: "John Mitchell", Position: "Lead", Department: "Logistics", Photo: "JM" },
-            { Name: "Emma Davis", Position: "Lead", Department: "Logistics", Photo: "ED" },
-            { Name: "Carlos Lopez", Position: "Lead", Department: "Packaging", Photo: "CL" },
-            { Name: "Rachel Green", Position: "Lead", Department: "Packaging", Photo: "RG" },
-            { Name: "Alex Park", Position: "Lead", Department: "Lab", Photo: "AP" },
-            { Name: "Maria Garcia", Position: "Lead", Department: "Lab", Photo: "MG" },
-            { Name: "Tom Wilson", Position: "Lead", Department: "HR", Photo: "TW" },
-            { Name: "Jennifer Lee", Position: "Employee", Department: "Logistics", Photo: "JL" },
-            { Name: "Mark Johnson", Position: "Employee", Department: "Logistics", Photo: "MJ" },
-            { Name: "Sophie Brown", Position: "Employee", Department: "Logistics", Photo: "SB" },
-            { Name: "Ryan Taylor", Position: "Employee", Department: "Logistics", Photo: "RT" },
-            { Name: "Nicole White", Position: "Employee", Department: "Packaging", Photo: "NW" },
-            { Name: "Kevin Zhang", Position: "Employee", Department: "Packaging", Photo: "KZ" },
-            { Name: "Amanda Clark", Position: "Employee", Department: "Packaging", Photo: "AC" },
-            { Name: "James Miller", Position: "Employee", Department: "Lab", Photo: "JMr" },
-            { Name: "Laura Anderson", Position: "Employee", Department: "Lab", Photo: "LA" },
-            { Name: "Chris Martin", Position: "Employee", Department: "Lab", Photo: "CM" },
-            { Name: "Diana Ross", Position: "Employee", Department: "HR", Photo: "DR" },
-            { Name: "Peter Smith", Position: "Employee", Department: "HR", Photo: "PS" }
-        ];
+        let zoomFactor = 1;
+        let columnMapping = {};
 
         // File upload handling
         const uploadArea = document.getElementById('uploadArea');
@@ -329,6 +425,44 @@
             }
         }
 
+        function detectColumns(headers) {
+            const mapping = {};
+            const requiredFields = ['name', 'position', 'department', 'photo'];
+            
+            headers.forEach(header => {
+                const lowerHeader = header.toLowerCase().trim();
+                
+                // Name detection
+                if (['name', 'full name', 'employee name', 'fullname'].includes(lowerHeader)) {
+                    mapping.name = header;
+                }
+                // Position detection
+                else if (['position', 'title', 'job title', 'role', 'job role'].includes(lowerHeader)) {
+                    mapping.position = header;
+                }
+                // Department detection
+                else if (['department', 'dept', 'division', 'team', 'group'].includes(lowerHeader)) {
+                    mapping.department = header;
+                }
+                // Photo detection
+                else if (['photo', 'picture', 'image', 'avatar', 'initials'].includes(lowerHeader)) {
+                    mapping.photo = header;
+                }
+            });
+
+            // Fallback to exact matches if fuzzy matching didn't work
+            if (Object.keys(mapping).length < 3) {
+                headers.forEach(header => {
+                    if (header.toLowerCase().includes('name') && !mapping.name) mapping.name = header;
+                    if (header.toLowerCase().includes('position') && !mapping.position) mapping.position = header;
+                    if (header.toLowerCase().includes('department') && !mapping.department) mapping.department = header;
+                    if (header.toLowerCase().includes('photo') && !mapping.photo) mapping.photo = header;
+                });
+            }
+
+            return mapping;
+        }
+
         function processExcelFile(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -336,40 +470,109 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     
-                    employeeData = jsonData.map(row => ({
-                        Name: row.Name || row.name || '',
-                        Position: row.Position || row.position || '',
-                        Department: row.Department || row.department || '',
-                        Photo: row.Photo || row.photo || getInitials(row.Name || row.name || '')
-                    }));
+                    if (jsonData.length < 2) {
+                        throw new Error('Excel file must have at least a header row and one data row');
+                    }
+
+                    const headers = jsonData[0];
+                    columnMapping = detectColumns(headers);
+                    
+                    console.log('Detected columns:', columnMapping);
+                    
+                    if (!columnMapping.name || !columnMapping.position || !columnMapping.department) {
+                        throw new Error('Required columns not found. Please ensure your Excel has Name, Position, and Department columns.');
+                    }
+
+                    const dataRows = jsonData.slice(1);
+                    employeeData = dataRows.map(row => {
+                        const nameIndex = headers.indexOf(columnMapping.name);
+                        const positionIndex = headers.indexOf(columnMapping.position);
+                        const departmentIndex = headers.indexOf(columnMapping.department);
+                        const photoIndex = columnMapping.photo ? headers.indexOf(columnMapping.photo) : -1;
+                        
+                        const name = row[nameIndex] || '';
+                        return {
+                            Name: name,
+                            Position: row[positionIndex] || '',
+                            Department: row[departmentIndex] || '',
+                            Photo: photoIndex >= 0 ? (row[photoIndex] || getInitials(name)) : getInitials(name)
+                        };
+                    }).filter(emp => emp.Name.trim() !== '' && emp.Position.trim() !== '');
                     
                     if (employeeData.length === 0) {
-                        alert('No data found in Excel file. Loading demo data instead.');
-                        employeeData = demoData;
+                        throw new Error('No valid employee data found');
                     }
                     
+                    console.log(`Loaded ${employeeData.length} employees`);
                     showChart();
                 } catch (error) {
                     console.error('Error processing Excel file:', error);
-                    alert('Error reading Excel file. Loading demo data instead.');
-                    employeeData = demoData;
-                    showChart();
+                    alert(`Error reading Excel file: ${error.message}\n\nPlease ensure your Excel file has the following columns:\n- Name (or Full Name)\n- Position (or Title)\n- Department (or Dept)\n- Photo (optional)`);
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
         function getInitials(name) {
-            return name.split(' ').map(word => word[0]).join('').toUpperCase();
+            if (!name) return '?';
+            return name.split(' ')
+                .filter(word => word.length > 0)
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 3);
         }
 
         function showChart() {
             document.getElementById('uploadSection').style.display = 'none';
             document.getElementById('controls').style.display = 'flex';
             document.getElementById('chartContainer').style.display = 'block';
+            
+            generateDepartmentButtons();
+            applyDatasetSizeOptimizations();
             renderOrgChart();
+            updateEmployeeCount();
+        }
+
+        function generateDepartmentButtons() {
+            const departments = [...new Set(employeeData.map(emp => emp.Department))].filter(dept => dept);
+            const container = document.getElementById('departmentButtons');
+            container.innerHTML = '';
+            
+            departments.forEach(dept => {
+                const btn = document.createElement('button');
+                btn.className = 'department-btn';
+                btn.dataset.dept = dept;
+                btn.textContent = dept;
+                container.appendChild(btn);
+            });
+        }
+
+        function applyDatasetSizeOptimizations() {
+            const body = document.body;
+            const totalEmployees = employeeData.length;
+            
+            // Remove existing size classes
+            body.classList.remove('large-dataset', 'huge-dataset', 'compact-mode');
+            
+            if (totalEmployees > 150) {
+                body.classList.add('huge-dataset', 'compact-mode');
+            } else if (totalEmployees > 75) {
+                body.classList.add('large-dataset', 'compact-mode');
+            } else if (totalEmployees > 50) {
+                body.classList.add('large-dataset');
+            }
+        }
+
+        function updateEmployeeCount() {
+            const filteredData = currentFilter === 'all' 
+                ? employeeData 
+                : employeeData.filter(emp => emp.Department === currentFilter || emp.Position.toLowerCase().includes('director'));
+            
+            document.getElementById('employeeCount').textContent = 
+                `${filteredData.length} employees ${currentFilter !== 'all' ? `(${currentFilter})` : '(total)'}`;
         }
 
         function renderOrgChart() {
@@ -378,38 +581,52 @@
 
             const filteredData = currentFilter === 'all' 
                 ? employeeData 
-                : employeeData.filter(emp => emp.Department === currentFilter || emp.Position === 'Director');
+                : employeeData.filter(emp => emp.Department === currentFilter || emp.Position.toLowerCase().includes('director'));
 
             // Group employees by position and department
-            const director = filteredData.find(emp => emp.Position === 'Director');
-            const supervisors = filteredData.filter(emp => emp.Position === 'Supervisor');
-            const leads = filteredData.filter(emp => emp.Position === 'Lead');
-            const employees = filteredData.filter(emp => emp.Position === 'Employee');
+            const directors = filteredData.filter(emp => emp.Position.toLowerCase().includes('director'));
+            const supervisors = filteredData.filter(emp => emp.Position.toLowerCase().includes('supervisor'));
+            const leads = filteredData.filter(emp => emp.Position.toLowerCase().includes('lead'));
+            const employees = filteredData.filter(emp => 
+                !emp.Position.toLowerCase().includes('director') && 
+                !emp.Position.toLowerCase().includes('supervisor') && 
+                !emp.Position.toLowerCase().includes('lead')
+            );
 
-            // Render Director (only if showing all departments)
-            if (currentFilter === 'all' && director) {
+            // Render Directors (only if showing all departments)
+            if (currentFilter === 'all' && directors.length > 0) {
                 const directorLevel = document.createElement('div');
                 directorLevel.className = 'director-level';
-                directorLevel.appendChild(createEmployeeCard(director, 'director-card'));
+                
+                const directorContainer = document.createElement('div');
+                directorContainer.className = 'level';
+                directors.forEach(director => {
+                    directorContainer.appendChild(createEmployeeCard(director, 'director-card'));
+                });
+                
+                directorLevel.appendChild(directorContainer);
                 orgChart.appendChild(directorLevel);
 
-                if (supervisors.length > 0) {
+                if (supervisors.length > 0 || leads.length > 0 || employees.length > 0) {
                     orgChart.appendChild(createConnectionLine());
                 }
             }
 
             // Render Departments
-            if (supervisors.length > 0) {
+            if (supervisors.length > 0 || leads.length > 0 || employees.length > 0) {
                 const departmentsLevel = document.createElement('div');
                 departmentsLevel.className = 'departments-level';
 
                 const departments = currentFilter === 'all' 
-                    ? ['Logistics', 'Packaging', 'Lab', 'HR']
+                    ? [...new Set(employeeData.map(emp => emp.Department))].filter(dept => dept)
                     : [currentFilter];
 
                 departments.forEach(deptName => {
-                    const deptSupervisor = supervisors.find(s => s.Department === deptName);
-                    if (!deptSupervisor) return;
+                    const deptSupervisors = supervisors.filter(s => s.Department === deptName);
+                    const deptLeads = leads.filter(l => l.Department === deptName);
+                    const deptEmployees = employees.filter(e => e.Department === deptName);
+                    
+                    if (deptSupervisors.length === 0 && deptLeads.length === 0 && deptEmployees.length === 0) return;
 
                     const department = document.createElement('div');
                     department.className = 'department';
@@ -421,14 +638,21 @@
                         department.appendChild(deptTitle);
                     }
 
-                    // Supervisor
-                    department.appendChild(createEmployeeCard(deptSupervisor, 'supervisor-card'));
-                    
-                    const deptLeads = leads.filter(l => l.Department === deptName);
-                    const deptEmployees = employees.filter(e => e.Department === deptName);
+                    // Supervisors
+                    if (deptSupervisors.length > 0) {
+                        const supervisorLevel = document.createElement('div');
+                        supervisorLevel.className = 'level';
+                        deptSupervisors.forEach(supervisor => {
+                            supervisorLevel.appendChild(createEmployeeCard(supervisor, 'supervisor-card'));
+                        });
+                        department.appendChild(supervisorLevel);
+                    }
 
+                    // Leads
                     if (deptLeads.length > 0) {
-                        department.appendChild(createConnectionLine());
+                        if (deptSupervisors.length > 0) {
+                            department.appendChild(createConnectionLine());
+                        }
                         
                         const leadsLevel = document.createElement('div');
                         leadsLevel.className = 'level';
@@ -438,8 +662,11 @@
                         department.appendChild(leadsLevel);
                     }
 
+                    // Employees
                     if (deptEmployees.length > 0) {
-                        department.appendChild(createConnectionLine());
+                        if (deptSupervisors.length > 0 || deptLeads.length > 0) {
+                            department.appendChild(createConnectionLine());
+                        }
                         
                         const employeesLevel = document.createElement('div');
                         employeesLevel.className = 'level';
@@ -454,6 +681,8 @@
 
                 orgChart.appendChild(departmentsLevel);
             }
+
+            updateEmployeeCount();
         }
 
         function createEmployeeCard(employee, additionalClass) {
@@ -485,6 +714,22 @@
             return line;
         }
 
+        // Zoom controls
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            zoomFactor = Math.min(zoomFactor + 0.1, 2);
+            updateZoom();
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            zoomFactor = Math.max(zoomFactor - 0.1, 0.3);
+            updateZoom();
+        });
+
+        function updateZoom() {
+            document.documentElement.style.setProperty('--zoom-factor', zoomFactor);
+            document.getElementById('zoomLevel').textContent = `${Math.round(zoomFactor * 100)}%`;
+        }
+
         // Department filter handling
         document.getElementById('controls').addEventListener('click', (e) => {
             if (e.target.classList.contains('department-btn')) {
@@ -495,10 +740,42 @@
             }
         });
 
-        // Load demo data on page load for demonstration
-        document.addEventListener('DOMContentLoaded', () => {
-            // Uncomment the line below to auto-load demo data
-            // employeeData = demoData; showChart();
+        // Auto-fit functionality
+        function autoFit() {
+            const container = document.getElementById('chartContainer');
+            const chart = document.getElementById('orgChart');
+            
+            if (!chart.firstChild) return;
+            
+            const containerRect = container.getBoundingClientRect();
+            const chartRect = chart.getBoundingClientRect();
+            
+            const scaleX = (containerRect.width * 0.95) / chartRect.width;
+            const scaleY = (containerRect.height * 0.95) / chartRect.height;
+            
+            zoomFactor = Math.min(scaleX, scaleY, 1);
+            updateZoom();
+        }
+
+        // Auto-fit on window resize
+        window.addEventListener('resize', () => {
+            setTimeout(autoFit, 100);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '=') {
+                    e.preventDefault();
+                    document.getElementById('zoomIn').click();
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    document.getElementById('zoomOut').click();
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    autoFit();
+                }
+            }
         });
     </script>
 </body>
