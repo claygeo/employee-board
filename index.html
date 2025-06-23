@@ -359,7 +359,7 @@
     <div class="screen-info" id="screenInfo"></div>
     
     <div class="tv-controls">
-        📺 Dynamic Org Chart: Color-coded Supervisors | Click Department → View Employees | ESC=Back | 1-7=Quick Access
+        📺 Dynamic Org Chart: Clean Supervisor Lines + Color Badges | Click Department → View Employees | ESC=Back | 1-7=Quick Access
     </div>
     
     <div class="tv-feedback" id="tvFeedback"></div>
@@ -710,10 +710,10 @@
             card.style.width = dimensions.width + "px";
             card.style.height = dimensions.height + "px";
             
-            // Dynamic sizing optimized for name display
-            const photoSize = Math.min(dimensions.width * 0.28, dimensions.height * 0.28); // Smaller photo for more text space
-            const nameSize = Math.max(11, Math.min(18, dimensions.width / 9)); // Generous name sizing
-            const positionSize = Math.max(9, Math.min(14, dimensions.width / 15));
+            // Dynamic sizing optimized for readability - names same size as positions
+            const photoSize = Math.min(dimensions.width * 0.28, dimensions.height * 0.28);
+            const nameSize = Math.max(9, Math.min(14, dimensions.width / 15)); // Same sizing as positions
+            const positionSize = Math.max(9, Math.min(14, dimensions.width / 15)); // Same size for consistency
             const deptSize = Math.max(8, Math.min(11, dimensions.width / 18));
             
             // Calculate layout spacing
@@ -776,13 +776,25 @@
             const chartContainer = document.getElementById("orgChart");
             if (!chartContainer) return;
             
-            // Only hierarchy connection lines (Plant Manager → Directors → Supervisors)
+            // Hierarchy connection lines (Plant Manager → Directors → Supervisors)
             employees.forEach(emp => {
                 if (emp.parentId && (emp.position === "Director" || emp.position === "Supervisor")) {
                     const parent = employees.find(e => e.id === emp.parentId);
                     if (parent) {
                         const line = createConnectionLine(parent, emp, cardDimensions);
                         chartContainer.appendChild(line);
+                    }
+                }
+            });
+            
+            // Clean supervisor-to-department lines
+            const supervisors = employees.filter(emp => emp.position === "Supervisor");
+            supervisors.forEach(supervisor => {
+                if (window.departmentSummaries) {
+                    const deptCard = window.departmentSummaries.find(dept => dept.name === supervisor.department);
+                    if (deptCard) {
+                        const lines = createCleanSupervisorToDeptLines(supervisor, deptCard, cardDimensions);
+                        lines.forEach(line => chartContainer.appendChild(line));
                     }
                 }
             });
@@ -821,6 +833,55 @@
             }
             
             return line;
+        }
+        
+        function createCleanSupervisorToDeptLines(supervisor, deptCard, cardDimensions) {
+            const lines = [];
+            const supervisorDimensions = cardDimensions["Supervisor"];
+            
+            const supervisorX = supervisor.x_pos + supervisorDimensions.width / 2;
+            const supervisorY = supervisor.y_pos + supervisorDimensions.height;
+            const deptX = deptCard.x_pos + deptCard.width / 2;
+            const deptY = deptCard.y_pos;
+            
+            const lineWidth = Math.max(2, Math.min(3, Math.round(screenWidth / 500)));
+            
+            // Create clean L-shaped connection: vertical drop + horizontal line + vertical connect
+            const midY = supervisorY + (deptY - supervisorY) * 0.7; // 70% down
+            
+            // Vertical line from supervisor
+            const verticalLine1 = document.createElement("div");
+            verticalLine1.className = "connection-line";
+            verticalLine1.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`; // Using dept color with transparency
+            verticalLine1.style.left = (supervisorX - lineWidth/2) + "px";
+            verticalLine1.style.top = supervisorY + "px";
+            verticalLine1.style.width = lineWidth + "px";
+            verticalLine1.style.height = (midY - supervisorY) + "px";
+            lines.push(verticalLine1);
+            
+            // Horizontal line
+            const horizontalLine = document.createElement("div");
+            horizontalLine.className = "connection-line";
+            horizontalLine.style.background = `linear-gradient(90deg, ${supervisor.dept_color}80, ${supervisor.dept_color}80)`;
+            const horizontalStart = Math.min(supervisorX, deptX);
+            const horizontalEnd = Math.max(supervisorX, deptX);
+            horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
+            horizontalLine.style.top = (midY - lineWidth/2) + "px";
+            horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
+            horizontalLine.style.height = lineWidth + "px";
+            lines.push(horizontalLine);
+            
+            // Vertical line to department
+            const verticalLine2 = document.createElement("div");
+            verticalLine2.className = "connection-line";
+            verticalLine2.style.background = `linear-gradient(180deg, ${supervisor.dept_color}80, ${supervisor.dept_color}CC)`;
+            verticalLine2.style.left = (deptX - lineWidth/2) + "px";
+            verticalLine2.style.top = midY + "px";
+            verticalLine2.style.width = lineWidth + "px";
+            verticalLine2.style.height = (deptY - midY) + "px";
+            lines.push(verticalLine2);
+            
+            return lines;
         }
         
         function initHierarchyView() {
@@ -1011,7 +1072,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             initHierarchyView();
             setTimeout(() => {
-                showFeedback("🎯 Complete Dynamic Chart Ready! Supervisors color-coded to departments | Press 1-7 for quick access");
+                showFeedback("🎯 Complete Dynamic Chart Ready! Clean supervisor-to-department lines | Press 1-7 for quick access");
             }, 500);
         });
     </script>
