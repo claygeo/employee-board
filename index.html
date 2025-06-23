@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimized Processing Plant Organizational Chart</title>
+    <title>Processing Plant Organizational Chart - Corrected</title>
     <style>
         * {
             margin: 0;
@@ -235,12 +235,12 @@
             flex-shrink: 0;
         }
         
-        /* IMPROVED: Universal text styling for better name visibility */
+        /* Enhanced text styling for better name visibility and wrapping */
         .card-name {
             font-weight: bold;
             text-align: center;
             color: #2c3e50;
-            line-height: 1.15;
+            line-height: 1.1;
             text-shadow: 0 1px 2px rgba(255,255,255,0.8);
             word-wrap: break-word;
             word-break: break-word;
@@ -249,9 +249,10 @@
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
-            font-size: 11px !important;
-            min-height: 30px;
+            font-size: 10px !important;
+            min-height: 24px;
             max-width: 100%;
+            white-space: normal;
         }
         
         .card-position {
@@ -259,7 +260,7 @@
             color: #7f8c8d;
             font-weight: 600;
             word-wrap: break-word;
-            font-size: 10px !important;
+            font-size: 9px !important;
             line-height: 1.1;
         }
         
@@ -270,7 +271,7 @@
             border-radius: 3px;
             font-weight: 500;
             padding: 1px 3px;
-            font-size: 9px !important;
+            font-size: 8px !important;
             line-height: 1.1;
         }
         
@@ -283,7 +284,7 @@
             margin: 2px 0;
             color: white;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            font-size: 9px !important;
+            font-size: 8px !important;
             line-height: 1.1;
         }
         
@@ -291,7 +292,7 @@
             text-align: center;
             color: #95a5a6;
             text-transform: uppercase;
-            font-size: 9px !important;
+            font-size: 8px !important;
             line-height: 1.1;
         }
         
@@ -379,11 +380,11 @@
     </div>
     
     <div class="tv-controls">
-        📺 Optimized Layout: Clear Director → Supervisor → Department Lines | Click Department → View Employees | ESC=Back | 1-7=Quick Access
+        📺 Corrected Hierarchy: Directors Connected to All Their Supervisors | Clear Chain of Command | ESC=Back | 1-7=Quick Access
     </div>
     
     <script>
-        // Employee data - Complete organizational structure
+        // CORRECTED Employee data - Complete organizational structure
         const employees = [
             // Plant Manager
             { "id": 1, "name": "Dora Garza", "position": "Plant Manager", "department": "Management", "parentId": null, "shift": "", "dept_color": "#95a5a6" },
@@ -391,30 +392,34 @@
             // Directors
             { "id": 2, "name": "Luis Hernandez", "position": "Director", "department": "Kitchen", "parentId": 1, "shift": "", "dept_color": "#f39c12" },
             { "id": 3, "name": "Lester Igarza", "position": "Director", "department": "Production", "parentId": 1, "shift": "", "dept_color": "#e74c3c" },
-            { "id": 4, "name": "Sunita Jainanan", "position": "Director", "department": "Processing Lab", "parentId": 1, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 5, "name": "Carlos Archaga", "position": "Director", "department": "Processing Lab", "parentId": 1, "shift": "Shift 2", "dept_color": "#3498db" },
+            { "id": 4, "name": "Sunita Jainanan", "position": "Director", "department": "Processing Lab", "parentId": 1, "shift": "", "dept_color": "#3498db" },
             { "id": 6, "name": "Michael Amaya", "position": "Director", "department": "Warehouse", "parentId": 1, "shift": "", "dept_color": "#2ecc71" },
             { "id": 7, "name": "Mariela De La Rosa", "position": "Director", "department": "Quality", "parentId": 1, "shift": "", "dept_color": "#9b59b6" },
             { "id": 8, "name": "Abel Ortega", "position": "Director", "department": "Maintenance", "parentId": 1, "shift": "", "dept_color": "#34495e" },
+            
+            // Supervisors
             { "id": 10, "name": "Natalie Zeledon", "position": "Supervisor", "department": "Analytical Lab", "parentId": 1, "shift": "", "dept_color": "#1abc9c" },
             
-            // Kitchen Supervisors
+            // Kitchen Supervisors (both under Luis)
             { "id": 11, "name": "Idalmis Medina Rodriguez", "position": "Supervisor", "department": "Kitchen", "parentId": 2, "shift": "1st Shift", "dept_color": "#f39c12" },
             { "id": 12, "name": "Nathan Vargas", "position": "Supervisor", "department": "Kitchen", "parentId": 2, "shift": "2nd Shift", "dept_color": "#f39c12" },
             
-            // Production Supervisors
+            // Production Supervisors (all three under Lester)
             { "id": 13, "name": "Jubilee Rodriguez", "position": "Supervisor", "department": "Production", "parentId": 3, "shift": "1st Shift", "dept_color": "#e74c3c" },
             { "id": 14, "name": "Maria Mendez", "position": "Supervisor", "department": "Production", "parentId": 3, "shift": "1st Shift", "dept_color": "#e74c3c" },
             { "id": 15, "name": "Samantha Perez-Morell", "position": "Supervisor", "department": "Production", "parentId": 3, "shift": "2nd Shift", "dept_color": "#e74c3c" },
             
-            // Warehouse Supervisors
+            // CORRECTED: Processing Lab Supervisor (Carlos now under Sunita)
+            { "id": 5, "name": "Carlos Archaga", "position": "Supervisor", "department": "Processing Lab", "parentId": 4, "shift": "", "dept_color": "#3498db" },
+            
+            // Warehouse Supervisors (both under Michael)
             { "id": 16, "name": "Susana Ceballos", "position": "Supervisor", "department": "Warehouse", "parentId": 6, "shift": "", "dept_color": "#2ecc71" },
             { "id": 17, "name": "Norma Rodriguez", "position": "Supervisor", "department": "Warehouse", "parentId": 6, "shift": "", "dept_color": "#2ecc71" },
             
             // Quality Supervisor
             { "id": 18, "name": "Gabriela Urbina", "position": "Supervisor", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6" },
             
-            // FIXED: Dan Peluso is now a Maintenance Supervisor under Abel Ortega
+            // Maintenance Supervisor
             { "id": 9, "name": "Dan Peluso", "position": "Supervisor", "department": "Maintenance", "parentId": 8, "shift": "", "dept_color": "#34495e" },
             
             // Kitchen Employees - 1st Shift
@@ -523,17 +528,17 @@
             { "id": 115, "name": "Leticia Sandoval", "position": "Employee", "department": "Production", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
             { "id": 116, "name": "Omar Figueroa", "position": "Employee", "department": "Production", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
             
-            // Processing Lab Employees
-            { "id": 117, "name": "Michael Slager", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 118, "name": "Carolina Ceballos", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 119, "name": "Luis Acevedo", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 120, "name": "Maria Paz", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db" },
+            // CORRECTED: Processing Lab Employees (all under Carlos)
+            { "id": 117, "name": "Michael Slager", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db" },
+            { "id": 118, "name": "Carolina Ceballos", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db" },
+            { "id": 119, "name": "Luis Acevedo", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db" },
+            { "id": 120, "name": "Maria Paz", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db" },
             { "id": 121, "name": "Joshua Lastres", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
             { "id": 122, "name": "Armando Hernandez", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
             { "id": 123, "name": "Melissa Loyola", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
-            { "id": 124, "name": "Randy Castellano", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
-            { "id": 125, "name": "Karla De La Cruz", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
-            { "id": 126, "name": "Diego", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
+            { "id": 124, "name": "Randy Castellano", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db" },
+            { "id": 125, "name": "Karla De La Cruz", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db" },
+            { "id": 126, "name": "Diego", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db" },
             
             // Warehouse Employees
             { "id": 127, "name": "Reginald Knight", "position": "Employee", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71" },
@@ -553,7 +558,7 @@
             { "id": 137, "name": "Jose Acosta", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
             { "id": 138, "name": "Yusdriviel Rodriguez", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
             
-            // Analytical Lab Employee
+            // CORRECTED: Analytical Lab Employee (under Natalie)
             { "id": 139, "name": "Miguel Colina", "position": "Employee", "department": "Analytical Lab", "parentId": 10, "shift": "", "dept_color": "#1abc9c" }
         ];
         
@@ -563,6 +568,36 @@
         let currentDepartment = null;
         
         const departmentNames = ["Production", "Kitchen", "Processing Lab", "Warehouse", "Quality", "Maintenance", "Analytical Lab"];
+        
+        // Enhanced name wrapping function
+        function wrapLongName(name) {
+            // Split by spaces and analyze the structure
+            const parts = name.split(' ');
+            
+            // If name has more than 2 parts and total length > 18, wrap strategically
+            if (parts.length >= 3 && name.length > 18) {
+                // For names with format: First Middle Last or First Last1 Last2
+                if (parts.length === 3) {
+                    // If middle or last names are long, break after first name
+                    if (parts[1].length > 8 || parts[2].length > 8) {
+                        return parts[0] + '<br>' + parts.slice(1).join(' ');
+                    }
+                    // Otherwise, break between first+middle and last
+                    return parts.slice(0, 2).join(' ') + '<br>' + parts[2];
+                }
+                // For names with 4+ parts, break in middle
+                const midPoint = Math.ceil(parts.length / 2);
+                return parts.slice(0, midPoint).join(' ') + '<br>' + parts.slice(midPoint).join(' ');
+            }
+            
+            // For 2-part names that are very long
+            if (parts.length === 2 && name.length > 20) {
+                return parts[0] + '<br>' + parts[1];
+            }
+            
+            // Return original name if no wrapping needed
+            return name;
+        }
         
         function calculateScreenDimensions() {
             const container = document.querySelector(".chart-container");
@@ -575,62 +610,64 @@
         function calculateOptimalSizing() {
             calculateScreenDimensions();
             
-            const padding = 20;
+            const padding = 15; // Reduced padding
             const availableWidth = screenWidth - (padding * 2);
             const availableHeight = screenHeight - (padding * 2);
             
             // Count elements that need to fit horizontally
             const directors = employees.filter(emp => emp.position === "Director");
+            const supervisors = employees.filter(emp => emp.position === "Supervisor");
             const departmentCount = departmentNames.length;
             
-            // Calculate optimal widths for each row
+            // Calculate optimal widths considering all elements that need horizontal space
             const directorRowWidth = availableWidth / directors.length;
+            const supervisorRowWidth = availableWidth / Math.max(supervisors.length, 8); // Minimum 8 slots
             const departmentRowWidth = availableWidth / departmentCount;
             
-            // Find the constraining width
-            const constrainingWidth = Math.min(directorRowWidth, departmentRowWidth) * 0.85;
+            // Find the most constraining width and make cards smaller
+            const constrainingWidth = Math.min(directorRowWidth, supervisorRowWidth, departmentRowWidth) * 0.75; // Reduced from 0.85
             
-            // Calculate heights based on vertical space
-            const availableVerticalSpace = availableHeight * 0.85;
-            const plantManagerHeight = availableVerticalSpace * 0.20;
-            const directorHeight = availableVerticalSpace * 0.22;
-            const supervisorHeight = availableVerticalSpace * 0.18;
-            const departmentHeight = availableVerticalSpace * 0.15;
+            // Calculate heights with tighter spacing
+            const availableVerticalSpace = availableHeight * 0.9;
+            const plantManagerHeight = availableVerticalSpace * 0.18; // Reduced
+            const directorHeight = availableVerticalSpace * 0.20; // Reduced
+            const supervisorHeight = availableVerticalSpace * 0.16; // Reduced
+            const departmentHeight = availableVerticalSpace * 0.14; // Reduced
             
-            // IMPROVED: Slightly larger card dimensions for better font accommodation
+            // Smaller card dimensions to fit more content
             const cardDimensions = {
                 "Plant Manager": {
-                    width: Math.min(constrainingWidth * 1.4, 340),
-                    height: Math.min(plantManagerHeight, 240)
+                    width: Math.min(constrainingWidth * 1.2, 280), // Reduced from 340
+                    height: Math.min(plantManagerHeight, 180) // Reduced from 240
                 },
                 "Director": {
-                    width: Math.min(constrainingWidth, 260),
-                    height: Math.min(directorHeight, 200)
+                    width: Math.min(constrainingWidth, 200), // Reduced from 260
+                    height: Math.min(directorHeight, 160) // Reduced from 200
                 },
                 "Supervisor": {
-                    width: Math.min(constrainingWidth * 0.8, 220),
-                    height: Math.min(supervisorHeight, 160)
+                    width: Math.min(constrainingWidth * 0.85, 170), // Reduced from 220
+                    height: Math.min(supervisorHeight, 130) // Reduced from 160
                 },
                 "Department": {
-                    width: Math.min(constrainingWidth, 240),
-                    height: Math.min(departmentHeight, 130)
+                    width: Math.min(constrainingWidth, 180), // Reduced from 240
+                    height: Math.min(departmentHeight, 110) // Reduced from 130
                 }
             };
             
-            // IMPROVED: Increased minimum sizes for better text readability
+            // Set absolute minimum sizes (smaller than before)
             Object.keys(cardDimensions).forEach(key => {
                 if (key === "Director") {
-                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 180);
-                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 130);
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 150); // Reduced from 180
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 110); // Reduced from 130
                 } else if (key === "Plant Manager") {
-                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 160);
-                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 120);
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 140); // Reduced from 160
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 100); // Reduced from 120
                 } else if (key === "Supervisor") {
-                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 140);
-                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 100);
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 120); // Reduced from 140
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 85); // Reduced from 100
                 } else {
-                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 140);
-                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 100);
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 120); // Reduced from 140
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 85); // Reduced from 100
                 }
             });
             
@@ -638,7 +675,7 @@
         }
         
         function calculateHierarchyLayout() {
-            const padding = 20;
+            const padding = 15; // Reduced padding
             const cardDimensions = calculateOptimalSizing();
             
             // Position Plant Manager
@@ -648,39 +685,70 @@
                 dora.y_pos = padding;
             }
             
-            // Position Directors
+            // Position Directors with tighter spacing
             const directors = employees.filter(emp => emp.position === "Director");
-            const directorY = padding + cardDimensions["Plant Manager"].height + 30;
-            const directorSpacing = Math.max(15, (screenWidth - padding * 2 - directors.length * cardDimensions.Director.width) / (directors.length + 1));
+            const directorY = padding + cardDimensions["Plant Manager"].height + 20; // Reduced gap
+            const directorSpacing = Math.max(8, (screenWidth - padding * 2 - directors.length * cardDimensions.Director.width) / (directors.length + 1));
             
             directors.forEach((director, index) => {
                 director.x_pos = padding + directorSpacing + index * (cardDimensions.Director.width + directorSpacing);
                 director.y_pos = directorY;
             });
             
-            // Position Supervisors
+            // Position Supervisors with overlapping allowed for better fit
             const supervisors = employees.filter(emp => emp.position === "Supervisor");
-            const supervisorY = directorY + cardDimensions.Director.height + 25;
+            const supervisorY = directorY + cardDimensions.Director.height + 18; // Reduced gap
             
+            // Group supervisors by parent to position them under their directors
+            const supervisorGroups = {};
             supervisors.forEach(supervisor => {
-                const parentDirector = employees.find(emp => emp.id === supervisor.parentId);
+                const parentId = supervisor.parentId;
+                if (!supervisorGroups[parentId]) {
+                    supervisorGroups[parentId] = [];
+                }
+                supervisorGroups[parentId].push(supervisor);
+            });
+            
+            // Position each group of supervisors
+            Object.keys(supervisorGroups).forEach(parentId => {
+                const groupSupervisors = supervisorGroups[parentId];
+                const parentDirector = employees.find(emp => emp.id === parseInt(parentId));
+                
                 if (parentDirector) {
-                    const siblingsSupervisors = supervisors.filter(s => s.parentId === supervisor.parentId);
-                    const siblingIndex = siblingsSupervisors.indexOf(supervisor);
-                    const totalSiblings = siblingsSupervisors.length;
+                    const totalSupervisors = groupSupervisors.length;
+                    const minSpacing = 5; // Minimum spacing between supervisor cards
+                    const maxWidth = cardDimensions.Director.width + 60; // Allow some overflow from director card
                     
-                    if (totalSiblings === 1) {
-                        supervisor.x_pos = parentDirector.x_pos + (cardDimensions.Director.width - cardDimensions.Supervisor.width) / 2;
+                    if (totalSupervisors === 1) {
+                        // Center single supervisor under director
+                        groupSupervisors[0].x_pos = parentDirector.x_pos + (cardDimensions.Director.width - cardDimensions.Supervisor.width) / 2;
+                        groupSupervisors[0].y_pos = supervisorY;
                     } else {
-                        const spacing = Math.max(5, (cardDimensions.Director.width - totalSiblings * cardDimensions.Supervisor.width) / (totalSiblings + 1));
-                        supervisor.x_pos = parentDirector.x_pos + spacing + siblingIndex * (cardDimensions.Supervisor.width + spacing);
+                        // Distribute multiple supervisors, allowing for tighter packing
+                        const totalWidthNeeded = totalSupervisors * cardDimensions.Supervisor.width + (totalSupervisors - 1) * minSpacing;
+                        
+                        let startX;
+                        if (totalWidthNeeded <= maxWidth) {
+                            // Center the group under the director
+                            startX = parentDirector.x_pos + (cardDimensions.Director.width - totalWidthNeeded) / 2;
+                        } else {
+                            // Start from left edge of director if needed
+                            startX = parentDirector.x_pos - (totalWidthNeeded - maxWidth) / 2;
+                        }
+                        
+                        groupSupervisors.forEach((supervisor, index) => {
+                            supervisor.x_pos = startX + index * (cardDimensions.Supervisor.width + minSpacing);
+                            supervisor.y_pos = supervisorY;
+                            
+                            // Ensure supervisor doesn't go off screen
+                            supervisor.x_pos = Math.max(padding, Math.min(supervisor.x_pos, screenWidth - padding - cardDimensions.Supervisor.width));
+                        });
                     }
-                    supervisor.y_pos = supervisorY;
                 }
             });
             
-            // OPTIMIZED: Position department cards directly under their supervisors
-            const deptY = supervisorY + cardDimensions.Supervisor.height + 30;
+            // Position department cards with tighter spacing
+            const deptY = supervisorY + cardDimensions.Supervisor.height + 20; // Reduced gap
             
             window.departmentSummaries = [];
             
@@ -695,7 +763,7 @@
                     const deptSummary = {
                         name: deptName,
                         employee_count: deptEmployees.length,
-                        x_pos: avgSupervisorX - cardDimensions.Department.width / 2, // Center under supervisors
+                        x_pos: avgSupervisorX - cardDimensions.Department.width / 2,
                         y_pos: deptY,
                         width: cardDimensions.Department.width,
                         height: cardDimensions.Department.height,
@@ -732,23 +800,24 @@
             card.style.width = dimensions.width + "px";
             card.style.height = dimensions.height + "px";
             
-            // IMPROVED: Fixed font sizing with universal approach
-            const photoSize = Math.min(dimensions.width * 0.25, dimensions.height * 0.25);
+            // Improved sizing with name wrapping
+            const photoSize = Math.min(dimensions.width * 0.25, dimensions.height * 0.25, 60);
             const isCompact = dimensions.height < 100;
-            const photoMargin = isCompact ? 2 : 4;
+            const photoMargin = isCompact ? 2 : 3;
             const textMargin = isCompact ? 1 : 2;
             
             const shiftHtml = employee.shift ? `<div class="card-shift" style="margin: ${textMargin}px 0;">${employee.shift}</div>` : "";
             
-            // FIXED: Supervisors only show the colored badge, no position text
+            // Wrap long names for better fit
+            const wrappedName = wrapLongName(employee.name);
+            
+            // Supervisors only show the colored badge, no position text
             let positionHtml = "";
             let deptIndicatorHtml = "";
             
             if (employee.position === "Supervisor") {
-                // Only show the colored supervisor badge
                 deptIndicatorHtml = `<div class="supervisor-dept-indicator" style="background-color: ${employee.dept_color}; margin: ${textMargin}px 0;">SUPERVISOR</div>`;
             } else {
-                // Show position text for non-supervisors
                 positionHtml = `<div class="card-position" style="margin: ${textMargin}px 0;">${employee.position}</div>`;
                 deptIndicatorHtml = `<div class="dept-indicator" style="margin: ${textMargin}px 0;">${employee.department}</div>`;
             }
@@ -758,7 +827,7 @@
                      src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='4' ry='4'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.12}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.78}' rx='${photoSize*0.18}' ry='${photoSize*0.12}' fill='%23bdc3c7'/></svg>" 
                      alt="${employee.name}"
                      style="width: ${photoSize}px; height: ${photoSize}px; margin: ${photoMargin}px 0;">
-                <div class="card-name" style="margin: ${textMargin}px 2px;">${employee.name}</div>
+                <div class="card-name" style="margin: ${textMargin}px 2px;">${wrappedName}</div>
                 ${positionHtml}
                 ${deptIndicatorHtml}
                 ${shiftHtml}
@@ -778,11 +847,11 @@
             card.style.height = dimensions.height + "px";
             
             // Dynamic text sizing
-            const titleSize = Math.max(11, Math.min(16, dimensions.width / 12));
-            const countSize = Math.max(10, Math.min(14, dimensions.width / 14));
+            const titleSize = Math.max(10, Math.min(14, dimensions.width / 14)); // Reduced
+            const countSize = Math.max(9, Math.min(12, dimensions.width / 16)); // Reduced
             
             const isCompact = dimensions.height < 90;
-            const titleMargin = isCompact ? 2 : 4;
+            const titleMargin = isCompact ? 2 : 3;
             
             card.innerHTML = `
                 <div class="dept-title" style="font-size: ${titleSize}px; margin-bottom: ${titleMargin}px;">${deptData.name}</div>
@@ -798,7 +867,7 @@
             const chartContainer = document.getElementById("orgChart");
             if (!chartContainer) return;
             
-            // IMPROVED: Clear hierarchy connection lines (Plant Manager → Directors → Supervisors)
+            // CORRECTED: Clear hierarchy connection lines (Plant Manager → Directors → Supervisors)
             employees.forEach(emp => {
                 if (emp.parentId && (emp.position === "Director" || emp.position === "Supervisor")) {
                     const parent = employees.find(e => e.id === emp.parentId);
@@ -875,7 +944,7 @@
             
             const lineWidth = Math.max(2, Math.min(3, Math.round(screenWidth / 500)));
             
-            // OPTIMIZED: Check if they're well-aligned vertically (within 40px)
+            // Check if they're well-aligned vertically (within 40px)
             if (Math.abs(supervisorX - deptX) <= 40) {
                 // Simple vertical line - they're optimally aligned
                 const verticalLine = document.createElement("div");
@@ -1016,12 +1085,15 @@
                 
                 const shiftHtml = employee.shift ? `<div class="drill-card-shift" style="margin: ${margin}px 0;">${employee.shift}</div>` : "";
                 
+                // Apply name wrapping to drill-down cards too
+                const wrappedName = wrapLongName(employee.name);
+                
                 card.innerHTML = `
                     <img class="card-photo" 
                          src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='3' ry='3'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.11}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.75}' rx='${photoSize*0.16}' ry='${photoSize*0.10}' fill='%23bdc3c7'/></svg>" 
                          alt="${employee.name}"
                          style="width: ${photoSize}px; height: ${photoSize}px; margin: ${margin}px 0;">
-                    <div class="drill-card-name" style="margin: ${margin}px 2px;">${employee.name}</div>
+                    <div class="drill-card-name" style="margin: ${margin}px 2px;">${wrappedName}</div>
                     <div class="drill-card-position" style="margin: ${margin}px 0;">${employee.position}</div>
                     ${shiftHtml}
                 `;
@@ -1030,7 +1102,7 @@
             });
         }
         
-        // FIXED: Proper back button functionality
+        // Proper back button functionality
         function closeDrillDown() {
             const hierarchyView = document.getElementById("hierarchyView");
             const drillDownView = document.getElementById("drillDownView");
@@ -1072,7 +1144,7 @@
             }, 200);
         });
         
-        // FIXED: Initialize with proper back button event listener
+        // Initialize with proper back button event listener
         document.addEventListener("DOMContentLoaded", function() {
             // Set up back button event listener
             const backButton = document.getElementById("backButton");
