@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Processing Plant Organizational Chart</title>
+    <title>Optimized Processing Plant Organizational Chart</title>
     <style>
         * {
             margin: 0;
@@ -359,7 +359,7 @@
     <div class="screen-info" id="screenInfo"></div>
     
     <div class="tv-controls">
-        📺 Dynamic Org Chart: Clean Supervisor Lines + Color Badges | Click Department → View Employees | ESC=Back | 1-7=Quick Access
+        📺 Optimized Layout: Supervisors Above Their Departments | Click Department → View Employees | ESC=Back | 1-7=Quick Access
     </div>
     
     <div class="tv-feedback" id="tvFeedback"></div>
@@ -562,50 +562,47 @@
             
             // Count elements that need to fit horizontally
             const directors = employees.filter(emp => emp.position === "Director");
-            const maxSupervisorsPerDirector = Math.max(...directors.map(dir => 
-                employees.filter(emp => emp.position === "Supervisor" && emp.parentId === dir.id).length
-            ));
             const departmentCount = departmentNames.length;
             
             // Calculate optimal widths for each row
             const directorRowWidth = availableWidth / directors.length;
             const departmentRowWidth = availableWidth / departmentCount;
             
-            // Find the constraining width (smallest)
-            const constrainingWidth = Math.min(directorRowWidth, departmentRowWidth) * 0.85; // 85% for spacing
+            // Find the constraining width
+            const constrainingWidth = Math.min(directorRowWidth, departmentRowWidth) * 0.85;
             
             // Calculate heights based on vertical space
-            const availableVerticalSpace = availableHeight * 0.85; // 85% for spacing
-            const plantManagerHeight = availableVerticalSpace * 0.20; // 20% for plant manager
-            const directorHeight = availableVerticalSpace * 0.22; // 22% for directors (increased)
-            const supervisorHeight = availableVerticalSpace * 0.18; // 18% for supervisors
-            const departmentHeight = availableVerticalSpace * 0.15; // 15% for departments
+            const availableVerticalSpace = availableHeight * 0.85;
+            const plantManagerHeight = availableVerticalSpace * 0.20;
+            const directorHeight = availableVerticalSpace * 0.22;
+            const supervisorHeight = availableVerticalSpace * 0.18;
+            const departmentHeight = availableVerticalSpace * 0.15;
             
             // Calculate card dimensions with aspect ratio constraints
             const cardDimensions = {
                 "Plant Manager": {
-                    width: Math.min(constrainingWidth * 1.4, 320), // Max 320px
-                    height: Math.min(plantManagerHeight, 220) // Max 220px
+                    width: Math.min(constrainingWidth * 1.4, 320),
+                    height: Math.min(plantManagerHeight, 220)
                 },
                 "Director": {
-                    width: Math.min(constrainingWidth, 240), // Max 240px (increased for long names)
-                    height: Math.min(directorHeight, 180) // Max 180px (increased)
+                    width: Math.min(constrainingWidth, 240),
+                    height: Math.min(directorHeight, 180)
                 },
                 "Supervisor": {
-                    width: Math.min(constrainingWidth * 0.8, 200), // Max 200px
-                    height: Math.min(supervisorHeight, 140) // Max 140px
+                    width: Math.min(constrainingWidth * 0.8, 200),
+                    height: Math.min(supervisorHeight, 140)
                 },
                 "Department": {
-                    width: Math.min(constrainingWidth, 220), // Max 220px
-                    height: Math.min(departmentHeight, 110) // Max 110px
+                    width: Math.min(constrainingWidth, 220),
+                    height: Math.min(departmentHeight, 110)
                 }
             };
             
-            // Ensure minimum sizes for readability - especially for directors
+            // Ensure minimum sizes for readability
             Object.keys(cardDimensions).forEach(key => {
                 if (key === "Director") {
-                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 160); // Larger min for directors
-                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 110); // Larger min for directors
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 160);
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 110);
                 } else if (key === "Plant Manager") {
                     cardDimensions[key].width = Math.max(cardDimensions[key].width, 140);
                     cardDimensions[key].height = Math.max(cardDimensions[key].height, 100);
@@ -622,7 +619,7 @@
             const padding = 20;
             const cardDimensions = calculateOptimalSizing();
             
-            console.log("🎯 Dynamic sizing:", cardDimensions);
+            console.log("🎯 Optimized sizing:", cardDimensions);
             
             // Position Plant Manager
             const dora = employees.find(emp => emp.name === "Dora Garza");
@@ -662,27 +659,32 @@
                 }
             });
             
-            // Create department summary data
+            // OPTIMIZED: Position department cards directly under their supervisors
             const deptY = supervisorY + cardDimensions.Supervisor.height + 30;
-            const deptSpacing = Math.max(10, (screenWidth - padding * 2 - departmentNames.length * cardDimensions.Department.width) / (departmentNames.length + 1));
             
             window.departmentSummaries = [];
             
-            departmentNames.forEach((deptName, index) => {
+            departmentNames.forEach((deptName) => {
                 const deptEmployees = employees.filter(emp => emp.department === deptName && emp.position === "Employee");
                 const deptSupervisors = employees.filter(emp => emp.department === deptName && emp.position === "Supervisor");
                 
-                if (deptEmployees.length > 0) {
+                if (deptEmployees.length > 0 && deptSupervisors.length > 0) {
+                    // Calculate average X position of supervisors for this department
+                    const avgSupervisorX = deptSupervisors.reduce((sum, sup) => sum + sup.x_pos + cardDimensions.Supervisor.width / 2, 0) / deptSupervisors.length;
+                    
                     const deptSummary = {
                         name: deptName,
                         employee_count: deptEmployees.length,
-                        x_pos: padding + deptSpacing + index * (cardDimensions.Department.width + deptSpacing),
+                        x_pos: avgSupervisorX - cardDimensions.Department.width / 2, // Center under supervisors
                         y_pos: deptY,
                         width: cardDimensions.Department.width,
                         height: cardDimensions.Department.height,
                         supervisors: deptSupervisors.map(s => s.name),
                         color: deptEmployees[0].dept_color
                     };
+                    
+                    // Ensure department card doesn't go off screen
+                    deptSummary.x_pos = Math.max(padding, Math.min(deptSummary.x_pos, screenWidth - padding - cardDimensions.Department.width));
                     
                     window.departmentSummaries.push(deptSummary);
                 }
@@ -710,9 +712,9 @@
             card.style.width = dimensions.width + "px";
             card.style.height = dimensions.height + "px";
             
-            // Dynamic sizing optimized for readability - names same size as positions
+            // Consistent font sizing - names same size as positions for readability
             const photoSize = Math.min(dimensions.width * 0.28, dimensions.height * 0.28);
-            const nameSize = Math.max(9, Math.min(14, dimensions.width / 15)); // Same sizing as positions
+            const nameSize = Math.max(9, Math.min(14, dimensions.width / 15)); // Same as position size
             const positionSize = Math.max(9, Math.min(14, dimensions.width / 15)); // Same size for consistency
             const deptSize = Math.max(8, Math.min(11, dimensions.width / 18));
             
@@ -787,13 +789,13 @@
                 }
             });
             
-            // Clean supervisor-to-department lines
+            // Optimized supervisor-to-department lines
             const supervisors = employees.filter(emp => emp.position === "Supervisor");
             supervisors.forEach(supervisor => {
                 if (window.departmentSummaries) {
                     const deptCard = window.departmentSummaries.find(dept => dept.name === supervisor.department);
                     if (deptCard) {
-                        const lines = createCleanSupervisorToDeptLines(supervisor, deptCard, cardDimensions);
+                        const lines = createOptimizedSupervisorToDeptLines(supervisor, deptCard, cardDimensions);
                         lines.forEach(line => chartContainer.appendChild(line));
                     }
                 }
@@ -835,7 +837,7 @@
             return line;
         }
         
-        function createCleanSupervisorToDeptLines(supervisor, deptCard, cardDimensions) {
+        function createOptimizedSupervisorToDeptLines(supervisor, deptCard, cardDimensions) {
             const lines = [];
             const supervisorDimensions = cardDimensions["Supervisor"];
             
@@ -846,40 +848,53 @@
             
             const lineWidth = Math.max(2, Math.min(3, Math.round(screenWidth / 500)));
             
-            // Create clean L-shaped connection: vertical drop + horizontal line + vertical connect
-            const midY = supervisorY + (deptY - supervisorY) * 0.7; // 70% down
-            
-            // Vertical line from supervisor
-            const verticalLine1 = document.createElement("div");
-            verticalLine1.className = "connection-line";
-            verticalLine1.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`; // Using dept color with transparency
-            verticalLine1.style.left = (supervisorX - lineWidth/2) + "px";
-            verticalLine1.style.top = supervisorY + "px";
-            verticalLine1.style.width = lineWidth + "px";
-            verticalLine1.style.height = (midY - supervisorY) + "px";
-            lines.push(verticalLine1);
-            
-            // Horizontal line
-            const horizontalLine = document.createElement("div");
-            horizontalLine.className = "connection-line";
-            horizontalLine.style.background = `linear-gradient(90deg, ${supervisor.dept_color}80, ${supervisor.dept_color}80)`;
-            const horizontalStart = Math.min(supervisorX, deptX);
-            const horizontalEnd = Math.max(supervisorX, deptX);
-            horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
-            horizontalLine.style.top = (midY - lineWidth/2) + "px";
-            horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
-            horizontalLine.style.height = lineWidth + "px";
-            lines.push(horizontalLine);
-            
-            // Vertical line to department
-            const verticalLine2 = document.createElement("div");
-            verticalLine2.className = "connection-line";
-            verticalLine2.style.background = `linear-gradient(180deg, ${supervisor.dept_color}80, ${supervisor.dept_color}CC)`;
-            verticalLine2.style.left = (deptX - lineWidth/2) + "px";
-            verticalLine2.style.top = midY + "px";
-            verticalLine2.style.width = lineWidth + "px";
-            verticalLine2.style.height = (deptY - midY) + "px";
-            lines.push(verticalLine2);
+            // OPTIMIZED: Check if they're well-aligned vertically (within 40px)
+            if (Math.abs(supervisorX - deptX) <= 40) {
+                // Simple vertical line - they're optimally aligned
+                const verticalLine = document.createElement("div");
+                verticalLine.className = "connection-line";
+                verticalLine.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`;
+                verticalLine.style.left = (supervisorX - lineWidth/2) + "px";
+                verticalLine.style.top = supervisorY + "px";
+                verticalLine.style.width = lineWidth + "px";
+                verticalLine.style.height = (deptY - supervisorY) + "px";
+                lines.push(verticalLine);
+            } else {
+                // Clean L-shaped connection for cases where perfect alignment isn't possible
+                const midY = supervisorY + (deptY - supervisorY) * 0.6;
+                
+                // Vertical line from supervisor
+                const verticalLine1 = document.createElement("div");
+                verticalLine1.className = "connection-line";
+                verticalLine1.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`;
+                verticalLine1.style.left = (supervisorX - lineWidth/2) + "px";
+                verticalLine1.style.top = supervisorY + "px";
+                verticalLine1.style.width = lineWidth + "px";
+                verticalLine1.style.height = (midY - supervisorY) + "px";
+                lines.push(verticalLine1);
+                
+                // Horizontal line
+                const horizontalLine = document.createElement("div");
+                horizontalLine.className = "connection-line";
+                horizontalLine.style.background = `linear-gradient(90deg, ${supervisor.dept_color}80, ${supervisor.dept_color}80)`;
+                const horizontalStart = Math.min(supervisorX, deptX);
+                const horizontalEnd = Math.max(supervisorX, deptX);
+                horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
+                horizontalLine.style.top = (midY - lineWidth/2) + "px";
+                horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
+                horizontalLine.style.height = lineWidth + "px";
+                lines.push(horizontalLine);
+                
+                // Vertical line to department
+                const verticalLine2 = document.createElement("div");
+                verticalLine2.className = "connection-line";
+                verticalLine2.style.background = `linear-gradient(180deg, ${supervisor.dept_color}80, ${supervisor.dept_color}CC)`;
+                verticalLine2.style.left = (deptX - lineWidth/2) + "px";
+                verticalLine2.style.top = midY + "px";
+                verticalLine2.style.width = lineWidth + "px";
+                verticalLine2.style.height = (deptY - midY) + "px";
+                lines.push(verticalLine2);
+            }
             
             return lines;
         }
@@ -1008,7 +1023,7 @@
             currentDepartment = null;
             
             updateScreenInfo();
-            showFeedback("🎯 Back to Hierarchy View");
+            showFeedback("🎯 Back to Optimized Hierarchy View");
         }
         
         function updateScreenInfo() {
@@ -1022,8 +1037,8 @@
                     Screen: ${screenWidth}×${screenHeight}<br>
                     PM: ${pmSize} | Dir: ${dirSize}<br>
                     Total: ${employees.length} people<br>
-                    Mode: ${isDrillDownActive ? 'DRILL-DOWN' : 'HIERARCHY'}<br>
-                    View: ${isDrillDownActive ? currentDepartment : "MAIN"}
+                    Mode: ${isDrillDownActive ? 'DRILL-DOWN' : 'OPTIMIZED'}<br>
+                    View: ${isDrillDownActive ? currentDepartment : "HIERARCHY"}
                 `;
             }
         }
@@ -1072,7 +1087,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             initHierarchyView();
             setTimeout(() => {
-                showFeedback("🎯 Complete Dynamic Chart Ready! Clean supervisor-to-department lines | Press 1-7 for quick access");
+                showFeedback("🎯 Optimized Layout Ready! Supervisors positioned above their departments | Short clean lines!");
             }, 500);
         });
     </script>
