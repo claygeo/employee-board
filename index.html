@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processing Plant Organizational Chart</title>
+    <title>Dynamic Processing Plant Organizational Chart</title>
     <style>
         * {
             margin: 0;
@@ -110,7 +110,7 @@
             overflow: auto;
         }
         
-        /* HIERARCHY CARDS */
+        /* EMPLOYEE CARDS */
         .employee-card {
             position: absolute;
             background: linear-gradient(145deg, #ffffff, #f8f9fa);
@@ -185,33 +185,22 @@
         .dept-analytical-lab { border-color: #1abc9c; background: linear-gradient(145deg, #f2fcfa, #e8f8f5); }
         
         .dept-title {
-            font-size: 16px;
             font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 6px;
             text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.1;
+            margin-bottom: 6px;
         }
         
         .dept-count {
-            font-size: 18px;
             font-weight: bold;
-            margin-bottom: 4px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .dept-subtitle {
-            font-size: 10px;
-            color: #7f8c8d;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .dept-supervisors {
-            font-size: 9px;
-            color: #95a5a6;
-            margin-top: 4px;
-            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         /* DRILL-DOWN EMPLOYEE CARDS */
@@ -252,16 +241,18 @@
             color: #2c3e50;
             line-height: 1.1;
             text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-            margin: 2px 0;
             word-wrap: break-word;
             hyphens: auto;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
         
         .card-position {
             text-align: center;
             color: #7f8c8d;
             font-weight: 600;
-            margin: 1px 0;
             word-wrap: break-word;
         }
         
@@ -272,8 +263,19 @@
             border-radius: 3px;
             font-weight: 500;
             padding: 1px 3px;
-            margin: 1px 0;
             font-size: 80%;
+        }
+        
+        .supervisor-dept-indicator {
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin: 2px 0;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            font-size: 85%;
         }
         
         .connection-line {
@@ -357,7 +359,7 @@
     <div class="screen-info" id="screenInfo"></div>
     
     <div class="tv-controls">
-        📺 Hierarchical Org Chart: Click Department → View Employees | ESC=Back | 1-7=Quick Access
+        📺 Dynamic Org Chart: Color-coded Supervisors | Click Department → View Employees | ESC=Back | 1-7=Quick Access
     </div>
     
     <div class="tv-feedback" id="tvFeedback"></div>
@@ -551,30 +553,76 @@
             updateScreenInfo();
         }
         
-        function updateScreenInfo() {
-            const screenInfo = document.getElementById("screenInfo");
-            if (screenInfo) {
-                screenInfo.innerHTML = `
-                    Screen: ${screenWidth}×${screenHeight}<br>
-                    Total: ${employees.length} people<br>
-                    Mode: ${isDrillDownActive ? 'DRILL-DOWN' : 'HIERARCHY'}<br>
-                    View: ${isDrillDownActive ? currentDepartment : "MAIN"}
-                `;
-            }
-        }
-        
-        function calculateHierarchyLayout() {
+        function calculateOptimalSizing() {
             calculateScreenDimensions();
             
             const padding = 20;
-            const baseSize = Math.min(screenWidth / 18, screenHeight / 14); // Increased base size for larger cards
+            const availableWidth = screenWidth - (padding * 2);
+            const availableHeight = screenHeight - (padding * 2);
             
+            // Count elements that need to fit horizontally
+            const directors = employees.filter(emp => emp.position === "Director");
+            const maxSupervisorsPerDirector = Math.max(...directors.map(dir => 
+                employees.filter(emp => emp.position === "Supervisor" && emp.parentId === dir.id).length
+            ));
+            const departmentCount = departmentNames.length;
+            
+            // Calculate optimal widths for each row
+            const directorRowWidth = availableWidth / directors.length;
+            const departmentRowWidth = availableWidth / departmentCount;
+            
+            // Find the constraining width (smallest)
+            const constrainingWidth = Math.min(directorRowWidth, departmentRowWidth) * 0.85; // 85% for spacing
+            
+            // Calculate heights based on vertical space
+            const availableVerticalSpace = availableHeight * 0.85; // 85% for spacing
+            const plantManagerHeight = availableVerticalSpace * 0.20; // 20% for plant manager
+            const directorHeight = availableVerticalSpace * 0.22; // 22% for directors (increased)
+            const supervisorHeight = availableVerticalSpace * 0.18; // 18% for supervisors
+            const departmentHeight = availableVerticalSpace * 0.15; // 15% for departments
+            
+            // Calculate card dimensions with aspect ratio constraints
             const cardDimensions = {
-                "Plant Manager": { width: Math.round(baseSize * 4.0), height: Math.round(baseSize * 3.2) },
-                "Director": { width: Math.round(baseSize * 3.0), height: Math.round(baseSize * 2.4) },
-                "Supervisor": { width: Math.round(baseSize * 2.6), height: Math.round(baseSize * 2.0) },
-                "Department": { width: Math.round(baseSize * 2.4), height: Math.round(baseSize * 1.6) }
+                "Plant Manager": {
+                    width: Math.min(constrainingWidth * 1.4, 320), // Max 320px
+                    height: Math.min(plantManagerHeight, 220) // Max 220px
+                },
+                "Director": {
+                    width: Math.min(constrainingWidth, 240), // Max 240px (increased for long names)
+                    height: Math.min(directorHeight, 180) // Max 180px (increased)
+                },
+                "Supervisor": {
+                    width: Math.min(constrainingWidth * 0.8, 200), // Max 200px
+                    height: Math.min(supervisorHeight, 140) // Max 140px
+                },
+                "Department": {
+                    width: Math.min(constrainingWidth, 220), // Max 220px
+                    height: Math.min(departmentHeight, 110) // Max 110px
+                }
             };
+            
+            // Ensure minimum sizes for readability - especially for directors
+            Object.keys(cardDimensions).forEach(key => {
+                if (key === "Director") {
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 160); // Larger min for directors
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 110); // Larger min for directors
+                } else if (key === "Plant Manager") {
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 140);
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 100);
+                } else {
+                    cardDimensions[key].width = Math.max(cardDimensions[key].width, 120);
+                    cardDimensions[key].height = Math.max(cardDimensions[key].height, 80);
+                }
+            });
+            
+            return cardDimensions;
+        }
+        
+        function calculateHierarchyLayout() {
+            const padding = 20;
+            const cardDimensions = calculateOptimalSizing();
+            
+            console.log("🎯 Dynamic sizing:", cardDimensions);
             
             // Position Plant Manager
             const dora = employees.find(emp => emp.name === "Dora Garza");
@@ -639,19 +687,21 @@
                     window.departmentSummaries.push(deptSummary);
                 }
             });
+            
+            // Store card dimensions globally
+            window.currentCardDimensions = cardDimensions;
         }
         
-        function createEmployeeCard(employee) {
+        function createEmployeeCard(employee, cardDimensions) {
             const card = document.createElement("div");
-            const baseSize = Math.min(screenWidth / 18, screenHeight / 14); // Increased base size
             
             let dimensions;
             if (employee.position === "Plant Manager") {
-                dimensions = { width: Math.round(baseSize * 4.0), height: Math.round(baseSize * 3.2) };
+                dimensions = cardDimensions["Plant Manager"];
             } else if (employee.position === "Director") {
-                dimensions = { width: Math.round(baseSize * 3.0), height: Math.round(baseSize * 2.4) };
+                dimensions = cardDimensions["Director"];
             } else if (employee.position === "Supervisor") {
-                dimensions = { width: Math.round(baseSize * 2.6), height: Math.round(baseSize * 2.0) };
+                dimensions = cardDimensions["Supervisor"];
             }
             
             card.className = `employee-card ${employee.position.toLowerCase().replace(' ', '-')}-card`;
@@ -660,39 +710,61 @@
             card.style.width = dimensions.width + "px";
             card.style.height = dimensions.height + "px";
             
-            const photoSize = Math.round(dimensions.width * 0.5); // Larger photo
-            const nameSize = Math.max(14, Math.round(dimensions.width / 8)); // Larger text
-            const positionSize = Math.max(12, Math.round(dimensions.width / 10));
-            const deptSize = Math.max(10, Math.round(dimensions.width / 12));
+            // Dynamic sizing optimized for name display
+            const photoSize = Math.min(dimensions.width * 0.28, dimensions.height * 0.28); // Smaller photo for more text space
+            const nameSize = Math.max(11, Math.min(18, dimensions.width / 9)); // Generous name sizing
+            const positionSize = Math.max(9, Math.min(14, dimensions.width / 15));
+            const deptSize = Math.max(8, Math.min(11, dimensions.width / 18));
             
-            const shiftHtml = employee.shift ? `<div class="card-shift" style="font-size: ${deptSize}px;">${employee.shift}</div>` : "";
+            // Calculate layout spacing
+            const isCompact = dimensions.height < 100;
+            const photoMargin = isCompact ? 2 : 4;
+            const textMargin = isCompact ? 1 : 2;
+            
+            const shiftHtml = employee.shift ? `<div class="card-shift" style="font-size: ${deptSize}px; margin: ${textMargin}px 0;">${employee.shift}</div>` : "";
+            
+            // Special styling for supervisors to show department connection
+            let deptIndicatorHtml = "";
+            if (employee.position === "Supervisor") {
+                deptIndicatorHtml = `<div class="supervisor-dept-indicator" style="font-size: ${deptSize - 1}px; background-color: ${employee.dept_color}; margin: ${textMargin}px 0;">SUPERVISES ${employee.department}</div>`;
+            } else {
+                deptIndicatorHtml = `<div style="font-size: ${deptSize}px; text-align: center; color: #95a5a6; text-transform: uppercase; margin: ${textMargin}px 0;">${employee.department}</div>`;
+            }
             
             card.innerHTML = `
                 <img class="card-photo" 
-                     src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='6' ry='6'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.12}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.78}' rx='${photoSize*0.18}' ry='${photoSize*0.12}' fill='%23bdc3c7'/></svg>" 
+                     src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='4' ry='4'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.12}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.78}' rx='${photoSize*0.18}' ry='${photoSize*0.12}' fill='%23bdc3c7'/></svg>" 
                      alt="${employee.name}"
-                     style="width: ${photoSize}px; height: ${photoSize}px;">
-                <div class="card-name" style="font-size: ${nameSize}px; line-height: 1.1; margin: 4px 2px;">${employee.name}</div>
-                <div class="card-position" style="font-size: ${positionSize}px; margin: 2px 0;">${employee.position}</div>
-                <div style="font-size: ${deptSize}px; text-align: center; color: #95a5a6; text-transform: uppercase; margin: 2px 0;">${employee.department}</div>
+                     style="width: ${photoSize}px; height: ${photoSize}px; margin: ${photoMargin}px 0;">
+                <div class="card-name" style="font-size: ${nameSize}px; margin: ${textMargin}px 2px; line-height: 1.1;">${employee.name}</div>
+                <div class="card-position" style="font-size: ${positionSize}px; margin: ${textMargin}px 0;">${employee.position}</div>
+                ${deptIndicatorHtml}
                 ${shiftHtml}
             `;
             
             return card;
         }
         
-        function createDepartmentCard(deptData) {
+        function createDepartmentCard(deptData, cardDimensions) {
             const card = document.createElement("div");
+            const dimensions = cardDimensions["Department"];
             
             card.className = `department-card dept-${deptData.name.toLowerCase().replace(/\s+/g, "-")}`;
             card.style.left = deptData.x_pos + "px";
             card.style.top = deptData.y_pos + "px";
-            card.style.width = deptData.width + "px";
-            card.style.height = deptData.height + "px";
+            card.style.width = dimensions.width + "px";
+            card.style.height = dimensions.height + "px";
+            
+            // Dynamic text sizing
+            const titleSize = Math.max(11, Math.min(16, dimensions.width / 12));
+            const countSize = Math.max(10, Math.min(14, dimensions.width / 14));
+            
+            const isCompact = dimensions.height < 90;
+            const titleMargin = isCompact ? 2 : 4;
             
             card.innerHTML = `
-                <div class="dept-title">${deptData.name}</div>
-                <div class="dept-count">(${deptData.employee_count}) employees</div>
+                <div class="dept-title" style="font-size: ${titleSize}px; margin-bottom: ${titleMargin}px;">${deptData.name}</div>
+                <div class="dept-count" style="font-size: ${countSize}px;">(${deptData.employee_count}) employees</div>
             `;
             
             card.addEventListener("click", () => openDrillDown(deptData.name));
@@ -700,51 +772,37 @@
             return card;
         }
         
-        function generateConnectionLines() {
+        function generateConnectionLines(cardDimensions) {
             const chartContainer = document.getElementById("orgChart");
             if (!chartContainer) return;
             
-            // Connection lines from Plant Manager to Directors and from Directors to Supervisors
+            // Only hierarchy connection lines (Plant Manager → Directors → Supervisors)
             employees.forEach(emp => {
                 if (emp.parentId && (emp.position === "Director" || emp.position === "Supervisor")) {
                     const parent = employees.find(e => e.id === emp.parentId);
                     if (parent) {
-                        const line = createConnectionLine(parent, emp);
-                        chartContainer.appendChild(line);
-                    }
-                }
-            });
-            
-            // Connection lines from Supervisors to their Department cards
-            const supervisors = employees.filter(emp => emp.position === "Supervisor");
-            supervisors.forEach(supervisor => {
-                if (window.departmentSummaries) {
-                    const deptCard = window.departmentSummaries.find(dept => dept.name === supervisor.department);
-                    if (deptCard) {
-                        const line = createSupervisorToDeptLine(supervisor, deptCard);
+                        const line = createConnectionLine(parent, emp, cardDimensions);
                         chartContainer.appendChild(line);
                     }
                 }
             });
         }
         
-        function createConnectionLine(parent, child) {
+        function createConnectionLine(parent, child, cardDimensions) {
             const line = document.createElement("div");
             line.className = "connection-line";
             
-            const baseSize = Math.min(screenWidth / 18, screenHeight / 14); // Updated base size
-            
             let parentDimensions, childDimensions;
             if (parent.position === "Plant Manager") {
-                parentDimensions = { width: Math.round(baseSize * 4.0), height: Math.round(baseSize * 3.2) };
+                parentDimensions = cardDimensions["Plant Manager"];
             } else if (parent.position === "Director") {
-                parentDimensions = { width: Math.round(baseSize * 3.0), height: Math.round(baseSize * 2.4) };
+                parentDimensions = cardDimensions["Director"];
             }
             
             if (child.position === "Director") {
-                childDimensions = { width: Math.round(baseSize * 3.0), height: Math.round(baseSize * 2.4) };
+                childDimensions = cardDimensions["Director"];
             } else if (child.position === "Supervisor") {
-                childDimensions = { width: Math.round(baseSize * 2.6), height: Math.round(baseSize * 2.0) };
+                childDimensions = cardDimensions["Supervisor"];
             }
             
             const parentX = parent.x_pos + parentDimensions.width / 2;
@@ -753,37 +811,11 @@
             const childY = child.y_pos;
             
             const lineHeight = childY - parentY;
-            const lineWidth = Math.max(2, Math.round(screenWidth / 600));
+            const lineWidth = Math.max(2, Math.min(4, Math.round(screenWidth / 400)));
             
             if (lineHeight > 0) {
                 line.style.left = (parentX - lineWidth/2) + "px";
                 line.style.top = parentY + "px";
-                line.style.width = lineWidth + "px";
-                line.style.height = lineHeight + "px";
-            }
-            
-            return line;
-        }
-        
-        function createSupervisorToDeptLine(supervisor, deptCard) {
-            const line = document.createElement("div");
-            line.className = "connection-line";
-            line.style.background = "linear-gradient(180deg, rgba(243, 156, 18, 0.8), rgba(243, 156, 18, 0.4))"; // Orange for supervisor connections
-            
-            const baseSize = Math.min(screenWidth / 18, screenHeight / 14);
-            const supervisorDimensions = { width: Math.round(baseSize * 2.6), height: Math.round(baseSize * 2.0) };
-            
-            const supervisorX = supervisor.x_pos + supervisorDimensions.width / 2;
-            const supervisorY = supervisor.y_pos + supervisorDimensions.height;
-            const deptX = deptCard.x_pos + deptCard.width / 2;
-            const deptY = deptCard.y_pos;
-            
-            const lineHeight = deptY - supervisorY;
-            const lineWidth = Math.max(2, Math.round(screenWidth / 600));
-            
-            if (lineHeight > 0) {
-                line.style.left = (supervisorX - lineWidth/2) + "px";
-                line.style.top = supervisorY + "px";
                 line.style.width = lineWidth + "px";
                 line.style.height = lineHeight + "px";
             }
@@ -797,21 +829,23 @@
             const chartContainer = document.getElementById("orgChart");
             chartContainer.innerHTML = "";
             
-            // Add connection lines
-            generateConnectionLines();
+            const cardDimensions = window.currentCardDimensions;
             
-            // Add hierarchy employees (Plant Manager, Directors, Supervisors)
+            // Add connection lines
+            generateConnectionLines(cardDimensions);
+            
+            // Add hierarchy employees
             employees.forEach(emp => {
                 if (emp.position === "Plant Manager" || emp.position === "Director" || emp.position === "Supervisor") {
-                    const card = createEmployeeCard(emp);
+                    const card = createEmployeeCard(emp, cardDimensions);
                     chartContainer.appendChild(card);
                 }
             });
             
-            // Add department summary cards
+            // Add department cards
             if (window.departmentSummaries) {
                 window.departmentSummaries.forEach(deptData => {
-                    const card = createDepartmentCard(deptData);
+                    const card = createDepartmentCard(deptData, cardDimensions);
                     chartContainer.appendChild(card);
                 });
             }
@@ -826,15 +860,12 @@
             const drillDownTitle = document.getElementById("drillDownTitle");
             const drillDownContent = document.getElementById("drillDownContent");
             
-            // Hide hierarchy and show drill-down
             hierarchyView.classList.add("hidden");
             drillDownView.classList.add("active");
             
-            // Update title
             const deptEmployees = employees.filter(emp => emp.department === departmentName && emp.position === "Employee");
             drillDownTitle.textContent = `${departmentName} Department (${deptEmployees.length} Employees)`;
             
-            // Layout employees
             layoutDrillDownEmployees(deptEmployees, drillDownContent);
             
             updateScreenInfo();
@@ -852,17 +883,19 @@
             let bestCols = 1;
             let bestCardSize = 0;
             
-            for (let cols = 1; cols <= Math.min(20, numEmployees); cols++) {
+            for (let cols = 1; cols <= Math.min(25, numEmployees); cols++) {
                 const rows = Math.ceil(numEmployees / cols);
                 const cardWidth = Math.floor((availableWidth - (cols - 1) * 8) / cols);
                 const cardHeight = Math.floor((availableHeight - (rows - 1) * 10) / rows);
                 const cardSize = Math.min(cardWidth, cardHeight);
                 
-                if (cardSize > bestCardSize && cardSize >= 50) {
+                if (cardSize > bestCardSize && cardSize >= 60) {
                     bestCardSize = cardSize;
                     bestCols = cols;
                 }
             }
+            
+            bestCardSize = Math.min(bestCardSize, 200);
             
             // Create employee cards
             deptEmployees.forEach((employee, index) => {
@@ -877,20 +910,23 @@
                 card.style.top = (row * (bestCardSize + 10) + 20) + "px";
                 card.style.position = "absolute";
                 
-                const photoSize = Math.round(bestCardSize * 0.4);
-                const nameSize = Math.max(8, Math.round(bestCardSize / 12));
-                const positionSize = Math.max(7, Math.round(bestCardSize / 15));
-                const shiftSize = Math.max(6, Math.round(bestCardSize / 18));
+                const photoSize = Math.min(bestCardSize * 0.35, 80);
+                const nameSize = Math.max(8, Math.min(14, bestCardSize / 12));
+                const positionSize = Math.max(7, Math.min(11, bestCardSize / 15));
+                const shiftSize = Math.max(6, Math.min(9, bestCardSize / 18));
                 
-                const shiftHtml = employee.shift ? `<div class="card-shift" style="font-size: ${shiftSize}px;">${employee.shift}</div>` : "";
+                const isCompact = bestCardSize < 100;
+                const margin = isCompact ? 1 : 2;
+                
+                const shiftHtml = employee.shift ? `<div class="card-shift" style="font-size: ${shiftSize}px; margin: ${margin}px 0;">${employee.shift}</div>` : "";
                 
                 card.innerHTML = `
                     <img class="card-photo" 
                          src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='3' ry='3'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.11}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.75}' rx='${photoSize*0.16}' ry='${photoSize*0.10}' fill='%23bdc3c7'/></svg>" 
                          alt="${employee.name}"
-                         style="width: ${photoSize}px; height: ${photoSize}px;">
-                    <div class="card-name" style="font-size: ${nameSize}px;">${employee.name}</div>
-                    <div class="card-position" style="font-size: ${positionSize}px;">${employee.position}</div>
+                         style="width: ${photoSize}px; height: ${photoSize}px; margin: ${margin}px 0;">
+                    <div class="card-name" style="font-size: ${nameSize}px; margin: ${margin}px 2px; line-height: 1.1;">${employee.name}</div>
+                    <div class="card-position" style="font-size: ${positionSize}px; margin: ${margin}px 0;">${employee.position}</div>
                     ${shiftHtml}
                 `;
                 
@@ -912,6 +948,23 @@
             
             updateScreenInfo();
             showFeedback("🎯 Back to Hierarchy View");
+        }
+        
+        function updateScreenInfo() {
+            const screenInfo = document.getElementById("screenInfo");
+            if (screenInfo) {
+                const cardDims = window.currentCardDimensions;
+                const pmSize = cardDims ? `${Math.round(cardDims["Plant Manager"].width)}×${Math.round(cardDims["Plant Manager"].height)}` : "N/A";
+                const dirSize = cardDims ? `${Math.round(cardDims["Director"].width)}×${Math.round(cardDims["Director"].height)}` : "N/A";
+                
+                screenInfo.innerHTML = `
+                    Screen: ${screenWidth}×${screenHeight}<br>
+                    PM: ${pmSize} | Dir: ${dirSize}<br>
+                    Total: ${employees.length} people<br>
+                    Mode: ${isDrillDownActive ? 'DRILL-DOWN' : 'HIERARCHY'}<br>
+                    View: ${isDrillDownActive ? currentDepartment : "MAIN"}
+                `;
+            }
         }
         
         // Navigation controls
@@ -958,7 +1011,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             initHierarchyView();
             setTimeout(() => {
-                showFeedback("🎯 Hierarchy Ready! Click departments to drill down | Press 1-7 for quick access");
+                showFeedback("🎯 Complete Dynamic Chart Ready! Supervisors color-coded to departments | Press 1-7 for quick access");
             }, 500);
         });
     </script>
