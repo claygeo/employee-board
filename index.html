@@ -316,20 +316,6 @@
             max-width: 350px;
         }
         
-        .screen-info {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.8);
-            color: #00ff88;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            z-index: 1001;
-            font-family: monospace;
-            line-height: 1.2;
-        }
-        
         .dept-production .dept-count { color: #e74c3c; }
         .dept-kitchen .dept-count { color: #f39c12; }
         .dept-processing-lab .dept-count { color: #3498db; }
@@ -356,10 +342,8 @@
         </div>
     </div>
     
-    <div class="screen-info" id="screenInfo"></div>
-    
     <div class="tv-controls">
-        📺 Optimized Layout: Supervisors Above Their Departments | Click Department → View Employees | ESC=Back | 1-7=Quick Access
+        📺 Optimized Layout: Clear Director → Supervisor → Department Lines | Click Department → View Employees | ESC=Back | 1-7=Quick Access
     </div>
     
     <div class="tv-feedback" id="tvFeedback"></div>
@@ -371,14 +355,13 @@
             { "id": 1, "name": "Dora Garza", "position": "Plant Manager", "department": "Management", "parentId": null, "shift": "", "dept_color": "#95a5a6" },
             
             // Directors
-            { "id": 2, "name": "Luis", "position": "Director", "department": "Kitchen", "parentId": 1, "shift": "", "dept_color": "#f39c12" },
+            { "id": 2, "name": "Luis Hernandez", "position": "Director", "department": "Kitchen", "parentId": 1, "shift": "", "dept_color": "#f39c12" },
             { "id": 3, "name": "Lester Igarza", "position": "Director", "department": "Production", "parentId": 1, "shift": "", "dept_color": "#e74c3c" },
             { "id": 4, "name": "Sunita Jainanan", "position": "Director", "department": "Processing Lab", "parentId": 1, "shift": "Shift 1", "dept_color": "#3498db" },
             { "id": 5, "name": "Carlos Archaga", "position": "Director", "department": "Processing Lab", "parentId": 1, "shift": "Shift 2", "dept_color": "#3498db" },
             { "id": 6, "name": "Michael Amaya", "position": "Director", "department": "Warehouse", "parentId": 1, "shift": "", "dept_color": "#2ecc71" },
             { "id": 7, "name": "Mariela De La Rosa", "position": "Director", "department": "Quality", "parentId": 1, "shift": "", "dept_color": "#9b59b6" },
             { "id": 8, "name": "Abel Ortega", "position": "Director", "department": "Maintenance", "parentId": 1, "shift": "", "dept_color": "#34495e" },
-            { "id": 9, "name": "Dan Peluso", "position": "Director", "department": "Maintenance", "parentId": 1, "shift": "", "dept_color": "#34495e" },
             { "id": 10, "name": "Natalie Zeledon", "position": "Supervisor", "department": "Analytical Lab", "parentId": 1, "shift": "", "dept_color": "#1abc9c" },
             
             // Kitchen Supervisors
@@ -396,6 +379,9 @@
             
             // Quality Supervisor
             { "id": 18, "name": "Gabriela Urbina", "position": "Supervisor", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6" },
+            
+            // FIXED: Dan Peluso is now a Maintenance Supervisor under Abel Ortega
+            { "id": 9, "name": "Dan Peluso", "position": "Supervisor", "department": "Maintenance", "parentId": 8, "shift": "", "dept_color": "#34495e" },
             
             // Kitchen Employees - 1st Shift
             { "id": 19, "name": "Fabiola Trujillo", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
@@ -529,9 +515,9 @@
             { "id": 135, "name": "Maria Dominguez", "position": "Employee", "department": "Quality", "parentId": 18, "shift": "", "dept_color": "#9b59b6" },
             
             // Maintenance Employees
-            { "id": 136, "name": "Jose Miranda", "position": "Employee", "department": "Maintenance", "parentId": 8, "shift": "", "dept_color": "#34495e" },
+            { "id": 136, "name": "Jose Miranda", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
             { "id": 137, "name": "Jose Acosta", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
-            { "id": 138, "name": "Yusdriviel Rodriguez", "position": "Employee", "department": "Maintenance", "parentId": 8, "shift": "", "dept_color": "#34495e" },
+            { "id": 138, "name": "Yusdriviel Rodriguez", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
             
             // Analytical Lab Employee
             { "id": 139, "name": "Miguel Colina", "position": "Employee", "department": "Analytical Lab", "parentId": 10, "shift": "", "dept_color": "#1abc9c" }
@@ -550,7 +536,6 @@
                 screenWidth = container.clientWidth || 1280;
                 screenHeight = container.clientHeight || 690;
             }
-            updateScreenInfo();
         }
         
         function calculateOptimalSizing() {
@@ -618,8 +603,6 @@
         function calculateHierarchyLayout() {
             const padding = 20;
             const cardDimensions = calculateOptimalSizing();
-            
-            console.log("🎯 Optimized sizing:", cardDimensions);
             
             // Position Plant Manager
             const dora = employees.find(emp => emp.name === "Dora Garza");
@@ -725,10 +708,10 @@
             
             const shiftHtml = employee.shift ? `<div class="card-shift" style="font-size: ${deptSize}px; margin: ${textMargin}px 0;">${employee.shift}</div>` : "";
             
-            // Special styling for supervisors to show department connection
+            // IMPROVED: Special styling for supervisors - just show "Supervisor" with department color
             let deptIndicatorHtml = "";
             if (employee.position === "Supervisor") {
-                deptIndicatorHtml = `<div class="supervisor-dept-indicator" style="font-size: ${deptSize - 1}px; background-color: ${employee.dept_color}; margin: ${textMargin}px 0;">SUPERVISES ${employee.department}</div>`;
+                deptIndicatorHtml = `<div class="supervisor-dept-indicator" style="font-size: ${deptSize - 1}px; background-color: ${employee.dept_color}; margin: ${textMargin}px 0;">SUPERVISOR</div>`;
             } else {
                 deptIndicatorHtml = `<div style="font-size: ${deptSize}px; text-align: center; color: #95a5a6; text-transform: uppercase; margin: ${textMargin}px 0;">${employee.department}</div>`;
             }
@@ -778,7 +761,7 @@
             const chartContainer = document.getElementById("orgChart");
             if (!chartContainer) return;
             
-            // Hierarchy connection lines (Plant Manager → Directors → Supervisors)
+            // IMPROVED: Clear hierarchy connection lines (Plant Manager → Directors → Supervisors)
             employees.forEach(emp => {
                 if (emp.parentId && (emp.position === "Director" || emp.position === "Supervisor")) {
                     const parent = employees.find(e => e.id === emp.parentId);
@@ -826,6 +809,13 @@
             
             const lineHeight = childY - parentY;
             const lineWidth = Math.max(2, Math.min(4, Math.round(screenWidth / 400)));
+            
+            // Enhanced line styling for better visibility
+            if (child.position === "Supervisor") {
+                line.style.background = `linear-gradient(180deg, rgba(52, 152, 219, 0.8), ${child.dept_color}CC)`;
+            } else {
+                line.style.background = `linear-gradient(180deg, rgba(52, 73, 94, 0.7), rgba(52, 73, 94, 0.3))`;
+            }
             
             if (lineHeight > 0) {
                 line.style.left = (parentX - lineWidth/2) + "px";
@@ -944,7 +934,6 @@
             
             layoutDrillDownEmployees(deptEmployees, drillDownContent);
             
-            updateScreenInfo();
             showFeedback(`🔍 ${departmentName}: Showing ${deptEmployees.length} employees`);
         }
         
@@ -1022,25 +1011,7 @@
             isDrillDownActive = false;
             currentDepartment = null;
             
-            updateScreenInfo();
             showFeedback("🎯 Back to Optimized Hierarchy View");
-        }
-        
-        function updateScreenInfo() {
-            const screenInfo = document.getElementById("screenInfo");
-            if (screenInfo) {
-                const cardDims = window.currentCardDimensions;
-                const pmSize = cardDims ? `${Math.round(cardDims["Plant Manager"].width)}×${Math.round(cardDims["Plant Manager"].height)}` : "N/A";
-                const dirSize = cardDims ? `${Math.round(cardDims["Director"].width)}×${Math.round(cardDims["Director"].height)}` : "N/A";
-                
-                screenInfo.innerHTML = `
-                    Screen: ${screenWidth}×${screenHeight}<br>
-                    PM: ${pmSize} | Dir: ${dirSize}<br>
-                    Total: ${employees.length} people<br>
-                    Mode: ${isDrillDownActive ? 'DRILL-DOWN' : 'OPTIMIZED'}<br>
-                    View: ${isDrillDownActive ? currentDepartment : "HIERARCHY"}
-                `;
-            }
         }
         
         // Navigation controls
@@ -1087,7 +1058,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             initHierarchyView();
             setTimeout(() => {
-                showFeedback("🎯 Optimized Layout Ready! Supervisors positioned above their departments | Short clean lines!");
+                showFeedback("🎯 Perfect! Clear director → supervisor lines, Dan Peluso fixed as Maintenance Supervisor!");
             }, 500);
         });
     </script>
