@@ -139,6 +139,12 @@ The system dynamically calculates optimal sizing using several factors:
 
 ## Visual Design
 
+Main Dashboard
+<img width="1911" height="902" alt="employee-1" src="https://github.com/user-attachments/assets/b3f6dad9-241f-4a16-b0a4-95c2f2fd7d14" />
+
+Drill-Down menu example
+<img width="1907" height="888" alt="employee-2" src="https://github.com/user-attachments/assets/22e6c59a-10ad-4e31-84bc-5bac10d61def" />
+
 ### Color System
 Each department features a distinct color palette for immediate visual identification:
 
