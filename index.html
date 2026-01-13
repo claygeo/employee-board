@@ -3,1750 +3,1929 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manufacturing Plant Organizational Chart - Compact Horizontal Cards</title>
+    <title>Customizable Employee Board</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+        }
+
         body {
-            background: 
-                linear-gradient(135deg, rgba(30, 60, 114, 0.85) 0%, rgba(42, 82, 152, 0.85) 100%),
-                url('./pictures/summer.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            font-family: "Arial", sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .company-name {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .company-name:hover {
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
             overflow: hidden;
-            height: 100vh;
-            position: relative;
         }
-        
-        .chart-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+
+        .view-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+        }
+
+        .view-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Hidden Admin Button - appears as subtle icon */
+        .admin-toggle {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .admin-toggle:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .admin-toggle.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        /* ==================== MAIN CONTAINER ==================== */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* ==================== ADMIN SIDEBAR ==================== */
+        .admin-sidebar {
+            width: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
             overflow: hidden;
+            transition: width 0.3s ease;
+            flex-shrink: 0;
         }
-        
-        /* HIERARCHY VIEW */
-        .hierarchy-view {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            transition: all 0.5s ease;
+
+        .admin-sidebar.open {
+            width: 320px;
         }
-        
-        .hierarchy-view.hidden {
-            opacity: 0;
-            transform: translateX(-100%);
+
+        .sidebar-content {
+            width: 320px;
+            padding: 20px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
         }
-        
-        /* DRILL-DOWN VIEW */
-        .drill-down-view {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                linear-gradient(135deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 73, 94, 0.95) 100%),
-                url('./pictures/summer.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.5s ease;
+
+        .sidebar-section {
+            margin-bottom: 25px;
         }
-        
-        .drill-down-view.active {
-            opacity: 1;
-            transform: translateX(0%);
+
+        .sidebar-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
-        
-        .drill-down-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(52,73,94,0.9));
+
+        .admin-btn {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .admin-btn.danger {
+            border-color: var(--accent-color);
+        }
+
+        .admin-btn.danger:hover {
+            background: rgba(231, 76, 60, 0.3);
+        }
+
+        .admin-btn.success {
+            border-color: var(--success-color);
+        }
+
+        .admin-btn.success:hover {
+            background: rgba(39, 174, 96, 0.3);
+        }
+
+        /* Department List in Sidebar */
+        .dept-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dept-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1001;
-        }
-        
-        .drill-down-title {
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .back-button {
-            background: linear-gradient(145deg, #e74c3c, #c0392b);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .dept-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dept-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dept-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .dept-item-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .dept-item-btn.edit {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .dept-item-btn.delete {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .dept-item-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+        }
+
+        /* ==================== CONTENT AREA ==================== */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* ==================== HIERARCHY VIEW ==================== */
+        .hierarchy-view {
+            display: none;
+        }
+
+        .hierarchy-view.active {
+            display: block;
+        }
+
+        .hierarchy-level {
+            margin-bottom: 40px;
+        }
+
+        .level-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .level-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* ==================== GRID VIEW ==================== */
+        .grid-view {
+            display: none;
+        }
+
+        .grid-view.active {
+            display: block;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .filter-select option {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* ==================== EMPLOYEE CARD ==================== */
+        .employee-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
+            border-left: 4px solid var(--primary-color);
+            position: relative;
         }
-        
-        .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
-        
-        .drill-down-content {
+
+        .employee-card.admin-mode::after {
+            content: '';
             position: absolute;
-            top: 60px;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            padding: 20px;
-            overflow: auto;
-        }
-        
-        /* IMPROVED TALLER HORIZONTAL EMPLOYEE CARDS */
-        .employee-card {
-            position: absolute;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            border: 2px solid;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            z-index: 10;
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            padding: 8px; /* Increased from 6px */
-        }
-        
-        .employee-card:hover {
-            transform: scale(1.05) translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-            z-index: 100;
-        }
-        
-        /* DEPARTMENT-BASED STYLING */
-        .dept-extraction-card {
-            border-color: #e67e22;
-            background: linear-gradient(145deg, #fdf6f0, #fcf3ec);
-            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
-        }
-        
-        .dept-processing-lab-card {
-            border-color: #3498db;
-            background: linear-gradient(145deg, #f2f8fd, #e8f4fd);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-        }
-        
-        .dept-kitchen-card {
-            border-color: #f39c12;
-            background: linear-gradient(145deg, #fef9f2, #fcf3e8);
-            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-        }
-        
-        .dept-packaging-card {
-            border-color: #e74c3c;
-            background: linear-gradient(145deg, #fdf2f2, #fce8e8);
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-        }
-        
-        .dept-warehouse-card {
-            border-color: #2ecc71;
-            background: linear-gradient(145deg, #f2fcf7, #e8f8f0);
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
-        }
-        
-        .dept-maintenance-card {
-            border-color: #34495e;
-            background: linear-gradient(145deg, #f5f6f7, #eaecee);
-            box-shadow: 0 4px 12px rgba(52, 73, 94, 0.3);
-        }
-        
-        .dept-quality-card {
-            border-color: #9b59b6;
-            background: linear-gradient(145deg, #f7f2fc, #f0e8f8);
-            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
-        }
-        
-        .dept-management-card {
-            border-color: #ffd700;
-            background: linear-gradient(145deg, #fff8dc, #ffeaa7);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-        }
-        
-        /* POSITION-BASED BORDER THICKNESS */
-        .manager-operations-card { border-width: 4px; }
-        .director-supply-chain-card { border-width: 4px; }
-        .manager-maintenance-card { border-width: 4px; }
-        .director-card { border-width: 3px; }
-        .manager-card { border-width: 3px; }
-        .supervisor-card { border-width: 3px; }
-        .quality-specialist-card { border-width: 3px; }
-        .lead-card { border-width: 3px; }
-        
-        /* PHOTO SECTION - Left side */
-        .card-photo-section {
-            flex: 0 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px; /* Increased from 8px */
-        }
-        
-        /* TEXT SECTION - Right side, improved spacing */
-        .card-text-section {
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 3px; /* Increased from 1px */
-            line-height: 1.2; /* Improved from 1.1 */
-            overflow: hidden;
-            min-width: 0;
-        }
-        
-        .card-photo {
-            border-radius: 4px;
-            object-fit: cover;
-            border: 1px solid white;
-            display: block;
-            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-        }
-        
-        /* IMPROVED TEXT - Better readability */
-        .card-name {
-            font-weight: bold;
-            color: #2c3e50;
-            line-height: 1.2;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-            word-wrap: break-word;
-            font-size: 12px; /* Increased from 11px */
-            margin: 0;
-            padding: 0;
-            white-space: normal;
-        }
-        
-        .card-title {
-            color: #566573;
-            font-weight: 500;
-            font-size: 10px;
-            line-height: 1.1;
-            margin: 0;
-            padding: 0;
-            white-space: normal;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .card-position {
-            color: #7f8c8d;
-            font-weight: 500;
-            font-size: 10px; /* Increased from 9px */
-            line-height: 1.1;
-            margin: 0;
-            padding: 0;
-            white-space: normal; /* Changed from nowrap to allow wrapping */
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* DEPARTMENT SUMMARY CARDS */
-        .department-card {
-            position: absolute;
-            background: linear-gradient(145deg, #ffffff, #f1f2f6);
+            border: 2px dashed var(--primary-color);
             border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-            border: 3px solid;
-            cursor: pointer;
-            z-index: 10;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .card-header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px;
-            transition: all 0.3s ease;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-secondary);
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .card-position {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .card-detail-icon {
+            width: 20px;
             text-align: center;
         }
-        
-        .department-card:hover {
-            transform: scale(1.08) translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            z-index: 100;
+
+        .dept-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
         }
-        
-        .dept-packaging { border-color: #e74c3c; background: linear-gradient(145deg, #fdf2f2, #fce8e8); }
-        .dept-kitchen { border-color: #f39c12; background: linear-gradient(145deg, #fef9f2, #fcf3e8); }
-        .dept-processing-lab { border-color: #3498db; background: linear-gradient(145deg, #f2f8fd, #e8f4fd); }
-        .dept-warehouse { border-color: #2ecc71; background: linear-gradient(145deg, #f2fcf7, #e8f8f0); }
-        .dept-quality { border-color: #9b59b6; background: linear-gradient(145deg, #f7f2fc, #f0e8f8); }
-        .dept-maintenance { border-color: #34495e; background: linear-gradient(145deg, #f5f6f7, #eaecee); }
-        .dept-extraction { border-color: #e67e22; background: linear-gradient(145deg, #fdf6f0, #fcf3ec); }
-        
-        .dept-title {
-            font-weight: bold;
-            color: #2c3e50;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-            margin-bottom: 4px;
-            line-height: 1.1;
+
+        .card-actions {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            gap: 5px;
         }
-        
-        .dept-count {
-            font-weight: bold;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .dept-packaging .dept-count { color: #e74c3c; }
-        .dept-kitchen .dept-count { color: #f39c12; }
-        .dept-processing-lab .dept-count { color: #3498db; }
-        .dept-warehouse .dept-count { color: #2ecc71; }
-        .dept-quality .dept-count { color: #9b59b6; }
-        .dept-maintenance .dept-count { color: #34495e; }
-        .dept-extraction .dept-count { color: #e67e22; }
-        
-        /* DRILL-DOWN EMPLOYEE CARDS */
-        .drill-employee-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,249,250,0.95));
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            border: 2px solid #ddd;
-            overflow: hidden;
-            transition: all 0.2s ease;
-            cursor: pointer;
+
+        .admin-mode .card-actions {
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 4px;
-            margin: 2px;
         }
-        
-        .drill-employee-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+        .card-action-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
         }
-        
-        .drill-card-photo-section {
-            flex: 0 0 auto;
+
+        .card-action-btn.edit {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .card-action-btn.delete {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .card-action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* ==================== DEPARTMENT VIEW ==================== */
+        .department-view {
+            display: none;
+        }
+
+        .department-view.active {
+            display: block;
+        }
+
+        .dept-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .dept-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .dept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .dept-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 6px;
+            font-size: 24px;
+            color: white;
         }
-        
-        .drill-card-text-section {
-            flex: 1 1 auto;
+
+        .dept-card-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .dept-card-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== MODALS ==================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f1f2f6;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .color-picker {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .color-preview {
+            flex: 1;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-danger {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        /* ==================== SETTINGS MODAL ==================== */
+        .settings-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .settings-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        /* ==================== EMPTY STATE ==================== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        /* ==================== TOAST NOTIFICATIONS ==================== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3000;
             display: flex;
             flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success {
+            background: var(--success-color);
+        }
+
+        .toast.error {
+            background: var(--accent-color);
+        }
+
+        .toast.info {
+            background: var(--primary-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ==================== CONFIRM DIALOG ==================== */
+        .confirm-dialog {
+            text-align: center;
+        }
+
+        .confirm-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .confirm-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .company-name {
+                font-size: 18px;
+            }
+
+            .admin-sidebar.open {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                z-index: 999;
+            }
+
+            .sidebar-content {
+                width: 100%;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+
+            .employees-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .search-box, .filter-select {
+                width: 100%;
+            }
+        }
+
+        /* ==================== HIERARCHY TREE ==================== */
+        .hierarchy-tree {
+            padding: 20px;
+        }
+
+        .tree-node {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .tree-node::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 50%;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tree-node::after {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 15px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tree-node:first-child::before {
+            top: 50%;
+        }
+
+        .tree-node:last-child::before {
+            bottom: 50%;
+        }
+
+        .tree-root {
+            padding-left: 0;
+        }
+
+        .tree-root::before, .tree-root::after {
+            display: none;
+        }
+
+        .tree-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin: 8px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .tree-card-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 1px;
-            line-height: 1.1;
-            min-width: 0;
-        }
-        
-        .drill-card-name {
             font-weight: bold;
-            color: #2c3e50;
-            line-height: 1.1;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-            font-size: 9px;
-            word-wrap: break-word;
+            color: var(--text-secondary);
         }
-        
-        .drill-card-title {
-            color: #566573;
-            font-weight: 500;
-            font-size: 8px;
-            line-height: 1.0;
-            white-space: nowrap;
+
+        .tree-card-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tree-card-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .tree-card-position {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .tree-children {
+            margin-left: 20px;
+        }
+
+        /* ==================== IMPORT/EXPORT ==================== */
+        .file-input-wrapper {
+            position: relative;
             overflow: hidden;
-            text-overflow: ellipsis;
+            display: inline-block;
+            width: 100%;
         }
-        
-        .drill-card-position {
-            color: #7f8c8d;
-            font-weight: 500;
-            font-size: 8px;
-            line-height: 1.0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* CONNECTION LINES */
-        .connection-line {
+
+        .file-input {
             position: absolute;
-            background: linear-gradient(180deg, rgba(52, 73, 94, 0.8), rgba(52, 73, 94, 0.4));
-            z-index: 1;
-            border-radius: 1px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
         }
-        
-        .hierarchy-line-plant-manager {
-            position: absolute;
-            background: linear-gradient(180deg, rgba(255, 215, 0, 0.9), rgba(52, 152, 219, 0.7));
-            z-index: 2;
-            border-radius: 2px;
-            box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        .hierarchy-line-director {
-            position: absolute;
-            background: linear-gradient(180deg, rgba(52, 152, 219, 0.9), rgba(243, 156, 18, 0.7));
-            z-index: 2;
-            border-radius: 2px;
-            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
-        }
-        
-        .hierarchy-line-maintenance {
-            position: absolute;
-            background: linear-gradient(180deg, rgba(52, 73, 94, 0.9), rgba(149, 165, 166, 0.7));
-            z-index: 2;
-            border-radius: 2px;
-            box-shadow: 0 2px 4px rgba(52, 73, 94, 0.3);
+
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
-    <div class="chart-container">
-        <!-- HIERARCHY VIEW -->
-        <div class="hierarchy-view" id="hierarchyView">
-            <div id="orgChart"></div>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">EB</div>
+            <h1 class="company-name" id="companyName" title="Click 5 times to toggle admin mode">Employee Board</h1>
         </div>
-        
-        <!-- DRILL-DOWN VIEW -->
-        <div class="drill-down-view" id="drillDownView">
-            <div class="drill-down-header">
-                <div class="drill-down-title" id="drillDownTitle">Department View</div>
-                <button class="back-button" id="backButton">← Back to Hierarchy</button>
+        <div class="header-actions">
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid">Grid</button>
+                <button class="view-btn" data-view="hierarchy">Hierarchy</button>
+                <button class="view-btn" data-view="departments">Departments</button>
             </div>
-            <div class="drill-down-content" id="drillDownContent"></div>
+            <button class="admin-toggle" id="adminToggle" title="Admin Panel (Ctrl+Shift+A)">⚙</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- ADMIN SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-content">
+                <!-- Stats Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Overview</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalEmployees">0</div>
+                            <div class="stat-label">Employees</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalDepartments">0</div>
+                            <div class="stat-label">Departments</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Management -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Employees</h3>
+                    <button class="admin-btn success" onclick="openEmployeeModal()">
+                        <span>+</span> Add Employee
+                    </button>
+                </div>
+
+                <!-- Department Management -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Departments</h3>
+                    <button class="admin-btn success" onclick="openDepartmentModal()">
+                        <span>+</span> Add Department
+                    </button>
+                    <div class="dept-list" id="deptList"></div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Data Management</h3>
+                    <button class="admin-btn" onclick="exportData()">
+                        <span>↓</span> Export Data (JSON)
+                    </button>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" id="importFile" accept=".json" onchange="importData(event)">
+                        <label class="file-input-label">
+                            <span>↑</span> Import Data (JSON)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Settings</h3>
+                    <button class="admin-btn" onclick="openSettingsModal()">
+                        <span>⚙</span> Board Settings
+                    </button>
+                    <button class="admin-btn danger" onclick="confirmReset()">
+                        <span>⟲</span> Reset to Default
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+            <!-- Grid View -->
+            <div class="grid-view active" id="gridView">
+                <div class="filter-bar">
+                    <input type="text" class="search-box" id="searchBox" placeholder="Search employees...">
+                    <select class="filter-select" id="deptFilter">
+                        <option value="">All Departments</option>
+                    </select>
+                    <select class="filter-select" id="positionFilter">
+                        <option value="">All Positions</option>
+                    </select>
+                </div>
+                <div class="employees-grid" id="employeesGrid"></div>
+            </div>
+
+            <!-- Hierarchy View -->
+            <div class="hierarchy-view" id="hierarchyView">
+                <div class="hierarchy-tree" id="hierarchyTree"></div>
+            </div>
+
+            <!-- Department View -->
+            <div class="department-view" id="departmentView">
+                <div class="dept-cards-grid" id="deptCardsGrid"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Employee Modal -->
+    <div class="modal-overlay" id="employeeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="employeeModalTitle">Add Employee</h2>
+                <button class="modal-close" onclick="closeEmployeeModal()">×</button>
+            </div>
+            <form id="employeeForm" onsubmit="saveEmployee(event)">
+                <input type="hidden" id="employeeId">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-input" id="employeeName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Position *</label>
+                    <input type="text" class="form-input" id="employeePosition" required placeholder="e.g., Manager, Supervisor, Employee">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department *</label>
+                    <select class="form-select" id="employeeDepartment" required>
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reports To</label>
+                    <select class="form-select" id="employeeManager">
+                        <option value="">None (Top Level)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Shift</label>
+                    <input type="text" class="form-input" id="employeeShift" placeholder="e.g., 1st Shift, Day Shift">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="employeeEmail">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="employeePhone">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmployeeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Employee</button>
+                </div>
+            </form>
         </div>
     </div>
-    
+
+    <!-- Department Modal -->
+    <div class="modal-overlay" id="departmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="departmentModalTitle">Add Department</h2>
+                <button class="modal-close" onclick="closeDepartmentModal()">×</button>
+            </div>
+            <form id="departmentForm" onsubmit="saveDepartment(event)">
+                <input type="hidden" id="departmentId">
+                <div class="form-group">
+                    <label class="form-label">Department Name *</label>
+                    <input type="text" class="form-input" id="departmentName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department Color</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" class="color-picker" id="departmentColor" value="#3498db" onchange="updateColorPreview()">
+                        <div class="color-preview" id="colorPreview" style="background: #3498db;"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="departmentDescription" placeholder="Brief description of the department">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeDepartmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Board Settings</h2>
+                <button class="modal-close" onclick="closeSettingsModal()">×</button>
+            </div>
+            <form id="settingsForm" onsubmit="saveSettings(event)">
+                <div class="settings-group">
+                    <div class="settings-group-title">Company Information</div>
+                    <div class="form-group">
+                        <label class="form-label">Company Name</label>
+                        <input type="text" class="form-input" id="settingsCompanyName">
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <div class="settings-group-title">Position Hierarchy</div>
+                    <div class="form-group">
+                        <label class="form-label">Position Levels (comma separated, highest to lowest)</label>
+                        <input type="text" class="form-input" id="settingsPositions" placeholder="Director, Manager, Supervisor, Lead, Employee">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <div class="confirm-dialog">
+                <div class="confirm-icon" id="confirmIcon">⚠️</div>
+                <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
+                <p class="confirm-message" id="confirmMessage">Are you sure you want to proceed?</p>
+                <div class="form-actions" style="justify-content: center;">
+                    <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script>
-        // UPDATED Employee data with THREE CO-EQUAL LEADERS: Dora, Michael, Abel
-        const employees = [
-            // THREE CO-EQUAL TOP-LEVEL LEADERS (parentId: null)
-            { "id": 1, "name": "Dora Gaeza", "position": "Manager, Operations", "department": "Management", "parentId": null, "shift": "", "dept_color": "#95a5a6" },
-            { "id": 6, "name": "Michael Amaya", "position": "Director, Supply Chain", "department": "Warehouse", "parentId": null, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 8, "name": "Abel Ortega", "position": "Manager, Maintenance", "department": "Maintenance", "parentId": null, "shift": "", "dept_color": "#34495e" },
-            
-            // Managers under Dora (5 total) - UPDATED TITLES
-            { "id": 2, "name": "Luis Hernandez", "position": "Manager, Kitchen", "department": "Kitchen", "parentId": 1, "shift": "", "dept_color": "#f39c12" },
-            { "id": 140, "name": "Daniel Gelpi", "position": "Manager, Extraction", "department": "Extraction", "parentId": 1, "shift": "", "dept_color": "#e67e22" },
-            { "id": 3, "name": "Lester Igarza", "position": "Manager, Production", "department": "Packaging", "parentId": 1, "shift": "", "dept_color": "#e74c3c" },
-            
-            // Managers under Michael (1 total) - UPDATED TITLES
-            { "id": 16, "name": "Susana Ceballos", "position": "Manager, Inventory", "department": "Warehouse", "parentId": 6, "shift": "", "dept_color": "#2ecc71" },
-            
-            // Supervisors under Dora (2 total) - UPDATED TITLES
-            { "id": 4, "name": "Sunita Jainanan", "position": "Supervisor, Processing", "department": "Processing Lab", "parentId": 1, "shift": "", "dept_color": "#3498db" },
-            { "id": 5, "name": "Carlos Archaga", "position": "Supervisor, Processing", "department": "Processing Lab", "parentId": 1, "shift": "", "dept_color": "#3498db" },
-            
-            // Supervisors under their respective managers
-            { "id": 17, "name": "Norma Rodriguez", "position": "Supervisor, Logistics", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 9, "name": "Dan Peluso", "position": "Supervisor, Maintenance", "department": "Maintenance", "parentId": 8, "shift": "", "dept_color": "#34495e" },
-            
-            // Quality Specialist
-            { "id": 7, "name": "Mariela De La Rosa", "position": "Quality Specialist", "department": "Quality", "parentId": 140, "shift": "", "dept_color": "#9b59b6" },
-            
-            // Department Leads - UPDATED TITLES
-            { "id": 11, "name": "Idalmis Medina Rodriguez", "position": "Lead, Kitchen", "department": "Kitchen", "parentId": 2, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 12, "name": "Nathan Vargas", "position": "Lead, Kitchen", "department": "Kitchen", "parentId": 2, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            
-            // Packaging Supervisors - UPDATED TITLES
-            { "id": 13, "name": "Jubilee Rodriguez", "position": "Supervisor, Production", "department": "Packaging", "parentId": 3, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 14, "name": "Maria Mendez", "position": "Supervisor, Production", "department": "Packaging", "parentId": 3, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 15, "name": "Samantha Perez-Morell", "position": "Supervisor, Production", "department": "Packaging", "parentId": 3, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            
-            // Quality Employees
-            { "id": 134, "name": "Irina Naumenco", "position": "Employee", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6" },
-            { "id": 135, "name": "Maria Dominguez", "position": "Employee", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6" },
-            { "id": 18, "name": "Gabriela Urbina", "position": "Associate", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6" },
-            
-            // Extraction Employees
-            { "id": 141, "name": "Raimart Castellanos", "position": "Employee", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22" },
-            { "id": 142, "name": "Mikael Gonzalez", "position": "Employee", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22" },
-            { "id": 143, "name": "Anthony Perrera", "position": "Employee", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22" },
-            { "id": 144, "name": "Jack Scilla", "position": "Employee", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22" },
-            { "id": 145, "name": "Camilo Torres", "position": "Employee", "department": "Extraction", "parentId": 140, "shift": "2nd Shift", "dept_color": "#e67e22" },
-            { "id": 146, "name": "Jenneth Miranda", "position": "Employee", "department": "Extraction", "parentId": 140, "shift": "2nd Shift", "dept_color": "#e67e22" },
-            
-            // Kitchen Employees - 1st Shift
-            { "id": 19, "name": "Fabiola Trujillo", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 20, "name": "Yurisan Marin", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 21, "name": "Niurka Cazada", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 22, "name": "Ramon Garcia", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 23, "name": "Willie Lozano", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 24, "name": "Isabel Alvarado", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 25, "name": "Ivan Delavega", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            { "id": 26, "name": "Karla Archaga", "position": "Employee", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12" },
-            
-            // Kitchen Employees - 2nd Shift
-            { "id": 27, "name": "Larry Collins", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 28, "name": "Jake Roth", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 29, "name": "Alex Ventura", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 30, "name": "Mildrey Guerra", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 31, "name": "Lydia Mendez", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 32, "name": "Francisco Beltran Rodriguez", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 33, "name": "Alberto Beltran Rivero", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 34, "name": "Elizabeth Ambroso", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 35, "name": "Alba Botero", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            { "id": 36, "name": "Jason Levine", "position": "Employee", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12" },
-            
-            // Packaging Employees - 1st Shift (50 employees)
-            { "id": 37, "name": "Ana Fernandez Fernandez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 38, "name": "Laidamys Blanco", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 39, "name": "Yanet Pesquiera", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 40, "name": "Maria De Silva", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 41, "name": "Belkis Carballo", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 42, "name": "Alejandro Godoy", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 43, "name": "Angel Ortiz Rodriguez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 44, "name": "Adolfo Valdes", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 45, "name": "Rafael Campana", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 46, "name": "Alberto Curiel", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 47, "name": "Charity Parks", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 48, "name": "Sailys Rodriguez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 49, "name": "Maria Vega", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 50, "name": "Carolina Sanchez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 51, "name": "Lourdes Sanchez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 52, "name": "Haydee Perez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 53, "name": "Martha Betancur", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 54, "name": "Gloriberth", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 55, "name": "Jorge Orjuela Lozano", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 56, "name": "Maite Corria", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 57, "name": "Maximino Plaza", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 58, "name": "Mavilin Marrero", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 59, "name": "Yabelkis Banos", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 60, "name": "Maray Valdes Lozano", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 61, "name": "Maricel Castellanos", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 62, "name": "Rosalva Contreras", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 63, "name": "Carlos Hernandez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 64, "name": "Sofia Rodriguez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 65, "name": "Miguel Santos", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 66, "name": "Elena Vargas", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 67, "name": "Fernando Lopez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 68, "name": "Isabella Cruz", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 69, "name": "Ricardo Morales", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 70, "name": "Valentina Ruiz", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 71, "name": "Alejandro Diaz", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 72, "name": "Camila Fernandez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 73, "name": "Diego Torres", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 74, "name": "Lucia Martinez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 75, "name": "Gabriel Ramirez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 76, "name": "Andrea Gonzalez", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 77, "name": "Sebastian Jimenez", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 78, "name": "Natalia Castro", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 79, "name": "Mateo Ortiz", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 80, "name": "Paula Herrera", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 81, "name": "Nicolas Ramos", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 82, "name": "Daniela Flores", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 83, "name": "Juan Carlos Medina", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 84, "name": "Mariana Delgado", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 85, "name": "Santiago Rivera", "position": "Employee", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            { "id": 86, "name": "Catalina Vega", "position": "Employee", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c" },
-            
-            // Packaging Employees - 2nd Shift (30 employees)
-            { "id": 87, "name": "Abelardo Rodriguez", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 88, "name": "Alberto Loyola-Mesa", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 89, "name": "Zithlaly Mendez", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 90, "name": "Josefina Acosta", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 91, "name": "Ana Zambrano", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 92, "name": "Galatea Gutierrez", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 93, "name": "Mario Hernandez", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 94, "name": "Jorge Acosta", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 95, "name": "Maria Amador", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 96, "name": "Karel Acosta", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 97, "name": "Ruth Garcia", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 98, "name": "Yanet Rodriguez", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 99, "name": "Sandra Bayona", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 100, "name": "Dora Molina", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 101, "name": "Blanca Bedoya", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 102, "name": "Roberto Silva", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 103, "name": "Carmen Aguilar", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 104, "name": "Eduardo Paredes", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 105, "name": "Guadalupe Navarro", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 106, "name": "Sergio Mendoza", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 107, "name": "Esperanza Guerrero", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 108, "name": "Arturo Campos", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 109, "name": "Rosa Elena Soto", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 110, "name": "Raul Contreras", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 111, "name": "Patricia Varela", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 112, "name": "Victor Hugo Paz", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 113, "name": "Silvia Moreno", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 114, "name": "Andres Castillo", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 115, "name": "Leticia Sandoval", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            { "id": 116, "name": "Omar Figueroa", "position": "Employee", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c" },
-            
-            // Processing Lab Employees
-            { "id": 117, "name": "Michael Slager", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 118, "name": "Carolina Ceballos", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 119, "name": "Luis Acevedo", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 120, "name": "Maria Paz", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db" },
-            { "id": 121, "name": "Joshua Lastres", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 2", "dept_color": "#3498db", "photo": "./pictures/joshua_lastres.jpg" },
-            { "id": 122, "name": "Armando Hernandez", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db" },
-            { "id": 123, "name": "Melissa Loyola", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 2", "dept_color": "#3498db" },
-            { "id": 124, "name": "Randy Castellano", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db" },
-            { "id": 125, "name": "Karla De La Cruz", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Shift 3", "dept_color": "#3498db" },
-            { "id": 126, "name": "Diego", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db" },
-            { "id": 139, "name": "Miguel Colina", "position": "Employee", "department": "Processing Lab", "parentId": 4, "shift": "Former Analytical Lab", "dept_color": "#3498db" },
-            { "id": 10, "name": "Natalie Zeledon", "position": "Employee", "department": "Processing Lab", "parentId": 5, "shift": "Former Analytical Lab", "dept_color": "#3498db" },
-            
-            // Warehouse Employees
-            { "id": 127, "name": "Reginald Knight", "position": "Employee", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 128, "name": "Jorge Figueroa", "position": "Employee", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 129, "name": "Renier Robaina", "position": "Employee", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 130, "name": "Ivan Camejo", "position": "Employee", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 131, "name": "Steven Wisby", "position": "Employee", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 132, "name": "Gary Rodriguez", "position": "Employee", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71" },
-            { "id": 133, "name": "Natalie Martinez", "position": "Employee", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71" },
-            
-            // Maintenance Employees
-            { "id": 136, "name": "Jose Miranda", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
-            { "id": 137, "name": "Jose Acosta", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" },
-            { "id": 138, "name": "Yusdriviel Rodriguez", "position": "Employee", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e" }
-        ];
-        
-        let screenWidth = 1280;
-        let screenHeight = 690;
-        let isDrillDownActive = false;
-        let currentDepartment = null;
-        
-        // Updated department names order: Extraction → Processing → Kitchen → Packaging → Warehouse → Maintenance
-        const departmentNames = ["Extraction", "Processing Lab", "Kitchen", "Packaging", "Warehouse", "Maintenance", "Quality"];
-        let createdConnections = new Set();
-        
-        // SMART name wrapping for compact cards
-        function wrapLongName(name) {
-            const parts = name.split(' ');
-            
-            // For names with 3+ parts, break after first name
-            if (parts.length >= 3 && name.length > 18) {
-                return parts[0] + '<br>' + parts.slice(1).join(' ');
-            }
-            
-            // For 2-part names that are long
-            if (parts.length === 2 && name.length > 20) {
-                return parts[0] + '<br>' + parts[1];
-            }
-            
-            return name;
+        // ==================== DATA STORE ====================
+        const STORAGE_KEY = 'customEmployeeBoard';
+
+        let appData = {
+            settings: {
+                companyName: 'Employee Board',
+                positionLevels: ['Director', 'Manager', 'Supervisor', 'Lead', 'Specialist', 'Employee', 'Associate']
+            },
+            departments: [],
+            employees: []
+        };
+
+        // ==================== DEFAULT DATA ====================
+        const defaultData = {
+            settings: {
+                companyName: 'Employee Board',
+                positionLevels: ['Director', 'Manager', 'Supervisor', 'Lead', 'Specialist', 'Employee', 'Associate']
+            },
+            departments: [
+                { id: 1, name: 'Management', color: '#f39c12', description: 'Executive leadership' },
+                { id: 2, name: 'Engineering', color: '#3498db', description: 'Software development' },
+                { id: 3, name: 'Marketing', color: '#9b59b6', description: 'Marketing and communications' },
+                { id: 4, name: 'Sales', color: '#27ae60', description: 'Sales and business development' },
+                { id: 5, name: 'Operations', color: '#e74c3c', description: 'Operations and logistics' },
+                { id: 6, name: 'Human Resources', color: '#1abc9c', description: 'HR and recruitment' }
+            ],
+            employees: [
+                { id: 1, name: 'John Smith', position: 'Director', department: 'Management', parentId: null, shift: '', email: 'john@company.com', phone: '' },
+                { id: 2, name: 'Sarah Johnson', position: 'Manager', department: 'Engineering', parentId: 1, shift: '', email: 'sarah@company.com', phone: '' },
+                { id: 3, name: 'Mike Brown', position: 'Manager', department: 'Marketing', parentId: 1, shift: '', email: 'mike@company.com', phone: '' },
+                { id: 4, name: 'Emily Davis', position: 'Manager', department: 'Sales', parentId: 1, shift: '', email: 'emily@company.com', phone: '' },
+                { id: 5, name: 'David Wilson', position: 'Supervisor', department: 'Engineering', parentId: 2, shift: 'Day Shift', email: '', phone: '' },
+                { id: 6, name: 'Lisa Anderson', position: 'Supervisor', department: 'Engineering', parentId: 2, shift: 'Night Shift', email: '', phone: '' },
+                { id: 7, name: 'James Taylor', position: 'Lead', department: 'Marketing', parentId: 3, shift: '', email: '', phone: '' },
+                { id: 8, name: 'Jennifer Martinez', position: 'Employee', department: 'Engineering', parentId: 5, shift: 'Day Shift', email: '', phone: '' },
+                { id: 9, name: 'Robert Garcia', position: 'Employee', department: 'Engineering', parentId: 5, shift: 'Day Shift', email: '', phone: '' },
+                { id: 10, name: 'Amanda Lee', position: 'Employee', department: 'Marketing', parentId: 7, shift: '', email: '', phone: '' }
+            ]
+        };
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            loadData();
+            renderAll();
+            setupEventListeners();
+            updateStats();
         }
 
-        // NEW: Smart position wrapping for long titles
-        function wrapLongPosition(position) {
-            // If position contains a comma, wrap at the comma
-            if (position.includes(', ')) {
-                return position.replace(', ', ',<br>');
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                    appData = JSON.parse(JSON.stringify(defaultData));
+                }
+            } else {
+                appData = JSON.parse(JSON.stringify(defaultData));
             }
-            
-            return position;
+            document.getElementById('companyName').textContent = appData.settings.companyName;
         }
 
-        // Calculate compact text dimensions
-        function measureTextDimensions(text, fontSize) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            context.font = `${fontSize}px Arial`;
-            const metrics = context.measureText(text);
-            return {
-                width: metrics.width,
-                height: fontSize * 1.2 // Approximate height
-            };
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            updateStats();
         }
-        
-        function calculateScreenDimensions() {
-            const container = document.querySelector(".chart-container");
-            if (container) {
-                screenWidth = container.clientWidth || 1280;
-                screenHeight = container.clientHeight || 690;
-            }
-        }
-        
-        function calculateOptimalSizing() {
-            calculateScreenDimensions();
-            
-            const padding = 10;
-            const isSmallScreen = screenWidth < 1400;
-            
-            // IMPROVED CARD DIMENSIONS - INCREASED HEIGHT BY ~5% FOR BETTER TEXT VISIBILITY
-            const photoSize = isSmallScreen ? 45 : 55;
-            const baseTextWidth = isSmallScreen ? 85 : 105; // Slightly wider for better text
-            const heightIncrease = 23; // Increased from 18 to 23 for even better text visibility (5% increase)
-            
-            const cardDimensions = {
-                "Manager, Operations": {
-                    photoSize: photoSize + 10,
-                    textWidth: baseTextWidth + 25,
-                    height: photoSize + 20 + heightIncrease
-                },
-                "Director, Supply Chain": {
-                    photoSize: photoSize + 10,
-                    textWidth: baseTextWidth + 25,
-                    height: photoSize + 20 + heightIncrease
-                },
-                "Manager, Maintenance": {
-                    photoSize: photoSize + 10,
-                    textWidth: baseTextWidth + 25,
-                    height: photoSize + 20 + heightIncrease
-                },
-                "Manager, Kitchen": {
-                    photoSize: photoSize,
-                    textWidth: baseTextWidth + 15,
-                    height: photoSize + 12 + heightIncrease
-                },
-                "Manager, Extraction": {
-                    photoSize: photoSize,
-                    textWidth: baseTextWidth + 15,
-                    height: photoSize + 12 + heightIncrease
-                },
-                "Manager, Production": {
-                    photoSize: photoSize,
-                    textWidth: baseTextWidth + 15,
-                    height: photoSize + 12 + heightIncrease
-                },
-                "Manager, Inventory": {
-                    photoSize: photoSize,
-                    textWidth: baseTextWidth + 15,
-                    height: photoSize + 12 + heightIncrease
-                },
-                "Supervisor, Processing": {
-                    photoSize: photoSize - 2,
-                    textWidth: baseTextWidth + 10,
-                    height: photoSize + 10 + heightIncrease
-                },
-                "Supervisor, Production": {
-                    photoSize: photoSize - 2,
-                    textWidth: baseTextWidth + 10,
-                    height: photoSize + 10 + heightIncrease
-                },
-                "Supervisor, Logistics": {
-                    photoSize: photoSize - 2,
-                    textWidth: baseTextWidth + 10,
-                    height: photoSize + 10 + heightIncrease
-                },
-                "Supervisor, Maintenance": {
-                    photoSize: photoSize - 2,
-                    textWidth: baseTextWidth + 10,
-                    height: photoSize + 10 + heightIncrease
-                },
-                "Lead, Kitchen": {
-                    photoSize: photoSize - 5,
-                    textWidth: baseTextWidth + 5,
-                    height: photoSize + 8 + heightIncrease
-                },
-                "Quality Specialist": {
-                    photoSize: photoSize,
-                    textWidth: baseTextWidth + 15,
-                    height: photoSize + 12 + heightIncrease
-                },
-                "Department": {
-                    width: Math.min(120, screenWidth * 0.09),
-                    height: Math.min(100, screenHeight * 0.095)
-                }
-            };
-            
-            return cardDimensions;
-        }
-        
-        // IMPROVED PROCESS FLOW POSITIONING WITH BETTER SPACING AND THREE TOP-LEVEL LEADERS
-        function calculateProcessFlowLayout() {
-            const padding = 15;
-            const cardDimensions = calculateOptimalSizing();
-            const isSmallScreen = screenWidth < 1400;
-            
-            // Position THREE CO-EQUAL TOP-LEVEL LEADERS
-            const dora = employees.find(emp => emp.name === "Dora Gaeza");
-            const michael = employees.find(emp => emp.name === "Michael Amaya");
-            const abel = employees.find(emp => emp.name === "Abel Ortega");
-            
-            if (dora) {
-                const doraDims = cardDimensions["Manager, Operations"];
-                const doraWidth = doraDims.photoSize + doraDims.textWidth + 20;
-                dora.x_pos = (screenWidth - doraWidth) / 2;
-                dora.y_pos = padding;
-                dora.cardWidth = doraWidth;
-                dora.cardHeight = doraDims.height;
-            }
-            
-            // RESPONSIVE PROCESS FLOW ZONES - SHIFTED EXTRACTION LEFT BY 5%
-            const availableWidth = screenWidth - (padding * 2);
-            const numZones = 6; // extraction, processing, kitchen, packaging, warehouse, maintenance
-            const zoneWidth = availableWidth / numZones;
-            const extractionShift = screenWidth * 0.05; // 5% left shift for extraction zone
-            
-            const processZones = {
-                extraction: { 
-                    x_start: padding - extractionShift, // MOVED LEFT BY 5%
-                    width: zoneWidth 
-                },
-                processing: { 
-                    x_start: padding + zoneWidth - extractionShift * 0.5, // Slight adjustment
-                    width: zoneWidth 
-                },
-                kitchen: { 
-                    x_start: padding + (zoneWidth * 2), 
-                    width: zoneWidth 
-                },
-                packaging: { 
-                    x_start: padding + (zoneWidth * 3), 
-                    width: zoneWidth 
-                },
-                warehouse: { 
-                    x_start: padding + (zoneWidth * 4), 
-                    width: zoneWidth 
-                },
-                maintenance: { 
-                    x_start: padding + (zoneWidth * 5), 
-                    width: zoneWidth 
-                }
-            };
-            
-            // Position Michael in warehouse zone, Abel in maintenance zone
-            if (michael) {
-                const michaelDims = cardDimensions["Director, Supply Chain"];
-                const michaelWidth = michaelDims.photoSize + michaelDims.textWidth + 20;
-                michael.x_pos = processZones.warehouse.x_start + (processZones.warehouse.width - michaelWidth) / 2;
-                michael.y_pos = padding;
-                michael.cardWidth = michaelWidth;
-                michael.cardHeight = michaelDims.height;
-                michael.x_pos = Math.max(padding, Math.min(michael.x_pos, screenWidth - padding - michaelWidth));
-            }
-            
-            if (abel) {
-                const abelDims = cardDimensions["Manager, Maintenance"];
-                const abelWidth = abelDims.photoSize + abelDims.textWidth + 20;
-                abel.x_pos = processZones.maintenance.x_start + (processZones.maintenance.width - abelWidth) / 2;
-                abel.y_pos = padding;
-                abel.cardWidth = abelWidth;
-                abel.cardHeight = abelDims.height;
-                abel.x_pos = Math.max(padding, Math.min(abel.x_pos, screenWidth - padding - abelWidth));
-            }
-            
-            const topLevelY = padding + (dora ? dora.cardHeight : 80) + (isSmallScreen ? 20 : 30);
-            
-            // Position employees in process flow zones - ONLY UNDER DORA
-            const doraDirectReports = employees.filter(emp => emp.parentId === 1 && !emp.position.includes("Supervisor"));
-            
-            doraDirectReports.forEach(emp => {
-                const dims = cardDimensions[emp.position] || cardDimensions["Manager, Production"];
-                emp.cardWidth = dims.photoSize + dims.textWidth + 20;
-                emp.cardHeight = dims.height;
-                
-                switch(emp.department) {
-                    case "Extraction":
-                        emp.x_pos = processZones.extraction.x_start + (processZones.extraction.width - emp.cardWidth) / 2;
-                        emp.y_pos = topLevelY;
-                        break;
-                    case "Kitchen":
-                        emp.x_pos = processZones.kitchen.x_start + (processZones.kitchen.width - emp.cardWidth) / 2;
-                        emp.y_pos = topLevelY;
-                        break;
-                    case "Packaging":
-                        emp.x_pos = processZones.packaging.x_start + (processZones.packaging.width - emp.cardWidth) / 2;
-                        emp.y_pos = topLevelY;
-                        break;
-                }
-                
-                // Ensure cards stay within screen bounds
-                emp.x_pos = Math.max(padding, Math.min(emp.x_pos, screenWidth - padding - emp.cardWidth));
-            });
-            
-            // QUALITY SPECIALIST POSITIONING - UNDER EXTRACTION IN VERTICAL FLOW
-            const mariela = employees.find(emp => emp.name === "Mariela De La Rosa");
-            const daniel = employees.find(emp => emp.name === "Daniel Gelpi");
-            
-            if (mariela && daniel) {
-                const dims = cardDimensions[mariela.position] || cardDimensions["Quality Specialist"];
-                mariela.cardWidth = dims.photoSize + dims.textWidth + 20;
-                mariela.cardHeight = dims.height;
-                
-                // Position Mariela under the extraction department card in vertical flow
-                mariela.x_pos = processZones.extraction.x_start + (processZones.extraction.width - mariela.cardWidth) / 2;
-                mariela.y_pos = topLevelY + daniel.cardHeight + cardDimensions.Department.height + 60; // Under extraction dept card
-                mariela.x_pos = Math.max(padding, Math.min(mariela.x_pos, screenWidth - padding - mariela.cardWidth));
-            }
-            
-            // POSITION SUNITA AND CARLOS AT SECOND LEVEL WITH OTHER SUPERVISORS
-            const sunita = employees.find(emp => emp.name === "Sunita Jainanan");
-            const carlos = employees.find(emp => emp.name === "Carlos Archaga");
-            
-            const secondLevelY = topLevelY + cardDimensions["Manager, Production"].height + (isSmallScreen ? 20 : 35); // Increased spacing
-            
-            if (sunita && carlos) {
-                const dims = cardDimensions["Supervisor, Processing"];
-                sunita.cardWidth = dims.photoSize + dims.textWidth + 20;
-                sunita.cardHeight = dims.height;
-                carlos.cardWidth = dims.photoSize + dims.textWidth + 20;
-                carlos.cardHeight = dims.height;
-                
-                // Position them side by side in processing zone
-                const totalWidth = sunita.cardWidth + carlos.cardWidth + 10;
-                let startX = processZones.processing.x_start + (processZones.processing.width - totalWidth) / 2;
-                
-                sunita.x_pos = Math.max(padding, startX);
-                sunita.y_pos = secondLevelY;
-                carlos.x_pos = Math.max(padding, sunita.x_pos + sunita.cardWidth + 10);
-                carlos.y_pos = secondLevelY;
-                
-                // Ensure cards stay within screen bounds
-                sunita.x_pos = Math.min(sunita.x_pos, screenWidth - padding - sunita.cardWidth);
-                carlos.x_pos = Math.min(carlos.x_pos, screenWidth - padding - carlos.cardWidth);
-            }
 
-            // IMPROVED SECOND-LEVEL POSITIONING WITH BETTER SPACING
-            const secondLevel = employees.filter(emp => 
-                (emp.position.includes("Supervisor") || emp.position.includes("Manager") || emp.position.includes("Lead")) && 
-                emp.parentId !== null && emp.parentId !== 1 && emp.parentId !== 140 && // Exclude Mariela (parentId 140) and direct Dora reports
-                emp.name !== "Sunita Jainanan" && emp.name !== "Carlos Archaga" // Exclude already positioned supervisors
-            );
-            
-            const groupedByParent = {};
-            secondLevel.forEach(emp => {
-                if (!groupedByParent[emp.parentId]) {
-                    groupedByParent[emp.parentId] = [];
-                }
-                groupedByParent[emp.parentId].push(emp);
+        function renderAll() {
+            renderEmployeesGrid();
+            renderHierarchyTree();
+            renderDepartmentCards();
+            renderDeptList();
+            populateDepartmentSelects();
+            populateManagerSelect();
+            populateFilterSelects();
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        function setupEventListeners() {
+            // View toggle
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchView(btn.dataset.view));
             });
-            
-            Object.keys(groupedByParent).forEach(parentId => {
-                const group = groupedByParent[parentId];
-                const parent = employees.find(emp => emp.id === parseInt(parentId));
-                
-                if (parent && parent.x_pos !== undefined) {
-                    group.forEach((child, index) => {
-                        const dims = cardDimensions[child.position] || cardDimensions["Supervisor, Production"];
-                        child.cardWidth = dims.photoSize + dims.textWidth + 20;
-                        child.cardHeight = dims.height;
-                        
-                        // IMPROVED SPACING FOR KITCHEN LEADS - Move them further down
-                        if (parent.name === "Luis Hernandez") {
-                            const adjustedY = secondLevelY + 150; // Increased spacing
-                            if (group.length === 1) {
-                                child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
-                                child.y_pos = adjustedY;
-                            } else {
-                                const spacing = 10;
-                                const totalWidth = group.reduce((sum, c) => {
-                                    const cDims = cardDimensions[c.position] || cardDimensions["Lead, Kitchen"];
-                                    return sum + cDims.photoSize + cDims.textWidth + 20;
-                                }, 0) + (group.length - 1) * spacing;
-                                
-                                let startX = parent.x_pos + (parent.cardWidth - totalWidth) / 2;
-                                let currentX = startX;
-                                
-                                group.forEach((c, i) => {
-                                    c.x_pos = Math.max(padding, currentX);
-                                    c.y_pos = adjustedY;
-                                    currentX += c.cardWidth + spacing;
-                                    c.x_pos = Math.min(c.x_pos, screenWidth - padding - c.cardWidth);
-                                });
-                            }
-                        }
-                        // SUSANA (Manager under Michael) - Move further down
-                        else if (parent.name === "Michael Amaya") {
-                            const adjustedY = secondLevelY + 140; // Increased spacing
-                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
-                            child.y_pos = adjustedY;
-                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
-                        }
-                        // NORMA (Supervisor under Susana) - Move further down relative to Susana
-                        else if (parent.name === "Susana Ceballos") {
-                            const susanaEmp = employees.find(e => e.name === "Susana Ceballos");
-                            const thirdLevelY = (susanaEmp.y_pos || secondLevelY + 140) + susanaEmp.cardHeight + 35;
-                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
-                            child.y_pos = thirdLevelY;
-                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
-                        }
-                        // DAN PELUSO (Supervisor under Abel)
-                        else if (parent.name === "Abel Ortega") {
-                            const adjustedY = secondLevelY + 140; // Increased spacing
-                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
-                            child.y_pos = adjustedY;
-                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
-                        }
-                        // PACKAGING SUPERVISORS - Move them down more to give Lester space
-                        else if (parent.name === "Lester Igarza" && group.length === 3) {
-                            const adjustedY = secondLevelY + 50; // Increased spacing from packaging manager
-                            const spacing = 10;
-                            const totalWidth = group.reduce((sum, c) => {
-                                const cDims = cardDimensions[c.position] || cardDimensions["Supervisor, Production"];
-                                return sum + cDims.photoSize + cDims.textWidth + 20;
-                            }, 0) + (group.length - 1) * spacing;
-                            
-                            let startX = parent.x_pos + (parent.cardWidth - totalWidth) / 2;
-                            let currentX = startX;
-                            
-                            group.forEach((c, i) => {
-                                c.x_pos = Math.max(padding, currentX);
-                                c.y_pos = adjustedY;
-                                currentX += c.cardWidth + spacing;
-                                c.x_pos = Math.min(c.x_pos, screenWidth - padding - c.cardWidth);
-                            });
-                        }
-                        // DEFAULT POSITIONING for other groups
-                        else if (group.length === 1) {
-                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
-                            child.y_pos = secondLevelY;
-                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
-                        } else {
-                            const spacing = 10;
-                            const totalWidth = group.reduce((sum, c) => {
-                                const cDims = cardDimensions[c.position] || cardDimensions["Supervisor, Production"];
-                                return sum + cDims.photoSize + cDims.textWidth + 20;
-                            }, 0) + (group.length - 1) * spacing;
-                            
-                            let startX = parent.x_pos + (parent.cardWidth - totalWidth) / 2;
-                            let currentX = startX;
-                            
-                            group.forEach((c, i) => {
-                                c.x_pos = Math.max(padding, currentX);
-                                c.y_pos = secondLevelY;
-                                currentX += c.cardWidth + spacing;
-                                c.x_pos = Math.min(c.x_pos, screenWidth - padding - c.cardWidth);
-                            });
-                        }
-                    });
+
+            // Admin toggle
+            document.getElementById('adminToggle').addEventListener('click', toggleAdminPanel);
+
+            // Secret admin toggle (click company name 5 times)
+            let clickCount = 0;
+            let clickTimer;
+            document.getElementById('companyName').addEventListener('click', () => {
+                clickCount++;
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => clickCount = 0, 2000);
+                if (clickCount >= 5) {
+                    toggleAdminPanel();
+                    clickCount = 0;
                 }
             });
-            
-            // DEPARTMENT CARD POSITIONING WITH VERTICAL EXTRACTION/QUALITY FLOW
-            const baseGap = isSmallScreen ? 15 : 20;
-            const deptY = Math.max(secondLevelY + cardDimensions["Supervisor, Production"].height + baseGap - 40, screenHeight - cardDimensions["Department"].height - 25);
-            window.departmentSummaries = [];
-            
-            departmentNames.forEach((deptName) => {
-                const deptEmployees = employees.filter(emp => emp.department === deptName && (emp.position === "Employee" || emp.position === "Associate"));
-                
-                if (deptEmployees.length > 0) {
-                    let avgX;
-                    let positionY = deptY;
-                    
-                    switch(deptName) {
-                        case "Extraction":
-                            avgX = processZones.extraction.x_start + processZones.extraction.width / 2;
-                            // Extraction department card positioned under Daniel Gelpi
-                            positionY = topLevelY + cardDimensions["Manager, Extraction"].height + 25;
-                            break;
-                        case "Processing Lab":
-                            avgX = processZones.processing.x_start + processZones.processing.width / 2;
-                            break;
-                        case "Kitchen":
-                            avgX = processZones.kitchen.x_start + processZones.kitchen.width / 2;
-                            break;
-                        case "Packaging":
-                            avgX = processZones.packaging.x_start + processZones.packaging.width / 2;
-                            break;
-                        case "Warehouse":
-                            avgX = processZones.warehouse.x_start + processZones.warehouse.width / 2;
-                            break;
-                        case "Maintenance":
-                            avgX = processZones.maintenance.x_start + processZones.maintenance.width / 2;
-                            break;
-                        case "Quality":
-                            // Quality department card positioned under Mariela in extraction zone
-                            avgX = processZones.extraction.x_start + processZones.extraction.width / 2;
-                            positionY = mariela ? mariela.y_pos + mariela.cardHeight + 25 : deptY + cardDimensions.Department.height + 20;
-                            break;
-                        default:
-                            avgX = (screenWidth) / 2;
-                    }
-                    
-                    const deptSummary = {
-                        name: deptName,
-                        employee_count: deptEmployees.length,
-                        x_pos: avgX - cardDimensions.Department.width / 2,
-                        y_pos: positionY,
-                        width: cardDimensions.Department.width,
-                        height: cardDimensions.Department.height,
-                        color: deptEmployees[0].dept_color
-                    };
-                    
-                    deptSummary.x_pos = Math.max(padding, Math.min(deptSummary.x_pos, screenWidth - padding - cardDimensions.Department.width));
-                    
-                    window.departmentSummaries.push(deptSummary);
-                }
-            });
-            
-            window.currentCardDimensions = cardDimensions;
-        }
-        
-        // IMPROVED CARD CREATION WITH BETTER TEXT DISPLAY AND POSITION WRAPPING
-        function createEmployeeCard(employee, cardDimensions) {
-            const card = document.createElement("div");
-            
-            const dimensions = cardDimensions[employee.position] || cardDimensions["Manager, Production"];
-            const cardWidth = employee.cardWidth || (dimensions.photoSize + dimensions.textWidth + 20);
-            const cardHeight = employee.cardHeight || dimensions.height;
-            
-            // Use department-based class instead of position-based
-            const deptClass = `dept-${employee.department.toLowerCase().replace(/\s+/g, '-')}-card`;
-            const positionClass = `${employee.position.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '')}-card`;
-            
-            card.className = `employee-card ${deptClass} ${positionClass}`;
-            card.style.left = employee.x_pos + "px";
-            card.style.top = employee.y_pos + "px";
-            card.style.width = cardWidth + "px";
-            card.style.height = cardHeight + "px";
-            
-            // PHOTO SECTION - Auto size
-            const photoSection = document.createElement("div");
-            photoSection.className = "card-photo-section";
-            
-            const textSection = document.createElement("div");
-            textSection.className = "card-text-section";
-            
-            // PHOTO
-            const photoSize = dimensions.photoSize;
-            
-            const photo = document.createElement("img");
-            photo.className = "card-photo";
-            
-            // Use actual photo if available, otherwise fall back to generated avatar
-            if (employee.photo) {
-                photo.src = employee.photo;
-                photo.onerror = function() {
-                    // Fallback to generated avatar if photo fails to load
-                    this.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='3' ry='3'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.12}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.78}' rx='${photoSize*0.18}' ry='${photoSize*0.12}' fill='%23bdc3c7'/></svg>`;
-                };
-            } else {
-                photo.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='3' ry='3'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.12}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.78}' rx='${photoSize*0.18}' ry='${photoSize*0.12}' fill='%23bdc3c7'/></svg>`;
-            }
-            
-            photo.alt = employee.name;
-            photo.style.width = photoSize + "px";
-            photo.style.height = photoSize + "px";
-            
-            photoSection.appendChild(photo);
-            
-            // TEXT CONTENT - IMPROVED VISIBILITY WITH POSITION WRAPPING
-            const wrappedName = wrapLongName(employee.name);
-            const wrappedPosition = wrapLongPosition(employee.position);
-            
-            // Employee Name (PRIMARY)
-            const nameDiv = document.createElement("div");
-            nameDiv.className = "card-name";
-            nameDiv.innerHTML = wrappedName;
-            textSection.appendChild(nameDiv);
-            
-            // Job Title (SECONDARY - right under name)
-            const titleDiv = document.createElement("div");
-            titleDiv.className = "card-title";
-            titleDiv.textContent = employee.position;
-            textSection.appendChild(titleDiv);
-            
-            // Position (TERTIARY - underneath title) - NOW WITH WRAPPING
-            const positionDiv = document.createElement("div");
-            positionDiv.className = "card-position";
-            positionDiv.innerHTML = wrappedPosition;
-            textSection.appendChild(positionDiv);
-            
-            card.appendChild(photoSection);
-            card.appendChild(textSection);
-            
-            return card;
-        }
-        
-        function createDepartmentCard(deptData, cardDimensions) {
-            const card = document.createElement("div");
-            const dimensions = cardDimensions["Department"];
-            
-            card.className = `department-card dept-${deptData.name.toLowerCase().replace(/\s+/g, "-")}`;
-            card.style.left = deptData.x_pos + "px";
-            card.style.top = deptData.y_pos + "px";
-            card.style.width = dimensions.width + "px";
-            card.style.height = dimensions.height + "px";
-            
-            const isSmallScreen = screenWidth < 1400;
-            const titleSize = Math.max(isSmallScreen ? 8 : 10, Math.min(isSmallScreen ? 10 : 13, dimensions.width / 12));
-            const countSize = Math.max(isSmallScreen ? 7 : 9, Math.min(isSmallScreen ? 9 : 11, dimensions.width / 14));
-            
-            card.innerHTML = `
-                <div class="dept-title" style="font-size: ${titleSize}px;">${deptData.name}</div>
-                <div class="dept-count" style="font-size: ${countSize}px;">(${deptData.employee_count}) employees</div>
-            `;
-            
-            card.addEventListener("click", () => openDrillDown(deptData.name));
-            
-            return card;
-        }
-        
-        // UPDATED CONNECTION SYSTEM FOR THREE CO-EQUAL LEADERS
-        function generateConnectionLines(cardDimensions) {
-            const chartContainer = document.getElementById("orgChart");
-            if (!chartContainer) return;
-            
-            createdConnections.clear();
-            
-            // DORA'S DIRECT REPORTS - UPDATED TO EXCLUDE MICHAEL AND ABEL
-            const dora = employees.find(emp => emp.name === "Dora Gaeza");
-            const doraDirectReportNames = [
-                "Daniel Gelpi", "Luis Hernandez", "Lester Igarza", 
-                "Sunita Jainanan", "Carlos Archaga"
-            ];
-            
-            doraDirectReportNames.forEach(name => {
-                const employee = employees.find(emp => emp.name === name);
-                if (employee && employee.x_pos !== undefined && dora.x_pos !== undefined) {
-                    const connectionKey = `${dora.id}->${employee.id}`;
-                    if (!createdConnections.has(connectionKey)) {
-                        const connectionElements = createDoraConnection(dora, employee, cardDimensions);
-                        connectionElements.forEach(element => chartContainer.appendChild(element));
-                        createdConnections.add(connectionKey);
-                    }
-                }
-            });
-            
-            // MICHAEL'S DIRECT REPORTS
-            const michael = employees.find(emp => emp.name === "Michael Amaya");
-            const michaelDirectReportNames = ["Susana Ceballos"];
-            
-            michaelDirectReportNames.forEach(name => {
-                const employee = employees.find(emp => emp.name === name);
-                if (employee && employee.x_pos !== undefined && michael.x_pos !== undefined) {
-                    const connectionKey = `${michael.id}->${employee.id}`;
-                    if (!createdConnections.has(connectionKey)) {
-                        const connectionElements = createMichaelConnection(michael, employee, cardDimensions);
-                        connectionElements.forEach(element => chartContainer.appendChild(element));
-                        createdConnections.add(connectionKey);
-                    }
-                }
-            });
-            
-            // ABEL'S DIRECT REPORTS
-            const abel = employees.find(emp => emp.name === "Abel Ortega");
-            const abelDirectReportNames = ["Dan Peluso"];
-            
-            abelDirectReportNames.forEach(name => {
-                const employee = employees.find(emp => emp.name === name);
-                if (employee && employee.x_pos !== undefined && abel.x_pos !== undefined) {
-                    const connectionKey = `${abel.id}->${employee.id}`;
-                    if (!createdConnections.has(connectionKey)) {
-                        const connectionElements = createAbelConnection(abel, employee, cardDimensions);
-                        connectionElements.forEach(element => chartContainer.appendChild(element));
-                        createdConnections.add(connectionKey);
-                    }
-                }
-            });
-            
-            // CONNECTION FROM DANIEL TO MARIELA (EXTRACTION TO QUALITY)
-            const daniel = employees.find(emp => emp.name === "Daniel Gelpi");
-            const mariela = employees.find(emp => emp.name === "Mariela De La Rosa");
-            if (daniel && mariela && daniel.x_pos !== undefined && mariela.x_pos !== undefined) {
-                const connectionKey = `${daniel.id}->${mariela.id}`;
-                if (!createdConnections.has(connectionKey)) {
-                    const connectionElements = createIndividualConnection(daniel, mariela, cardDimensions, "department");
-                    connectionElements.forEach(element => chartContainer.appendChild(element));
-                    createdConnections.add(connectionKey);
-                }
-            }
-            
-            // MANAGER/DIRECTOR CONNECTIONS - WITH DEPARTMENT COLORS FOR SAME-DEPT CONNECTIONS
-            const managerConnections = [
-                { manager: "Lester Igarza", reports: ["Jubilee Rodriguez", "Maria Mendez", "Samantha Perez-Morell"] },
-                { manager: "Luis Hernandez", reports: ["Idalmis Medina Rodriguez", "Nathan Vargas"] },
-                { manager: "Susana Ceballos", reports: ["Norma Rodriguez"] }
-            ];
-            
-            managerConnections.forEach(({ manager, reports }) => {
-                const managerEmp = employees.find(emp => emp.name === manager);
-                reports.forEach(reportName => {
-                    const reportEmp = employees.find(emp => emp.name === reportName);
-                    if (managerEmp && reportEmp && managerEmp.x_pos !== undefined && reportEmp.x_pos !== undefined) {
-                        const connectionKey = `${managerEmp.id}->${reportEmp.id}`;
-                        if (!createdConnections.has(connectionKey)) {
-                            let lineType = "regular";
-                            if (managerEmp.department === reportEmp.department) {
-                                lineType = "department"; // Use department color for same-department connections
-                            }
-                            const connectionElements = createIndividualConnection(managerEmp, reportEmp, cardDimensions, lineType);
-                            connectionElements.forEach(element => chartContainer.appendChild(element));
-                            createdConnections.add(connectionKey);
-                        }
-                    }
-                });
-            });
-            
-            // Create lines to department cards
-            const leadershipRoles = employees.filter(emp => 
-                (emp.position.includes("Supervisor") || emp.position.includes("Manager") || emp.position === "Quality Specialist") && 
-                emp.x_pos !== undefined
-            );
-            
-            leadershipRoles.forEach(leader => {
-                if (window.departmentSummaries) {
-                    const deptCard = window.departmentSummaries.find(dept => dept.name === leader.department);
-                    if (deptCard) {
-                        const lines = createOptimizedSupervisorToDeptLines(leader, deptCard, cardDimensions);
-                        lines.forEach(line => chartContainer.appendChild(line));
-                    }
-                }
-            });
-        }
-        
-        // NEW FUNCTION FOR DORA'S HORIZONTAL-FIRST CONNECTIONS
-        function createDoraConnection(dora, target, cardDimensions) {
-            const elements = [];
-            
-            if (dora.x_pos === undefined || target.x_pos === undefined) {
-                return elements;
-            }
-            
-            const doraX = dora.x_pos + (dora.cardWidth || 100) / 2;
-            const doraY = dora.y_pos + (dora.cardHeight || 60);
-            const targetX = target.x_pos + (target.cardWidth || 100) / 2;
-            const targetY = target.y_pos;
-            
-            const isSmallScreen = screenWidth < 1400;
-            const lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
-            const lineClass = "hierarchy-line-plant-manager";
-            
-            // HORIZONTAL FIRST, THEN VERTICAL ROUTING
-            const horizontalY = doraY + 20; // Distance down from Dora before going horizontal
-            
-            // Step 1: Vertical line down from Dora
-            const verticalLine1 = document.createElement("div");
-            verticalLine1.className = lineClass;
-            verticalLine1.style.left = (doraX - lineWidth/2) + "px";
-            verticalLine1.style.top = doraY + "px";
-            verticalLine1.style.width = lineWidth + "px";
-            verticalLine1.style.height = 20 + "px"; // Fixed distance down
-            elements.push(verticalLine1);
-            
-            // Step 2: Horizontal line to target's X position
-            const horizontalLine = document.createElement("div");
-            horizontalLine.className = lineClass;
-            const horizontalStart = Math.min(doraX, targetX);
-            const horizontalEnd = Math.max(doraX, targetX);
-            horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
-            horizontalLine.style.top = (horizontalY - lineWidth/2) + "px";
-            horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
-            horizontalLine.style.height = lineWidth + "px";
-            elements.push(horizontalLine);
-            
-            // Step 3: Vertical line down to target
-            const verticalLine2 = document.createElement("div");
-            verticalLine2.className = lineClass;
-            verticalLine2.style.left = (targetX - lineWidth/2) + "px";
-            verticalLine2.style.top = horizontalY + "px";
-            verticalLine2.style.width = lineWidth + "px";
-            verticalLine2.style.height = (targetY - horizontalY) + "px";
-            elements.push(verticalLine2);
-            
-            return elements;
-        }
-        
-        // NEW FUNCTION FOR MICHAEL'S CONNECTIONS
-        function createMichaelConnection(michael, target, cardDimensions) {
-            const elements = [];
-            
-            if (michael.x_pos === undefined || target.x_pos === undefined) {
-                return elements;
-            }
-            
-            const michaelX = michael.x_pos + (michael.cardWidth || 100) / 2;
-            const michaelY = michael.y_pos + (michael.cardHeight || 60);
-            const targetX = target.x_pos + (target.cardWidth || 100) / 2;
-            const targetY = target.y_pos;
-            
-            const isSmallScreen = screenWidth < 1400;
-            const lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
-            const lineClass = "hierarchy-line-director";
-            
-            // Direct vertical connection for Michael to Susana
-            const verticalLine = document.createElement("div");
-            verticalLine.className = lineClass;
-            verticalLine.style.left = (michaelX - lineWidth/2) + "px";
-            verticalLine.style.top = michaelY + "px";
-            verticalLine.style.width = lineWidth + "px";
-            verticalLine.style.height = (targetY - michaelY) + "px";
-            elements.push(verticalLine);
-            
-            return elements;
-        }
-        
-        // NEW FUNCTION FOR ABEL'S CONNECTIONS
-        function createAbelConnection(abel, target, cardDimensions) {
-            const elements = [];
-            
-            if (abel.x_pos === undefined || target.x_pos === undefined) {
-                return elements;
-            }
-            
-            const abelX = abel.x_pos + (abel.cardWidth || 100) / 2;
-            const abelY = abel.y_pos + (abel.cardHeight || 60);
-            const targetX = target.x_pos + (target.cardWidth || 100) / 2;
-            const targetY = target.y_pos;
-            
-            const isSmallScreen = screenWidth < 1400;
-            const lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
-            const lineClass = "hierarchy-line-maintenance";
-            
-            // Direct vertical connection for Abel to Dan
-            const verticalLine = document.createElement("div");
-            verticalLine.className = lineClass;
-            verticalLine.style.left = (abelX - lineWidth/2) + "px";
-            verticalLine.style.top = abelY + "px";
-            verticalLine.style.width = lineWidth + "px";
-            verticalLine.style.height = (targetY - abelY) + "px";
-            elements.push(verticalLine);
-            
-            return elements;
-        }
-        
-        function createIndividualConnection(parent, child, cardDimensions, lineType) {
-            const elements = [];
-            
-            if (parent.x_pos === undefined || child.x_pos === undefined) {
-                return elements;
-            }
-            
-            const parentX = parent.x_pos + (parent.cardWidth || 100) / 2;
-            const parentY = parent.y_pos + (parent.cardHeight || 60);
-            const childX = child.x_pos + (child.cardWidth || 100) / 2;
-            const childY = child.y_pos;
-            
-            const isSmallScreen = screenWidth < 1400;
-            let lineWidth;
-            let lineClass;
-            let customBackground = null;
-            
-            if (lineType === "plant-manager") {
-                lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
-                lineClass = "hierarchy-line-plant-manager";
-            } else if (lineType === "director") {
-                lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 500)));
-                lineClass = "hierarchy-line-director";
-            } else if (lineType === "department") {
-                lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 600)));
-                lineClass = "connection-line";
-                customBackground = `linear-gradient(180deg, ${parent.dept_color}CC, ${parent.dept_color}80)`;
-            } else {
-                lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 600)));
-                lineClass = "connection-line";
-            }
-            
-            if (Math.abs(parentX - childX) <= 15) {
-                const verticalLine = document.createElement("div");
-                verticalLine.className = lineClass;
-                if (customBackground) {
-                    verticalLine.style.background = customBackground;
-                }
-                verticalLine.style.left = (parentX - lineWidth/2) + "px";
-                verticalLine.style.top = parentY + "px";
-                verticalLine.style.width = lineWidth + "px";
-                verticalLine.style.height = (childY - parentY) + "px";
-                elements.push(verticalLine);
-            } else {
-                const midY = parentY + (childY - parentY) * 0.5;
-                
-                const verticalLine1 = document.createElement("div");
-                verticalLine1.className = lineClass;
-                if (customBackground) {
-                    verticalLine1.style.background = customBackground;
-                }
-                verticalLine1.style.left = (parentX - lineWidth/2) + "px";
-                verticalLine1.style.top = parentY + "px";
-                verticalLine1.style.width = lineWidth + "px";
-                verticalLine1.style.height = (midY - parentY) + "px";
-                elements.push(verticalLine1);
-                
-                const horizontalLine = document.createElement("div");
-                horizontalLine.className = lineClass;
-                if (customBackground) {
-                    horizontalLine.style.background = `linear-gradient(90deg, ${parent.dept_color}80, ${parent.dept_color}80)`;
-                }
-                const horizontalStart = Math.min(parentX, childX);
-                const horizontalEnd = Math.max(parentX, childX);
-                horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
-                horizontalLine.style.top = (midY - lineWidth/2) + "px";
-                horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
-                horizontalLine.style.height = lineWidth + "px";
-                elements.push(horizontalLine);
-                
-                const verticalLine2 = document.createElement("div");
-                verticalLine2.className = lineClass;
-                if (customBackground) {
-                    verticalLine2.style.background = customBackground;
-                }
-                verticalLine2.style.left = (childX - lineWidth/2) + "px";
-                verticalLine2.style.top = midY + "px";
-                verticalLine2.style.width = lineWidth + "px";
-                verticalLine2.style.height = (childY - midY) + "px";
-                elements.push(verticalLine2);
-            }
-            
-            return elements;
-        }
-        
-        function createOptimizedSupervisorToDeptLines(supervisor, deptCard, cardDimensions) {
-            const lines = [];
-            
-            const supervisorX = supervisor.x_pos + (supervisor.cardWidth || 100) / 2;
-            const supervisorY = supervisor.y_pos + (supervisor.cardHeight || 60);
-            const deptX = deptCard.x_pos + deptCard.width / 2;
-            const deptY = deptCard.y_pos;
-            
-            const isSmallScreen = screenWidth < 1400;
-            const lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 600)));
-            
-            if (Math.abs(supervisorX - deptX) <= 25) {
-                const verticalLine = document.createElement("div");
-                verticalLine.className = "connection-line";
-                verticalLine.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`;
-                verticalLine.style.left = (supervisorX - lineWidth/2) + "px";
-                verticalLine.style.top = supervisorY + "px";
-                verticalLine.style.width = lineWidth + "px";
-                verticalLine.style.height = (deptY - supervisorY) + "px";
-                lines.push(verticalLine);
-            } else {
-                const midY = supervisorY + (deptY - supervisorY) * 0.6;
-                
-                const verticalLine1 = document.createElement("div");
-                verticalLine1.className = "connection-line";
-                verticalLine1.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`;
-                verticalLine1.style.left = (supervisorX - lineWidth/2) + "px";
-                verticalLine1.style.top = supervisorY + "px";
-                verticalLine1.style.width = lineWidth + "px";
-                verticalLine1.style.height = (midY - supervisorY) + "px";
-                lines.push(verticalLine1);
-                
-                const horizontalLine = document.createElement("div");
-                horizontalLine.className = "connection-line";
-                horizontalLine.style.background = `linear-gradient(90deg, ${supervisor.dept_color}80, ${supervisor.dept_color}80)`;
-                const horizontalStart = Math.min(supervisorX, deptX);
-                const horizontalEnd = Math.max(supervisorX, deptX);
-                horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
-                horizontalLine.style.top = (midY - lineWidth/2) + "px";
-                horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
-                horizontalLine.style.height = lineWidth + "px";
-                lines.push(horizontalLine);
-                
-                const verticalLine2 = document.createElement("div");
-                verticalLine2.className = "connection-line";
-                verticalLine2.style.background = `linear-gradient(180deg, ${supervisor.dept_color}80, ${supervisor.dept_color}CC)`;
-                verticalLine2.style.left = (deptX - lineWidth/2) + "px";
-                verticalLine2.style.top = midY + "px";
-                verticalLine2.style.width = lineWidth + "px";
-                verticalLine2.style.height = (deptY - midY) + "px";
-                lines.push(verticalLine2);
-            }
-            
-            return lines;
-        }
-        
-        function initHierarchyView() {
-            calculateProcessFlowLayout();
-            
-            const chartContainer = document.getElementById("orgChart");
-            chartContainer.innerHTML = "";
-            
-            const cardDimensions = window.currentCardDimensions;
-            
-            generateConnectionLines(cardDimensions);
-            
-            employees.forEach(emp => {
-                if (emp.position !== "Employee" && emp.position !== "Associate" && emp.x_pos !== undefined) {
-                    const card = createEmployeeCard(emp, cardDimensions);
-                    chartContainer.appendChild(card);
-                }
-            });
-            
-            if (window.departmentSummaries) {
-                window.departmentSummaries.forEach(deptData => {
-                    const card = createDepartmentCard(deptData, cardDimensions);
-                    chartContainer.appendChild(card);
-                });
-            }
-        }
-        
-        function openDrillDown(departmentName) {
-            currentDepartment = departmentName;
-            isDrillDownActive = true;
-            
-            const hierarchyView = document.getElementById("hierarchyView");
-            const drillDownView = document.getElementById("drillDownView");
-            const drillDownTitle = document.getElementById("drillDownTitle");
-            const drillDownContent = document.getElementById("drillDownContent");
-            
-            hierarchyView.classList.add("hidden");
-            drillDownView.classList.add("active");
-            
-            const deptEmployees = employees.filter(emp => emp.department === departmentName && (emp.position === "Employee" || emp.position === "Associate"));
-            const deptLeadership = employees.filter(emp => emp.department === departmentName && emp.position !== "Employee" && emp.position !== "Associate");
-            const allDeptMembers = [...deptLeadership, ...deptEmployees];
-            
-            drillDownTitle.textContent = `${departmentName} Department (${deptEmployees.length} Employees${deptLeadership.length > 0 ? ` + ${deptLeadership.length} Leadership` : ''})`;
-            
-            layoutDrillDownEmployees(allDeptMembers, drillDownContent);
-        }
-        
-        function layoutDrillDownEmployees(deptMembers, container) {
-            container.innerHTML = "";
-            
-            const availableWidth = screenWidth - 40;
-            const availableHeight = screenHeight - 100;
-            const numMembers = deptMembers.length;
-            
-            let bestCols = 1;
-            let bestCardSize = 0;
-            
-            for (let cols = 1; cols <= Math.min(20, numMembers); cols++) {
-                const rows = Math.ceil(numMembers / cols);
-                const cardWidth = Math.floor((availableWidth - (cols - 1) * 8) / cols);
-                const cardHeight = Math.floor((availableHeight - (rows - 1) * 10) / rows);
-                const cardSize = Math.min(cardWidth, cardHeight);
-                
-                if (cardSize > bestCardSize && cardSize >= 60) {
-                    bestCardSize = cardSize;
-                    bestCols = cols;
-                }
-            }
-            
-            bestCardSize = Math.min(bestCardSize, 140);
-            
-            deptMembers.forEach((member, index) => {
-                const row = Math.floor(index / bestCols);
-                const col = index % bestCols;
-                
-                const card = document.createElement("div");
-                card.className = "drill-employee-card";
-                card.style.width = bestCardSize + "px";
-                card.style.height = (bestCardSize * 0.6) + "px";
-                card.style.left = (col * (bestCardSize + 8) + 20) + "px";
-                card.style.top = (row * (bestCardSize * 0.6 + 10) + 20) + "px";
-                card.style.position = "absolute";
-                
-                if (member.position.includes("Manager") || member.position.includes("Supervisor") || member.position.includes("Lead") || member.position === "Quality Specialist") {
-                    card.style.border = `3px solid ${member.dept_color}`;
-                    card.style.background = "linear-gradient(145deg, #fff3cd, #ffeaa7)";
-                    card.style.boxShadow = `0 6px 20px ${member.dept_color}40`;
-                }
-                
-                const photoSection = document.createElement("div");
-                photoSection.className = "drill-card-photo-section";
-                
-                const textSection = document.createElement("div");
-                textSection.className = "drill-card-text-section";
-                
-                const photoSize = Math.min(bestCardSize * 0.25, 35);
-                
-                const photo = document.createElement("img");
-                photo.className = "card-photo";
-                
-                // Use actual photo if available, otherwise fall back to generated avatar
-                if (member.photo) {
-                    photo.src = member.photo;
-                    photo.onerror = function() {
-                        this.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='2' ry='2'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.11}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.75}' rx='${photoSize*0.16}' ry='${photoSize*0.10}' fill='%23bdc3c7'/></svg>`;
-                    };
-                } else {
-                    photo.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='2' ry='2'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.11}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.75}' rx='${photoSize*0.16}' ry='${photoSize*0.10}' fill='%23bdc3c7'/></svg>`;
-                }
-                
-                photo.alt = member.name;
-                photo.style.width = photoSize + "px";
-                photo.style.height = photoSize + "px";
-                
-                photoSection.appendChild(photo);
-                
-                const wrappedName = wrapLongName(member.name);
-                
-                const nameDiv = document.createElement("div");
-                nameDiv.className = "drill-card-name";
-                nameDiv.innerHTML = wrappedName;
-                textSection.appendChild(nameDiv);
-                
-                // Add job title for all members
-                const titleDiv = document.createElement("div");
-                titleDiv.className = "drill-card-title";
-                titleDiv.textContent = member.position;
-                textSection.appendChild(titleDiv);
-                
-                if (member.position.includes("Manager") || member.position.includes("Supervisor") || member.position.includes("Lead") || member.position === "Quality Specialist") {
-                    const positionDiv = document.createElement("div");
-                    positionDiv.className = "drill-card-position";
-                    positionDiv.textContent = member.position;
-                    positionDiv.style.color = member.dept_color;
-                    positionDiv.style.fontWeight = "bold";
-                    textSection.appendChild(positionDiv);
-                }
-                
-                card.appendChild(photoSection);
-                card.appendChild(textSection);
-                
-                container.appendChild(card);
-            });
-        }
-        
-        function closeDrillDown() {
-            const hierarchyView = document.getElementById("hierarchyView");
-            const drillDownView = document.getElementById("drillDownView");
-            
-            if (hierarchyView && drillDownView) {
-                hierarchyView.classList.remove("hidden");
-                drillDownView.classList.remove("active");
-            }
-            
-            isDrillDownActive = false;
-            currentDepartment = null;
-        }
-        
-        // Navigation controls - Updated for new order
-        document.addEventListener("keydown", function(e) {
-            switch(e.key) {
-                case "Escape":
+
+            // Keyboard shortcut (Ctrl+Shift+A)
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'A') {
                     e.preventDefault();
-                    if (isDrillDownActive) {
-                        closeDrillDown();
-                    }
-                    break;
-                    
-                case "1": if (!isDrillDownActive) openDrillDown("Extraction"); break;
-                case "2": if (!isDrillDownActive) openDrillDown("Processing Lab"); break;
-                case "3": if (!isDrillDownActive) openDrillDown("Kitchen"); break;
-                case "4": if (!isDrillDownActive) openDrillDown("Packaging"); break;
-                case "5": if (!isDrillDownActive) openDrillDown("Warehouse"); break;
-                case "6": if (!isDrillDownActive) openDrillDown("Maintenance"); break;
-                case "7": if (!isDrillDownActive) openDrillDown("Quality"); break;
-            }
-        });
-        
-        window.addEventListener("resize", function() {
-            setTimeout(() => {
-                if (!isDrillDownActive) {
-                    initHierarchyView();
+                    toggleAdminPanel();
                 }
-            }, 200);
-        });
-        
-        // Initialize
-        document.addEventListener("DOMContentLoaded", function() {
-            const backButton = document.getElementById("backButton");
-            if (backButton) {
-                backButton.addEventListener("click", closeDrillDown);
+            });
+
+            // Search and filter
+            document.getElementById('searchBox').addEventListener('input', filterEmployees);
+            document.getElementById('deptFilter').addEventListener('change', filterEmployees);
+            document.getElementById('positionFilter').addEventListener('change', filterEmployees);
+
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // ESC key to close modals
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+                }
+            });
+        }
+
+        // ==================== VIEW SWITCHING ====================
+        function switchView(view) {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+
+            document.getElementById('gridView').classList.toggle('active', view === 'grid');
+            document.getElementById('hierarchyView').classList.toggle('active', view === 'hierarchy');
+            document.getElementById('departmentView').classList.toggle('active', view === 'departments');
+        }
+
+        // ==================== ADMIN PANEL ====================
+        let isAdminMode = false;
+
+        function toggleAdminPanel() {
+            isAdminMode = !isAdminMode;
+            document.getElementById('adminSidebar').classList.toggle('open', isAdminMode);
+            document.getElementById('adminToggle').classList.toggle('active', isAdminMode);
+            document.querySelectorAll('.employee-card').forEach(card => {
+                card.classList.toggle('admin-mode', isAdminMode);
+            });
+            showToast(isAdminMode ? 'Admin mode enabled' : 'Admin mode disabled', 'info');
+        }
+
+        // ==================== STATS ====================
+        function updateStats() {
+            document.getElementById('totalEmployees').textContent = appData.employees.length;
+            document.getElementById('totalDepartments').textContent = appData.departments.length;
+        }
+
+        // ==================== EMPLOYEE GRID ====================
+        function renderEmployeesGrid() {
+            const grid = document.getElementById('employeesGrid');
+
+            if (appData.employees.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">👥</div>
+                        <div class="empty-state-title">No Employees Yet</div>
+                        <div class="empty-state-text">Add your first employee to get started</div>
+                        <button class="btn btn-primary" onclick="openEmployeeModal()">Add Employee</button>
+                    </div>
+                `;
+                return;
             }
-            
-            initHierarchyView();
-        });
+
+            grid.innerHTML = appData.employees.map(emp => {
+                const dept = appData.departments.find(d => d.name === emp.department);
+                const manager = appData.employees.find(e => e.id === emp.parentId);
+                const deptColor = dept ? dept.color : '#95a5a6';
+                const initials = emp.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+
+                return `
+                    <div class="employee-card ${isAdminMode ? 'admin-mode' : ''}" style="border-left-color: ${deptColor};" data-id="${emp.id}" data-dept="${emp.department}" data-position="${emp.position}">
+                        <div class="card-actions">
+                            <button class="card-action-btn edit" onclick="editEmployee(${emp.id})" title="Edit">✎</button>
+                            <button class="card-action-btn delete" onclick="confirmDeleteEmployee(${emp.id})" title="Delete">×</button>
+                        </div>
+                        <div class="card-header">
+                            <div class="card-photo">${initials}</div>
+                            <div class="card-info">
+                                <div class="card-name">${emp.name}</div>
+                                <div class="card-position">${emp.position}</div>
+                            </div>
+                        </div>
+                        <div class="card-details">
+                            <div class="card-detail">
+                                <span class="card-detail-icon">🏢</span>
+                                <span class="dept-badge" style="background: ${deptColor};">${emp.department}</span>
+                            </div>
+                            ${manager ? `<div class="card-detail"><span class="card-detail-icon">👤</span> Reports to: ${manager.name}</div>` : ''}
+                            ${emp.shift ? `<div class="card-detail"><span class="card-detail-icon">⏰</span> ${emp.shift}</div>` : ''}
+                            ${emp.email ? `<div class="card-detail"><span class="card-detail-icon">✉</span> ${emp.email}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterEmployees() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const deptFilter = document.getElementById('deptFilter').value;
+            const positionFilter = document.getElementById('positionFilter').value;
+
+            document.querySelectorAll('#employeesGrid .employee-card').forEach(card => {
+                const name = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
+                const dept = card.dataset.dept;
+                const position = card.dataset.position;
+
+                const matchesSearch = name.includes(search);
+                const matchesDept = !deptFilter || dept === deptFilter;
+                const matchesPosition = !positionFilter || position === positionFilter;
+
+                card.style.display = matchesSearch && matchesDept && matchesPosition ? '' : 'none';
+            });
+        }
+
+        // ==================== HIERARCHY TREE ====================
+        function renderHierarchyTree() {
+            const container = document.getElementById('hierarchyTree');
+            const topLevel = appData.employees.filter(e => !e.parentId);
+
+            if (topLevel.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌳</div>
+                        <div class="empty-state-title">No Hierarchy Yet</div>
+                        <div class="empty-state-text">Add employees to build your organization chart</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = topLevel.map(emp => renderTreeNode(emp, true)).join('');
+        }
+
+        function renderTreeNode(employee, isRoot = false) {
+            const dept = appData.departments.find(d => d.name === employee.department);
+            const deptColor = dept ? dept.color : '#95a5a6';
+            const initials = employee.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            const children = appData.employees.filter(e => e.parentId === employee.id);
+
+            return `
+                <div class="tree-node ${isRoot ? 'tree-root' : ''}">
+                    <div class="tree-card" style="border-left-color: ${deptColor};">
+                        <div class="tree-card-photo">${initials}</div>
+                        <div class="tree-card-info">
+                            <div class="tree-card-name">${employee.name}</div>
+                            <div class="tree-card-position">${employee.position} - ${employee.department}</div>
+                        </div>
+                    </div>
+                    ${children.length > 0 ? `
+                        <div class="tree-children">
+                            ${children.map(child => renderTreeNode(child)).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // ==================== DEPARTMENT VIEW ====================
+        function renderDepartmentCards() {
+            const container = document.getElementById('deptCardsGrid');
+
+            if (appData.departments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🏢</div>
+                        <div class="empty-state-title">No Departments Yet</div>
+                        <div class="empty-state-text">Add departments to organize your team</div>
+                        <button class="btn btn-primary" onclick="openDepartmentModal()">Add Department</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = appData.departments.map(dept => {
+                const count = appData.employees.filter(e => e.department === dept.name).length;
+                return `
+                    <div class="dept-card" style="border-top-color: ${dept.color};" onclick="filterByDepartment('${dept.name}')">
+                        <div class="dept-card-icon" style="background: ${dept.color};">🏢</div>
+                        <div class="dept-card-name">${dept.name}</div>
+                        <div class="dept-card-count">${count} employee${count !== 1 ? 's' : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterByDepartment(deptName) {
+            document.getElementById('deptFilter').value = deptName;
+            switchView('grid');
+            filterEmployees();
+        }
+
+        // ==================== SIDEBAR DEPT LIST ====================
+        function renderDeptList() {
+            const container = document.getElementById('deptList');
+            container.innerHTML = appData.departments.map(dept => `
+                <div class="dept-item">
+                    <div class="dept-item-left">
+                        <div class="dept-color-dot" style="background: ${dept.color};"></div>
+                        <span>${dept.name}</span>
+                    </div>
+                    <div class="dept-item-actions">
+                        <button class="dept-item-btn edit" onclick="editDepartment(${dept.id})" title="Edit">✎</button>
+                        <button class="dept-item-btn delete" onclick="confirmDeleteDepartment(${dept.id})" title="Delete">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== POPULATE SELECTS ====================
+        function populateDepartmentSelects() {
+            const selects = [document.getElementById('employeeDepartment')];
+            selects.forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Select Department</option>' +
+                    appData.departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+                select.value = currentValue;
+            });
+        }
+
+        function populateManagerSelect(excludeId = null) {
+            const select = document.getElementById('employeeManager');
+            const currentValue = select.value;
+
+            const options = appData.employees
+                .filter(e => e.id !== excludeId)
+                .map(e => `<option value="${e.id}">${e.name} (${e.position})</option>`)
+                .join('');
+
+            select.innerHTML = '<option value="">None (Top Level)</option>' + options;
+            select.value = currentValue;
+        }
+
+        function populateFilterSelects() {
+            const deptFilter = document.getElementById('deptFilter');
+            const positionFilter = document.getElementById('positionFilter');
+
+            deptFilter.innerHTML = '<option value="">All Departments</option>' +
+                appData.departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+
+            const positions = [...new Set(appData.employees.map(e => e.position))];
+            positionFilter.innerHTML = '<option value="">All Positions</option>' +
+                positions.map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+
+        // ==================== EMPLOYEE MODAL ====================
+        function openEmployeeModal(employee = null) {
+            document.getElementById('employeeModalTitle').textContent = employee ? 'Edit Employee' : 'Add Employee';
+            document.getElementById('employeeForm').reset();
+
+            populateDepartmentSelects();
+            populateManagerSelect(employee?.id);
+
+            if (employee) {
+                document.getElementById('employeeId').value = employee.id;
+                document.getElementById('employeeName').value = employee.name;
+                document.getElementById('employeePosition').value = employee.position;
+                document.getElementById('employeeDepartment').value = employee.department;
+                document.getElementById('employeeManager').value = employee.parentId || '';
+                document.getElementById('employeeShift').value = employee.shift || '';
+                document.getElementById('employeeEmail').value = employee.email || '';
+                document.getElementById('employeePhone').value = employee.phone || '';
+            } else {
+                document.getElementById('employeeId').value = '';
+            }
+
+            document.getElementById('employeeModal').classList.add('active');
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeModal').classList.remove('active');
+        }
+
+        function editEmployee(id) {
+            const employee = appData.employees.find(e => e.id === id);
+            if (employee) openEmployeeModal(employee);
+        }
+
+        function saveEmployee(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('employeeId').value;
+            const employee = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('employeeName').value.trim(),
+                position: document.getElementById('employeePosition').value.trim(),
+                department: document.getElementById('employeeDepartment').value,
+                parentId: document.getElementById('employeeManager').value ? parseInt(document.getElementById('employeeManager').value) : null,
+                shift: document.getElementById('employeeShift').value.trim(),
+                email: document.getElementById('employeeEmail').value.trim(),
+                phone: document.getElementById('employeePhone').value.trim()
+            };
+
+            if (id) {
+                const index = appData.employees.findIndex(e => e.id === parseInt(id));
+                if (index !== -1) appData.employees[index] = employee;
+                showToast('Employee updated successfully', 'success');
+            } else {
+                appData.employees.push(employee);
+                showToast('Employee added successfully', 'success');
+            }
+
+            saveData();
+            renderAll();
+            closeEmployeeModal();
+        }
+
+        function confirmDeleteEmployee(id) {
+            const employee = appData.employees.find(e => e.id === id);
+            if (!employee) return;
+
+            const hasReports = appData.employees.some(e => e.parentId === id);
+
+            document.getElementById('confirmTitle').textContent = 'Delete Employee';
+            document.getElementById('confirmMessage').textContent = hasReports
+                ? `Are you sure you want to delete ${employee.name}? This employee has direct reports who will become top-level.`
+                : `Are you sure you want to delete ${employee.name}?`;
+            document.getElementById('confirmIcon').textContent = '⚠️';
+            document.getElementById('confirmBtn').onclick = () => deleteEmployee(id);
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function deleteEmployee(id) {
+            // Remove parent reference from reports
+            appData.employees.forEach(e => {
+                if (e.parentId === id) e.parentId = null;
+            });
+
+            appData.employees = appData.employees.filter(e => e.id !== id);
+            saveData();
+            renderAll();
+            closeConfirmModal();
+            showToast('Employee deleted', 'success');
+        }
+
+        // ==================== DEPARTMENT MODAL ====================
+        function openDepartmentModal(department = null) {
+            document.getElementById('departmentModalTitle').textContent = department ? 'Edit Department' : 'Add Department';
+            document.getElementById('departmentForm').reset();
+
+            if (department) {
+                document.getElementById('departmentId').value = department.id;
+                document.getElementById('departmentName').value = department.name;
+                document.getElementById('departmentColor').value = department.color;
+                document.getElementById('departmentDescription').value = department.description || '';
+            } else {
+                document.getElementById('departmentId').value = '';
+                document.getElementById('departmentColor').value = '#3498db';
+            }
+
+            updateColorPreview();
+            document.getElementById('departmentModal').classList.add('active');
+        }
+
+        function closeDepartmentModal() {
+            document.getElementById('departmentModal').classList.remove('active');
+        }
+
+        function editDepartment(id) {
+            const department = appData.departments.find(d => d.id === id);
+            if (department) openDepartmentModal(department);
+        }
+
+        function updateColorPreview() {
+            const color = document.getElementById('departmentColor').value;
+            document.getElementById('colorPreview').style.background = color;
+        }
+
+        function saveDepartment(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('departmentId').value;
+            const oldName = id ? appData.departments.find(d => d.id === parseInt(id))?.name : null;
+
+            const department = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('departmentName').value.trim(),
+                color: document.getElementById('departmentColor').value,
+                description: document.getElementById('departmentDescription').value.trim()
+            };
+
+            if (id) {
+                const index = appData.departments.findIndex(d => d.id === parseInt(id));
+                if (index !== -1) {
+                    appData.departments[index] = department;
+                    // Update employees with old department name
+                    if (oldName && oldName !== department.name) {
+                        appData.employees.forEach(e => {
+                            if (e.department === oldName) e.department = department.name;
+                        });
+                    }
+                }
+                showToast('Department updated successfully', 'success');
+            } else {
+                appData.departments.push(department);
+                showToast('Department added successfully', 'success');
+            }
+
+            saveData();
+            renderAll();
+            closeDepartmentModal();
+        }
+
+        function confirmDeleteDepartment(id) {
+            const department = appData.departments.find(d => d.id === id);
+            if (!department) return;
+
+            const employeeCount = appData.employees.filter(e => e.department === department.name).length;
+
+            document.getElementById('confirmTitle').textContent = 'Delete Department';
+            document.getElementById('confirmMessage').textContent = employeeCount > 0
+                ? `Are you sure you want to delete ${department.name}? ${employeeCount} employee(s) in this department will have no department.`
+                : `Are you sure you want to delete ${department.name}?`;
+            document.getElementById('confirmIcon').textContent = '⚠️';
+            document.getElementById('confirmBtn').onclick = () => deleteDepartment(id);
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function deleteDepartment(id) {
+            const department = appData.departments.find(d => d.id === id);
+            if (department) {
+                // Clear department from employees
+                appData.employees.forEach(e => {
+                    if (e.department === department.name) e.department = '';
+                });
+            }
+
+            appData.departments = appData.departments.filter(d => d.id !== id);
+            saveData();
+            renderAll();
+            closeConfirmModal();
+            showToast('Department deleted', 'success');
+        }
+
+        // ==================== SETTINGS MODAL ====================
+        function openSettingsModal() {
+            document.getElementById('settingsCompanyName').value = appData.settings.companyName;
+            document.getElementById('settingsPositions').value = appData.settings.positionLevels.join(', ');
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+
+            appData.settings.companyName = document.getElementById('settingsCompanyName').value.trim() || 'Employee Board';
+            appData.settings.positionLevels = document.getElementById('settingsPositions').value
+                .split(',')
+                .map(p => p.trim())
+                .filter(p => p);
+
+            document.getElementById('companyName').textContent = appData.settings.companyName;
+
+            saveData();
+            closeSettingsModal();
+            showToast('Settings saved successfully', 'success');
+        }
+
+        // ==================== CONFIRM MODAL ====================
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function confirmReset() {
+            document.getElementById('confirmTitle').textContent = 'Reset All Data';
+            document.getElementById('confirmMessage').textContent = 'This will reset all data to default. This action cannot be undone. Are you sure?';
+            document.getElementById('confirmIcon').textContent = '🔄';
+            document.getElementById('confirmBtn').onclick = resetData;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function resetData() {
+            appData = JSON.parse(JSON.stringify(defaultData));
+            saveData();
+            document.getElementById('companyName').textContent = appData.settings.companyName;
+            renderAll();
+            closeConfirmModal();
+            showToast('Data reset to default', 'success');
+        }
+
+        // ==================== IMPORT/EXPORT ====================
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `employee-board-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('Data exported successfully', 'success');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+
+                    // Validate structure
+                    if (!imported.departments || !imported.employees) {
+                        throw new Error('Invalid data structure');
+                    }
+
+                    appData = {
+                        settings: imported.settings || defaultData.settings,
+                        departments: imported.departments,
+                        employees: imported.employees
+                    };
+
+                    saveData();
+                    document.getElementById('companyName').textContent = appData.settings.companyName;
+                    renderAll();
+                    showToast('Data imported successfully', 'success');
+                } catch (err) {
+                    showToast('Error importing data: Invalid file format', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ==================== TOAST NOTIFICATIONS ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================== INITIALIZE APP ====================
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

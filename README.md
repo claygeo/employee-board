@@ -1,328 +1,157 @@
-# Manufacturing Plant Organizational Chart
+# Customizable Employee Board
 
-A comprehensive, interactive organizational visualization system designed for manufacturing facilities with complex hierarchical structures. This HTML-based solution provides an intuitive way to visualize employee relationships, departmental organization, and reporting structures in modern manufacturing environments.
+A fully customizable, interactive employee organizational chart and directory system. This self-contained HTML application allows you to create, manage, and visualize your organization's structure with complete flexibility.
 
-## Table of Contents
+## Features
 
-- [Project Overview](#project-overview)
-- [Key Features](#key-features)
-- [Organizational Structure](#organizational-structure)
-- [Interactive Features](#interactive-features)
-- [Technical Implementation](#technical-implementation)
-- [Visual Design](#visual-design)
-- [Responsive Layout](#responsive-layout)
-- [Department Management](#department-management)
-- [Usage Instructions](#usage-instructions)
-- [Customization Guide](#customization-guide)
-- [Browser Compatibility](#browser-compatibility)
-- [Performance Considerations](#performance-considerations)
+### Fully Customizable Organization
+- **Add/Edit/Remove Departments** - Create custom departments with your own colors
+- **Add/Edit/Remove Employees** - Full CRUD operations for employee management
+- **Flexible Hierarchy** - Set any reporting structure with "Reports To" relationships
+- **Custom Position Levels** - Define your own position hierarchy (Director, Manager, etc.)
+- **Company Branding** - Set your own company name
 
-## Project Overview
+### Multiple Views
+- **Grid View** - Card-based employee directory with search and filters
+- **Hierarchy View** - Visual organizational tree showing reporting relationships
+- **Department View** - Department overview with employee counts
 
-The Manufacturing Plant Organizational Chart is a self-contained HTML application that transforms complex organizational data into an interactive, visually appealing hierarchy display. Built specifically for manufacturing environments, it accommodates the unique challenges of multi-shift operations, cross-departmental workflows, and process-oriented organizational structures.
+### Admin Panel
+Access the admin panel to manage everything:
+- **Toggle Methods:**
+  - Click the gear icon (⚙) in the top right
+  - Press `Ctrl+Shift+A`
+  - Click the company name 5 times rapidly (hidden toggle)
 
-The system visualizes a complete manufacturing facility with 140+ employees across seven departments, featuring a tri-leadership model with co-equal department heads managing Operations, Supply Chain, and Maintenance functions. This structure reflects modern manufacturing best practices where operational efficiency, supply chain management, and equipment maintenance require specialized leadership focus.
+### Data Management
+- **localStorage Persistence** - All data automatically saved to browser
+- **Export to JSON** - Download your data for backup or migration
+- **Import from JSON** - Load data from exported files
+- **Reset to Default** - Start fresh with sample data
 
-## Key Features
+### Search & Filter
+- Search employees by name
+- Filter by department
+- Filter by position
 
-### Dual-View System
-- **Hierarchy View**: Complete organizational structure with reporting relationships
-- **Drill-Down View**: Detailed departmental employee listings with enhanced information display
-- **Smooth Transitions**: Animated view switching with professional visual effects
+## Quick Start
 
-### Interactive Navigation
-- **Click-to-Explore**: Department cards open detailed employee views
-- **Keyboard Navigation**: Numeric keys (1-7) for quick department access
-- **Back Navigation**: Escape key or back button to return to hierarchy view
+1. Open `index.html` in any modern web browser
+2. View the sample organization with default data
+3. Click the gear icon (⚙) or press `Ctrl+Shift+A` to open admin mode
+4. Start customizing:
+   - Add your departments with custom colors
+   - Add your employees
+   - Set reporting relationships
+   - Update company name in settings
 
-### Advanced Visualization
-- **Connection Lines**: Visual reporting relationships with color-coded hierarchies
-- **Department Color Coding**: Consistent visual identity across all organizational levels
-- **Photo Integration**: Employee photo display with fallback avatar generation
-- **Smart Layout**: Automatic positioning based on organizational relationships
+## Admin Panel Features
 
-### Performance Optimization
-- **Responsive Design**: Seamless adaptation from mobile devices to large displays
-- **Scalable Components**: Dynamic sizing based on screen dimensions and content
-- **Efficient Rendering**: Optimized DOM manipulation for smooth performance
+### Overview Section
+- Total employee count
+- Total department count
 
-## Organizational Structure
+### Employee Management
+- **Add Employee** - Create new employee with name, position, department, manager, shift, email, phone
+- **Edit Employee** - Click edit button on any employee card
+- **Delete Employee** - Remove employees (direct reports become top-level)
 
-### Leadership Model
-The organization features a modern tri-leadership structure reflecting contemporary manufacturing best practices:
+### Department Management
+- **Add Department** - Create with custom name and color
+- **Edit Department** - Modify name, color, or description
+- **Delete Department** - Remove department (employees become unassigned)
 
-1. **Operations Manager (Dora Gaeza)**: Oversees core production departments including Extraction, Kitchen, Packaging, and Processing operations
-2. **Supply Chain Director (Michael Amaya)**: Manages warehouse operations, inventory control, and logistics coordination
-3. **Maintenance Manager (Abel Ortega)**: Leads facility maintenance, equipment reliability, and infrastructure management
+### Data Management
+- **Export Data** - Download complete data as JSON file
+- **Import Data** - Upload JSON file to restore or migrate data
+- **Reset to Default** - Clear all data and restore sample organization
 
-### Department Breakdown
+### Settings
+- **Company Name** - Set your organization's name
+- **Position Levels** - Define position hierarchy (comma separated)
 
-#### Production Departments
-- **Extraction (6 employees)**: Raw material processing with 1st and 2nd shift coverage
-- **Processing Lab (12 employees)**: Quality processing with three-shift operations plus analytical lab integration
-- **Kitchen (18 employees)**: Food production with dedicated 1st and 2nd shift teams
-- **Packaging (80 employees)**: High-volume packaging operations with dedicated supervisory coverage
+## Data Structure
 
-#### Support Departments
-- **Warehouse (7 employees)**: Inventory management and logistics operations
-- **Maintenance (3 employees)**: Equipment maintenance and facility management
-- **Quality (3 employees)**: Quality assurance and compliance oversight
+The application uses a simple JSON structure:
 
-### Shift Structure
-The system accommodates complex shift patterns common in manufacturing:
-- **1st Shift**: Primary production hours with highest staffing
-- **2nd Shift**: Secondary production coverage
-- **3rd Shift**: Specialized processing operations
-- **Continuous Coverage**: Cross-shift leadership coordination
-
-## Interactive Features
-
-### Hierarchy View Navigation
-The main organizational view presents the complete structure with several interactive elements:
-
-- **Employee Cards**: Clickable cards showing name, position, and department
-- **Department Summaries**: Aggregated employee counts with department-specific styling
-- **Connection Lines**: Visual hierarchy relationships with color-coded leadership paths
-- **Hover Effects**: Enhanced visual feedback for interactive elements
-
-### Drill-Down Functionality
-Clicking any department summary opens a detailed view featuring:
-
-- **Complete Employee Roster**: All department members including leadership
-- **Enhanced Information Display**: Expanded employee details with shift information
-- **Leadership Highlighting**: Visual distinction for supervisory roles
-- **Optimized Layout**: Grid-based arrangement maximizing screen utilization
-
-### Visual Feedback Systems
-- **Hover Animations**: Scale and shadow effects for interactive elements
-- **Color-Coded Departments**: Consistent visual identity across all views
-- **Progressive Information Disclosure**: Essential information in hierarchy, detailed information in drill-down
-- **Smooth Transitions**: Professional animation effects between view states
-
-## Technical Implementation
-
-### Architecture
-The system is built as a single-file HTML application with embedded CSS and JavaScript:
-
-- **Self-Contained**: No external dependencies or API calls required
-- **Progressive Enhancement**: Base functionality works with JavaScript disabled
-- **Modular Code Structure**: Clearly separated concerns for layout, interaction, and data management
-
-### Data Structure
-Employee information is stored in a comprehensive JavaScript array with the following fields:
-```javascript
+```json
 {
-    id: unique_identifier,
-    name: "Full Name",
-    position: "Job Title",
-    department: "Department Name",
-    parentId: reporting_manager_id,
-    shift: "Shift Information",
-    dept_color: "Department Color Code"
+  "settings": {
+    "companyName": "Your Company",
+    "positionLevels": ["Director", "Manager", "Supervisor", "Lead", "Employee"]
+  },
+  "departments": [
+    {
+      "id": 1,
+      "name": "Engineering",
+      "color": "#3498db",
+      "description": "Software development team"
+    }
+  ],
+  "employees": [
+    {
+      "id": 1,
+      "name": "John Smith",
+      "position": "Director",
+      "department": "Engineering",
+      "parentId": null,
+      "shift": "",
+      "email": "john@company.com",
+      "phone": ""
+    }
+  ]
 }
 ```
 
-### Layout Algorithm
-The positioning system uses a sophisticated process-flow approach:
+### Employee Fields
+| Field | Description |
+|-------|-------------|
+| `id` | Unique identifier (auto-generated) |
+| `name` | Full name |
+| `position` | Job title/position |
+| `department` | Department name |
+| `parentId` | ID of manager (null = top level) |
+| `shift` | Shift information (optional) |
+| `email` | Email address (optional) |
+| `phone` | Phone number (optional) |
 
-1. **Zone-Based Positioning**: Screen divided into departmental zones following manufacturing process flow
-2. **Hierarchical Placement**: Leadership positioned based on reporting relationships
-3. **Connection Generation**: Automatic line creation showing organizational relationships
-4. **Responsive Adaptation**: Dynamic sizing based on screen dimensions
-
-### Responsive Calculations
-The system dynamically calculates optimal sizing using several factors:
-- Screen dimensions and aspect ratio
-- Employee count per department
-- Text content length and wrapping requirements
-- Available space for connection lines and visual elements
-
-## Visual Design
-
-Main Dashboard
-<img width="1911" height="902" alt="employee-1" src="https://github.com/user-attachments/assets/b3f6dad9-241f-4a16-b0a4-95c2f2fd7d14" />
-
-Drill-Down menu example
-<img width="1907" height="888" alt="employee-2" src="https://github.com/user-attachments/assets/22e6c59a-10ad-4e31-84bc-5bac10d61def" />
-
-### Color System
-Each department features a distinct color palette for immediate visual identification:
-
-- **Extraction**: Warm orange tones (#e67e22)
-- **Processing Lab**: Professional blue (#3498db)
-- **Kitchen**: Vibrant orange (#f39c12)
-- **Packaging**: Alert red (#e74c3c)
-- **Warehouse**: Growth green (#2ecc71)
-- **Maintenance**: Industrial gray (#34495e)
-- **Quality**: Royal purple (#9b59b6)
-- **Management**: Gold accents (#ffd700)
-
-### Typography Hierarchy
-The text system uses multiple levels to convey information priority:
-
-- **Names**: Bold, high-contrast text for primary identification
-- **Job Titles**: Medium weight for role clarity
-- **Additional Information**: Lighter text for supplementary details
-- **Responsive Sizing**: Dynamic font scaling based on available space
-
-### Card Design System
-Employee cards feature a horizontal layout optimized for information density:
-
-- **Photo Section**: Consistent sizing with automatic avatar generation
-- **Text Section**: Flexible width accommodating varying name lengths
-- **Border System**: Visual hierarchy through border thickness and color
-- **Shadow Effects**: Depth perception with subtle shadow gradients
-
-## Responsive Layout
-
-### Mobile Optimization (≤1400px)
-- **Compact Spacing**: Reduced margins and padding for screen efficiency
-- **Simplified Information**: Essential details only in constrained spaces
-- **Touch-Friendly Interactions**: Larger touch targets and hover states
-- **Single-Column Layouts**: Vertical stacking for narrow screens
-
-### Desktop Enhancement (>1400px)
-- **Rich Information Display**: Full detail visibility with expanded layouts
-- **Multi-Panel Interface**: Side-by-side information presentation
-- **Enhanced Visual Effects**: Complex animations and transitions
-- **Keyboard Navigation**: Full shortcut support for power users
-
-### Adaptive Components
-All visual elements scale dynamically based on:
-- Available screen real estate
-- Content density requirements
-- User interaction patterns
-- Performance considerations
-
-## Department Management
-
-### Process Flow Integration
-Departments are arranged following the manufacturing process flow:
-
-1. **Extraction → Processing**: Raw material transformation
-2. **Processing → Kitchen**: Intermediate processing steps
-3. **Kitchen → Packaging**: Final product preparation
-4. **Packaging → Warehouse**: Distribution preparation
-5. **Maintenance**: Cross-departmental equipment support
-6. **Quality**: Process oversight and compliance
-
-### Shift Coordination
-The system visualizes complex shift patterns:
-
-- **Overlapping Coverage**: Multiple shifts with staggered schedules
-- **Leadership Coordination**: Cross-shift communication structures
-- **Resource Allocation**: Visual representation of staffing levels
-- **Workflow Continuity**: Process handoff visualization
-
-## Usage Instructions
-
-### Initial Setup
-1. **File Placement**: Save the HTML file to your desired location
-2. **Asset Management**: Ensure any referenced images are in the correct relative paths
-3. **Browser Opening**: Open the file in any modern web browser
-4. **Full-Screen Viewing**: Maximize browser window for optimal experience
-
-### Navigation Controls
-
-#### Mouse/Touch Navigation
-- **Click Department Cards**: Open detailed employee views
-- **Click Back Button**: Return to hierarchy view
-- **Hover Effects**: Preview interactive elements
-
-#### Keyboard Shortcuts
-- **Numbers 1-7**: Direct department access
-  - 1: Extraction
-  - 2: Processing Lab
-  - 3: Kitchen
-  - 4: Packaging
-  - 5: Warehouse
-  - 6: Maintenance
-  - 7: Quality
-- **Escape Key**: Return to main hierarchy view
-
-### View Switching
-- **Hierarchy View**: Complete organizational overview with reporting relationships
-- **Department View**: Detailed employee listings with enhanced information
-- **Smooth Transitions**: Animated view changes with professional effects
-
-## Customization Guide
-
-### Adding New Employees
-To add employees to the system:
-
-1. **Locate Employee Array**: Find the `employees` constant in the JavaScript section
-2. **Add Employee Object**: Create new entry with required fields
-3. **Update Department Counts**: System automatically calculates employee counts
-4. **Refresh Layout**: Automatic repositioning based on new data
-
-### Modifying Departments
-To customize departments:
-
-1. **Update Department Names**: Modify the `departmentNames` array
-2. **Adjust Color Schemes**: Edit CSS color variables for each department
-3. **Modify Process Flow**: Adjust zone positioning in `calculateProcessFlowLayout`
-4. **Update Navigation**: Modify keyboard shortcuts and department ordering
-
-### Visual Customization
-The system supports extensive visual modifications:
-
-- **Color Palettes**: Comprehensive CSS color system
-- **Typography**: Font family, sizing, and weight adjustments
-- **Layout Parameters**: Spacing, sizing, and positioning controls
-- **Animation Settings**: Timing, easing, and transition customization
-
-### Background Integration
-The system supports background image integration:
-
-- **Image Placement**: Place background images in a `pictures` folder
-- **CSS References**: Update background image paths in the CSS section
-- **Responsive Backgrounds**: Automatic scaling and positioning
-- **Overlay Effects**: Gradient overlays for text readability
+### Department Fields
+| Field | Description |
+|-------|-------------|
+| `id` | Unique identifier (auto-generated) |
+| `name` | Department name |
+| `color` | Hex color code for styling |
+| `description` | Brief description (optional) |
 
 ## Browser Compatibility
 
-### Supported Browsers
-The system is compatible with all modern browsers:
+Works with all modern browsers:
+- Chrome/Chromium
+- Firefox
+- Safari
+- Edge
 
-- **Chrome/Chromium**: Full feature support with optimal performance
-- **Firefox**: Complete functionality with excellent rendering
-- **Safari**: Full compatibility with WebKit-specific optimizations
-- **Edge**: Modern Edge with comprehensive feature support
+## Technical Details
 
-### Feature Requirements
-Essential browser capabilities:
-- **CSS3 Support**: Gradients, transforms, and transitions
-- **ES6+ JavaScript**: Modern JavaScript features and syntax
-- **DOM Manipulation**: Dynamic content creation and modification
-- **Event Handling**: Mouse, touch, and keyboard interaction support
+- **Self-Contained** - Single HTML file, no external dependencies
+- **No Backend Required** - Runs entirely in the browser
+- **localStorage** - Data persists in browser storage
+- **Responsive Design** - Works on desktop and mobile devices
 
-### Performance Considerations
-The system is optimized for:
-- **Low Memory Usage**: Efficient DOM structure with minimal overhead
-- **Fast Rendering**: Optimized CSS for smooth animations
-- **Responsive Performance**: Debounced resize handling
-- **Touch Performance**: Optimized for mobile device interactions
+## Keyboard Shortcuts
 
-## Performance Considerations
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Shift+A` | Toggle admin panel |
+| `Escape` | Close open modals |
 
-### Optimization Strategies
-The system employs several performance optimization techniques:
+## Tips
 
-- **Efficient DOM Management**: Minimal DOM manipulation with batched updates
-- **CSS-Based Animations**: Hardware-accelerated transitions and transforms
-- **Event Debouncing**: Throttled resize and interaction handling
-- **Memory Management**: Cleanup of unused elements and event listeners
+1. **Backup Regularly** - Use Export Data to save your organization periodically
+2. **Plan Your Hierarchy** - Add managers before their direct reports for easier "Reports To" selection
+3. **Use Meaningful Colors** - Choose department colors that help identify teams quickly
+4. **Hidden Admin Access** - Click the company name 5 times for secret admin toggle (useful for presentations)
 
-### Scalability Features
-The system is designed to handle organizational growth:
+## License
 
-- **Dynamic Layout**: Automatic adjustment to varying employee counts
-- **Flexible Hierarchies**: Support for complex reporting structures
-- **Extensible Design**: Easy addition of new departments and roles
-- **Performance Monitoring**: Built-in considerations for large datasets
-
----
-
-This organizational chart system represents a comprehensive solution for visualizing complex manufacturing hierarchies. Its combination of interactive features, responsive design, and customization capabilities makes it an invaluable tool for understanding and managing organizational structures in modern manufacturing environments.
-
-The system's self-contained nature ensures easy deployment and maintenance, while its professional visual design creates an engaging experience for all users, from front-line employees to executive leadership.
+Free to use and modify for any purpose.

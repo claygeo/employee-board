@@ -1,58 +1,26 @@
-[
-  {
-    "id": 1,
-    "name": "Sarah Johnson",
-    "department": "HR",
-    "description": "Human Resources Manager responsible for employee relations, recruitment, and policy development.",
-    "photo": "sarah_johnson.jpg"
+{
+  "settings": {
+    "companyName": "Employee Board",
+    "positionLevels": ["Director", "Manager", "Supervisor", "Lead", "Specialist", "Employee", "Associate"]
   },
-  {
-    "id": 2,
-    "name": "Michael Chen",
-    "department": "Logistics",
-    "description": "Senior Logistics Coordinator managing supply chain operations and vendor relationships.",
-    "photo": "michael_chen.jpg"
-  },
-  {
-    "id": 3,
-    "name": "Emily Davis",
-    "department": "Warehouse",
-    "description": "Warehouse Supervisor overseeing inventory management and shipping operations.",
-    "photo": "emily_davis.jpg"
-  },
-  {
-    "id": 4,
-    "name": "Robert Martinez",
-    "department": "HR",
-    "description": "HR Specialist focusing on employee benefits and compensation analysis.",
-    "photo": "robert_martinez.jpg"
-  },
-  {
-    "id": 5,
-    "name": "Lisa Thompson",
-    "department": "Logistics",
-    "description": "Transportation Manager coordinating fleet operations and delivery schedules.",
-    "photo": "lisa_thompson.jpg"
-  },
-  {
-    "id": 6,
-    "name": "David Wilson",
-    "department": "Warehouse",
-    "description": "Warehouse Associate handling receiving, storage, and order fulfillment.",
-    "photo": "david_wilson.jpg"
-  },
-  {
-    "id": 7,
-    "name": "Jennifer Brown",
-    "department": "HR",
-    "description": "Talent Acquisition Specialist responsible for recruiting and onboarding new employees.",
-    "photo": "jennifer_brown.jpg"
-  },
-  {
-    "id": 8,
-    "name": "James Anderson",
-    "department": "Logistics",
-    "description": "Logistics Analyst optimizing routes and analyzing supply chain efficiency.",
-    "photo": "james_anderson.jpg"
-  }
-]
+  "departments": [
+    { "id": 1, "name": "Management", "color": "#f39c12", "description": "Executive leadership" },
+    { "id": 2, "name": "Engineering", "color": "#3498db", "description": "Software development" },
+    { "id": 3, "name": "Marketing", "color": "#9b59b6", "description": "Marketing and communications" },
+    { "id": 4, "name": "Sales", "color": "#27ae60", "description": "Sales and business development" },
+    { "id": 5, "name": "Operations", "color": "#e74c3c", "description": "Operations and logistics" },
+    { "id": 6, "name": "Human Resources", "color": "#1abc9c", "description": "HR and recruitment" }
+  ],
+  "employees": [
+    { "id": 1, "name": "John Smith", "position": "Director", "department": "Management", "parentId": null, "shift": "", "email": "john@company.com", "phone": "" },
+    { "id": 2, "name": "Sarah Johnson", "position": "Manager", "department": "Engineering", "parentId": 1, "shift": "", "email": "sarah@company.com", "phone": "" },
+    { "id": 3, "name": "Mike Brown", "position": "Manager", "department": "Marketing", "parentId": 1, "shift": "", "email": "mike@company.com", "phone": "" },
+    { "id": 4, "name": "Emily Davis", "position": "Manager", "department": "Sales", "parentId": 1, "shift": "", "email": "emily@company.com", "phone": "" },
+    { "id": 5, "name": "David Wilson", "position": "Supervisor", "department": "Engineering", "parentId": 2, "shift": "Day Shift", "email": "", "phone": "" },
+    { "id": 6, "name": "Lisa Anderson", "position": "Supervisor", "department": "Engineering", "parentId": 2, "shift": "Night Shift", "email": "", "phone": "" },
+    { "id": 7, "name": "James Taylor", "position": "Lead", "department": "Marketing", "parentId": 3, "shift": "", "email": "", "phone": "" },
+    { "id": 8, "name": "Jennifer Martinez", "position": "Employee", "department": "Engineering", "parentId": 5, "shift": "Day Shift", "email": "", "phone": "" },
+    { "id": 9, "name": "Robert Garcia", "position": "Employee", "department": "Engineering", "parentId": 5, "shift": "Day Shift", "email": "", "phone": "" },
+    { "id": 10, "name": "Amanda Lee", "position": "Employee", "department": "Marketing", "parentId": 7, "shift": "", "email": "", "phone": "" }
+  ]
+}
