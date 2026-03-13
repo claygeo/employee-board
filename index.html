@@ -3,1929 +3,2257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customizable Employee Board</title>
+    <title>Manufacturing Plant Organizational Chart</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
-        }
-
+        
         body {
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-primary);
-        }
-
-        /* ==================== HEADER ==================== */
-        .header {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .company-name {
-            color: white;
-            font-size: 24px;
-            font-weight: 600;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .company-name:hover {
-            opacity: 0.9;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .view-toggle {
-            display: flex;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            background: 
+                linear-gradient(135deg, rgba(30, 60, 114, 0.85) 0%, rgba(42, 82, 152, 0.85) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="%23f8f9fa"/><circle cx="200" cy="200" r="100" fill="%23e9ecef" opacity="0.5"/><circle cx="1600" cy="300" r="150" fill="%23dee2e6" opacity="0.3"/><circle cx="800" cy="800" r="200" fill="%23e9ecef" opacity="0.4"/></svg>');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            font-family: "Arial", sans-serif;
             overflow: hidden;
-        }
-
-        .view-btn {
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .view-btn.active {
-            background: var(--primary-color);
-        }
-
-        .view-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Hidden Admin Button - appears as subtle icon */
-        .admin-toggle {
-            width: 36px;
-            height: 36px;
-            background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.4);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .admin-toggle:hover {
-            border-color: rgba(255, 255, 255, 0.5);
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .admin-toggle.active {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: white;
-        }
-
-        /* ==================== MAIN CONTAINER ==================== */
-        .main-container {
-            display: flex;
-            min-height: calc(100vh - 70px);
-        }
-
-        /* ==================== ADMIN SIDEBAR ==================== */
-        .admin-sidebar {
-            width: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            transition: width 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .admin-sidebar.open {
-            width: 320px;
-        }
-
-        .sidebar-content {
-            width: 320px;
-            padding: 20px;
-            height: calc(100vh - 70px);
-            overflow-y: auto;
-        }
-
-        .sidebar-section {
-            margin-bottom: 25px;
-        }
-
-        .sidebar-title {
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .admin-btn {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-        }
-
-        .admin-btn.danger {
-            border-color: var(--accent-color);
-        }
-
-        .admin-btn.danger:hover {
-            background: rgba(231, 76, 60, 0.3);
-        }
-
-        .admin-btn.success {
-            border-color: var(--success-color);
-        }
-
-        .admin-btn.success:hover {
-            background: rgba(39, 174, 96, 0.3);
-        }
-
-        /* Department List in Sidebar */
-        .dept-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .dept-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            margin-bottom: 5px;
-            color: white;
-        }
-
-        .dept-item-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .dept-color-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .dept-item-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .dept-item-btn {
-            width: 24px;
-            height: 24px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .dept-item-btn.edit {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .dept-item-btn.delete {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .dept-item-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
-        }
-
-        /* ==================== CONTENT AREA ==================== */
-        .content-area {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-        }
-
-        /* ==================== HIERARCHY VIEW ==================== */
-        .hierarchy-view {
-            display: none;
-        }
-
-        .hierarchy-view.active {
-            display: block;
-        }
-
-        .hierarchy-level {
-            margin-bottom: 40px;
-        }
-
-        .level-title {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        .level-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        /* ==================== GRID VIEW ==================== */
-        .grid-view {
-            display: none;
-        }
-
-        .grid-view.active {
-            display: block;
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-        }
-
-        .search-box::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .filter-select {
-            padding: 12px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            min-width: 150px;
-        }
-
-        .filter-select option {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .employees-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        /* ==================== EMPLOYEE CARD ==================== */
-        .employee-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--primary-color);
+            height: 100vh;
             position: relative;
         }
 
-        .employee-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .employee-card.admin-mode::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px dashed var(--primary-color);
-            border-radius: 12px;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .card-photo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-secondary);
-        }
-
-        .card-info {
-            flex: 1;
-        }
-
-        .card-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .card-position {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .card-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .card-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .card-detail-icon {
-            width: 20px;
-            text-align: center;
-        }
-
-        .dept-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .card-actions {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            gap: 5px;
-        }
-
-        .admin-mode .card-actions {
-            display: flex;
-        }
-
-        .card-action-btn {
-            width: 30px;
-            height: 30px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .card-action-btn.edit {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .card-action-btn.delete {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .card-action-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* ==================== DEPARTMENT VIEW ==================== */
-        .department-view {
-            display: none;
-        }
-
-        .department-view.active {
-            display: block;
-        }
-
-        .dept-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .dept-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-align: center;
-            border-top: 4px solid var(--primary-color);
-        }
-
-        .dept-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .dept-card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .dept-card-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-
-        .dept-card-count {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* ==================== MODALS ==================== */
-        .modal-overlay {
-            display: none;
+        /* LOGIN SCREEN STYLES */
+        .login-screen {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
+            background: 
+                linear-gradient(135deg, rgba(30, 60, 114, 0.95) 0%, rgba(42, 82, 152, 0.95) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="%23f8f9fa"/><circle cx="200" cy="200" r="100" fill="%23e9ecef" opacity="0.5"/><circle cx="1600" cy="300" r="150" fill="%23dee2e6" opacity="0.3"/><circle cx="800" cy="800" r="200" fill="%23e9ecef" opacity="0.4"/></svg>');
+            background-size: cover;
+            background-position: center;
+            display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
+            z-index: 10000;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: #f1f2f6;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            background: white;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .color-picker-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .color-picker {
-            width: 50px;
-            height: 40px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .color-preview {
-            flex: 1;
-            height: 40px;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 25px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-
-        .btn-secondary {
-            background: #e0e0e0;
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: #d0d0d0;
-        }
-
-        .btn-danger {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #219a52;
-        }
-
-        /* ==================== SETTINGS MODAL ==================== */
-        .settings-group {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .settings-group-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-        }
-
-        /* ==================== EMPTY STATE ==================== */
-        .empty-state {
+        .login-container {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,249,250,0.95));
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.2);
             text-align: center;
-            padding: 60px 20px;
-            color: white;
+            min-width: 350px;
         }
 
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state-title {
+        .login-title {
+            color: #2c3e50;
             font-size: 24px;
-            font-weight: 600;
+            font-weight: bold;
             margin-bottom: 10px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .empty-state-text {
+        .login-subtitle {
+            color: #566573;
             font-size: 16px;
-            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            text-align: center;
             margin-bottom: 20px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
         }
 
-        /* ==================== TOAST NOTIFICATIONS ==================== */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .login-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
         }
 
-        .toast {
-            padding: 15px 20px;
-            border-radius: 10px;
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(145deg, #3498db, #2980b9);
             color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .login-error {
+            color: #e74c3c;
             font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: slideIn 0.3s ease;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .login-error.show {
+            opacity: 1;
+        }
+
+        .login-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .chart-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        /* HIERARCHY VIEW */
+        .hierarchy-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .hierarchy-view.hidden {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        
+        /* DRILL-DOWN VIEW */
+        .drill-down-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(135deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 73, 94, 0.95) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="%23f8f9fa"/><circle cx="200" cy="200" r="100" fill="%23e9ecef" opacity="0.5"/><circle cx="1600" cy="300" r="150" fill="%23dee2e6" opacity="0.3"/><circle cx="800" cy="800" r="200" fill="%23e9ecef" opacity="0.4"/></svg>');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+        }
+        
+        .drill-down-view.active {
+            opacity: 1;
+            transform: translateX(0%);
+        }
+        
+        .drill-down-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(52,73,94,0.9));
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1001;
+        }
+        
+        .drill-down-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .back-button {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .drill-down-content {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 60px;
+            padding: 20px;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .toast.success {
-            background: var(--success-color);
-        }
-
-        .toast.error {
-            background: var(--accent-color);
-        }
-
-        .toast.info {
-            background: var(--primary-color);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* ==================== CONFIRM DIALOG ==================== */
-        .confirm-dialog {
-            text-align: center;
-        }
-
-        .confirm-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .confirm-message {
-            font-size: 16px;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
-        }
-
-        /* ==================== RESPONSIVE ==================== */
-        @media (max-width: 768px) {
-            .header {
-                padding: 10px 15px;
-            }
-
-            .company-name {
-                font-size: 18px;
-            }
-
-            .admin-sidebar.open {
-                position: fixed;
-                top: 70px;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                z-index: 999;
-            }
-
-            .sidebar-content {
-                width: 100%;
-            }
-
-            .content-area {
-                padding: 15px;
-            }
-
-            .employees-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-bar {
-                flex-direction: column;
-            }
-
-            .search-box, .filter-select {
-                width: 100%;
-            }
-        }
-
-        /* ==================== HIERARCHY TREE ==================== */
-        .hierarchy-tree {
+        .drill-down-grid {
+            display: grid;
+            gap: 15px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
         }
 
-        .tree-node {
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .tree-node::before {
-            content: '';
+        /* PAGINATION STYLES - Only for Packaging */
+        .pagination-container {
             position: absolute;
-            left: 10px;
-            top: 0;
-            bottom: 50%;
-            width: 2px;
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .tree-node::after {
-            content: '';
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            width: 15px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .tree-node:first-child::before {
-            top: 50%;
-        }
-
-        .tree-node:last-child::before {
-            bottom: 50%;
-        }
-
-        .tree-root {
-            padding-left: 0;
-        }
-
-        .tree-root::before, .tree-root::after {
-            display: none;
-        }
-
-        .tree-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 12px 15px;
-            margin: 8px 0;
-            display: inline-flex;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border-radius: 25px;
+            padding: 10px 20px;
+            display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            border-left: 3px solid var(--primary-color);
+            gap: 10px;
+            z-index: 1002;
         }
 
-        .tree-card-photo {
+        .pagination-button {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 35px;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .pagination-button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .pagination-button.active {
+            background: linear-gradient(145deg, #e67e22, #d35400);
+        }
+
+        .pagination-info {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .page-jump-input {
             width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
+            padding: 5px;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .page-jump-button {
+            background: linear-gradient(145deg, #27ae60, #229954);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-jump-button:hover {
+            transform: translateY(-1px);
+        }
+        
+        /* IMPROVED TALLER HORIZONTAL EMPLOYEE CARDS */
+        .employee-card {
+            position: absolute;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            border: 2px solid;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            padding: 8px;
+        }
+        
+        .employee-card:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+            z-index: 100;
+        }
+        
+        /* DEPARTMENT-BASED STYLING */
+        .dept-extraction-card {
+            border-color: #e67e22;
+            background: linear-gradient(145deg, #fdf6f0, #fcf3ec);
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+        }
+        
+        .dept-processing-lab-card {
+            border-color: #3498db;
+            background: linear-gradient(145deg, #f2f8fd, #e8f4fd);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .dept-kitchen-card {
+            border-color: #f39c12;
+            background: linear-gradient(145deg, #fef9f2, #fcf3e8);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+        
+        .dept-packaging-card {
+            border-color: #e74c3c;
+            background: linear-gradient(145deg, #fdf2f2, #fce8e8);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        .dept-warehouse-card {
+            border-color: #2ecc71;
+            background: linear-gradient(145deg, #f2fcf7, #e8f8f0);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+        
+        .dept-maintenance-card {
+            border-color: #34495e;
+            background: linear-gradient(145deg, #f5f6f7, #eaecee);
+            box-shadow: 0 4px 12px rgba(52, 73, 94, 0.3);
+        }
+        
+        .dept-quality-card {
+            border-color: #9b59b6;
+            background: linear-gradient(145deg, #f7f2fc, #f0e8f8);
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+        }
+        
+        .dept-management-card {
+            border-color: #ffd700;
+            background: linear-gradient(145deg, #fff8dc, #ffeaa7);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .dept-executive-card {
+            border-color: #8e44ad;
+            background: linear-gradient(145deg, #f4f2ff, #ede7f6);
+            box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+        }
+        
+        /* POSITION-BASED BORDER THICKNESS */
+        .manager-operations-card { border-width: 4px; }
+        .director-supply-chain-card { border-width: 4px; }
+        .manager-maintenance-facility-card { border-width: 4px; }
+        .director-card { border-width: 3px; }
+        .manager-card { border-width: 3px; }
+        .supervisor-card { border-width: 3px; }
+        .supervisor-maintenance-facility-card { border-width: 3px; }
+        .quality-specialist-card { border-width: 3px; }
+        .lead-card { border-width: 3px; }
+        
+        /* PHOTO SECTION - Left side */
+        .card-photo-section {
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: var(--text-secondary);
+            margin-right: 10px;
         }
-
-        .tree-card-info {
+        
+        /* TEXT SECTION - Right side, improved spacing */
+        .card-text-section {
+            flex: 1 1 auto;
             display: flex;
             flex-direction: column;
-        }
-
-        .tree-card-name {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-primary);
-        }
-
-        .tree-card-position {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .tree-children {
-            margin-left: 20px;
-        }
-
-        /* ==================== IMPORT/EXPORT ==================== */
-        .file-input-wrapper {
-            position: relative;
+            justify-content: center;
+            gap: 3px;
+            line-height: 1.2;
             overflow: hidden;
-            display: inline-block;
-            width: 100%;
+            min-width: 0;
         }
-
-        .file-input {
+        
+        .card-photo {
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid white;
+            display: block;
+            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* IMPROVED TEXT - Better readability */
+        .card-name {
+            font-weight: bold;
+            color: #2c3e50;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            word-wrap: break-word;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+            white-space: normal;
+        }
+        
+        .card-title {
+            color: #566573;
+            font-weight: 500;
+            font-size: 10px;
+            line-height: 1.1;
+            margin: 0;
+            padding: 0;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .card-position {
+            color: #7f8c8d;
+            font-weight: 500;
+            font-size: 10px;
+            line-height: 1.1;
+            margin: 0;
+            padding: 0;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* DEPARTMENT SUMMARY CARDS */
+        .department-card {
             position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
+            background: linear-gradient(145deg, #ffffff, #f1f2f6);
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            border: 3px solid;
             cursor: pointer;
-            width: 100%;
-            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            transition: all 0.3s ease;
+            text-align: center;
         }
-
-        .file-input-label {
+        
+        .department-card:hover {
+            transform: scale(1.08) translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 100;
+        }
+        
+        .dept-packaging { border-color: #e74c3c; background: linear-gradient(145deg, #fdf2f2, #fce8e8); }
+        .dept-kitchen { border-color: #f39c12; background: linear-gradient(145deg, #fef9f2, #fcf3e8); }
+        .dept-processing-lab { border-color: #3498db; background: linear-gradient(145deg, #f2f8fd, #e8f4fd); }
+        .dept-warehouse { border-color: #2ecc71; background: linear-gradient(145deg, #f2fcf7, #e8f8f0); }
+        .dept-quality { border-color: #9b59b6; background: linear-gradient(145deg, #f7f2fc, #f0e8f8); }
+        .dept-maintenance { border-color: #34495e; background: linear-gradient(145deg, #f5f6f7, #eaecee); }
+        .dept-extraction { border-color: #e67e22; background: linear-gradient(145deg, #fdf6f0, #fcf3ec); }
+        .dept-executive { border-color: #8e44ad; background: linear-gradient(145deg, #f4f2ff, #ede7f6); }
+        
+        .dept-title {
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            margin-bottom: 4px;
+            line-height: 1.1;
+        }
+        
+        .dept-count {
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .dept-packaging .dept-count { color: #e74c3c; }
+        .dept-kitchen .dept-count { color: #f39c12; }
+        .dept-processing-lab .dept-count { color: #3498db; }
+        .dept-warehouse .dept-count { color: #2ecc71; }
+        .dept-quality .dept-count { color: #9b59b6; }
+        .dept-maintenance .dept-count { color: #34495e; }
+        .dept-extraction .dept-count { color: #e67e22; }
+        .dept-executive .dept-count { color: #8e44ad; }
+        
+        /* ENHANCED DRILL-DOWN EMPLOYEE CARDS */
+        .drill-employee-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,249,250,0.95));
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 3px solid #ddd;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .drill-employee-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        
+        .drill-card-photo-section {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .drill-card-text-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .drill-card-photo {
+            border-radius: 8px;
+            object-fit: cover;
+            border: 3px solid white;
+            display: block;
+            background: linear-gradient(135deg, #bdc3c7, #ecf0f1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+        
+        .drill-card-name {
+            font-weight: bold;
+            color: #2c3e50;
+            line-height: 1.3;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            font-size: 18px;
+            word-wrap: break-word;
+        }
+        
+        .drill-card-title {
+            color: #566573;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
+            white-space: normal;
+        }
+        
+        .drill-card-shift {
+            color: #7f8c8d;
+            font-weight: 500;
+            font-size: 12px;
+            line-height: 1.2;
+            font-style: italic;
+        }
+        
+        /* CONNECTION LINES */
+        .connection-line {
+            position: absolute;
+            background: linear-gradient(180deg, rgba(52, 73, 94, 0.8), rgba(52, 73, 94, 0.4));
+            z-index: 1;
+            border-radius: 1px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .hierarchy-line-plant-manager {
+            position: absolute;
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.9), rgba(52, 152, 219, 0.7));
+            z-index: 2;
+            border-radius: 2px;
+            box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+        }
+        
+        .hierarchy-line-director {
+            position: absolute;
+            background: linear-gradient(180deg, rgba(52, 152, 219, 0.9), rgba(243, 156, 18, 0.7));
+            z-index: 2;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+        }
+        
+        .hierarchy-line-maintenance {
+            position: absolute;
+            background: linear-gradient(180deg, rgba(52, 73, 94, 0.9), rgba(149, 165, 166, 0.7));
+            z-index: 2;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(52, 73, 94, 0.3);
         }
 
-        .file-input-label:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
+        /* EXECUTIVE CARD POSITIONING */
+        .executive-card {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #f4f2ff, #ede7f6);
+            border: 3px solid #8e44ad;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(142, 68, 173, 0.3);
+            cursor: pointer;
+            z-index: 10;
+            padding: 12px;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .executive-card:hover {
+            transform: scale(1.08) translateY(-3px);
+            box-shadow: 0 10px 25px rgba(142, 68, 173, 0.4);
+            z-index: 100;
+        }
+
+        .executive-title {
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            margin-bottom: 4px;
+            line-height: 1.1;
+            font-size: 11px;
+        }
+
+        .executive-count {
+            font-weight: bold;
+            color: #8e44ad;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">EB</div>
-            <h1 class="company-name" id="companyName" title="Click 5 times to toggle admin mode">Employee Board</h1>
-        </div>
-        <div class="header-actions">
-            <div class="view-toggle">
-                <button class="view-btn active" data-view="grid">Grid</button>
-                <button class="view-btn" data-view="hierarchy">Hierarchy</button>
-                <button class="view-btn" data-view="departments">Departments</button>
-            </div>
-            <button class="admin-toggle" id="adminToggle" title="Admin Panel (Ctrl+Shift+A)">⚙</button>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <div class="main-container">
-        <!-- ADMIN SIDEBAR -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="sidebar-content">
-                <!-- Stats Section -->
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Overview</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalEmployees">0</div>
-                            <div class="stat-label">Employees</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalDepartments">0</div>
-                            <div class="stat-label">Departments</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Employee Management -->
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Employees</h3>
-                    <button class="admin-btn success" onclick="openEmployeeModal()">
-                        <span>+</span> Add Employee
-                    </button>
-                </div>
-
-                <!-- Department Management -->
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Departments</h3>
-                    <button class="admin-btn success" onclick="openDepartmentModal()">
-                        <span>+</span> Add Department
-                    </button>
-                    <div class="dept-list" id="deptList"></div>
-                </div>
-
-                <!-- Data Management -->
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Data Management</h3>
-                    <button class="admin-btn" onclick="exportData()">
-                        <span>↓</span> Export Data (JSON)
-                    </button>
-                    <div class="file-input-wrapper">
-                        <input type="file" class="file-input" id="importFile" accept=".json" onchange="importData(event)">
-                        <label class="file-input-label">
-                            <span>↑</span> Import Data (JSON)
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Settings</h3>
-                    <button class="admin-btn" onclick="openSettingsModal()">
-                        <span>⚙</span> Board Settings
-                    </button>
-                    <button class="admin-btn danger" onclick="confirmReset()">
-                        <span>⟲</span> Reset to Default
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- CONTENT AREA -->
-        <main class="content-area">
-            <!-- Grid View -->
-            <div class="grid-view active" id="gridView">
-                <div class="filter-bar">
-                    <input type="text" class="search-box" id="searchBox" placeholder="Search employees...">
-                    <select class="filter-select" id="deptFilter">
-                        <option value="">All Departments</option>
-                    </select>
-                    <select class="filter-select" id="positionFilter">
-                        <option value="">All Positions</option>
-                    </select>
-                </div>
-                <div class="employees-grid" id="employeesGrid"></div>
-            </div>
-
-            <!-- Hierarchy View -->
-            <div class="hierarchy-view" id="hierarchyView">
-                <div class="hierarchy-tree" id="hierarchyTree"></div>
-            </div>
-
-            <!-- Department View -->
-            <div class="department-view" id="departmentView">
-                <div class="dept-cards-grid" id="deptCardsGrid"></div>
-            </div>
-        </main>
-    </div>
-
-    <!-- MODALS -->
-    <!-- Employee Modal -->
-    <div class="modal-overlay" id="employeeModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title" id="employeeModalTitle">Add Employee</h2>
-                <button class="modal-close" onclick="closeEmployeeModal()">×</button>
-            </div>
-            <form id="employeeForm" onsubmit="saveEmployee(event)">
-                <input type="hidden" id="employeeId">
-                <div class="form-group">
-                    <label class="form-label">Full Name *</label>
-                    <input type="text" class="form-input" id="employeeName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Position *</label>
-                    <input type="text" class="form-input" id="employeePosition" required placeholder="e.g., Manager, Supervisor, Employee">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Department *</label>
-                    <select class="form-select" id="employeeDepartment" required>
-                        <option value="">Select Department</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Reports To</label>
-                    <select class="form-select" id="employeeManager">
-                        <option value="">None (Top Level)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Shift</label>
-                    <input type="text" class="form-input" id="employeeShift" placeholder="e.g., 1st Shift, Day Shift">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="employeeEmail">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" class="form-input" id="employeePhone">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeEmployeeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Employee</button>
-                </div>
-            </form>
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <h1 class="login-title">Manufacturing Plant</h1>
+            <p class="login-subtitle">Organizational Chart Demo</p>
+            <input type="password" class="login-input" id="passcodeInput" placeholder="Enter Passcode (demo)" maxlength="10">
+            <button class="login-button" id="loginButton">Access Chart</button>
+            <div class="login-error" id="loginError">Invalid passcode. Please try again.</div>
         </div>
     </div>
 
-    <!-- Department Modal -->
-    <div class="modal-overlay" id="departmentModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title" id="departmentModalTitle">Add Department</h2>
-                <button class="modal-close" onclick="closeDepartmentModal()">×</button>
+    <div class="chart-container">
+        <!-- HIERARCHY VIEW -->
+        <div class="hierarchy-view" id="hierarchyView">
+            <!-- EXECUTIVE CARD -->
+            <div class="executive-card" id="executiveCard">
+                <div class="executive-title">Executive Team</div>
+                <div class="executive-count">(6) members</div>
             </div>
-            <form id="departmentForm" onsubmit="saveDepartment(event)">
-                <input type="hidden" id="departmentId">
-                <div class="form-group">
-                    <label class="form-label">Department Name *</label>
-                    <input type="text" class="form-input" id="departmentName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Department Color</label>
-                    <div class="color-picker-wrapper">
-                        <input type="color" class="color-picker" id="departmentColor" value="#3498db" onchange="updateColorPreview()">
-                        <div class="color-preview" id="colorPreview" style="background: #3498db;"></div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <input type="text" class="form-input" id="departmentDescription" placeholder="Brief description of the department">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeDepartmentModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Department</button>
-                </div>
-            </form>
+            <div id="orgChart"></div>
         </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Board Settings</h2>
-                <button class="modal-close" onclick="closeSettingsModal()">×</button>
+        
+        <!-- DRILL-DOWN VIEW -->
+        <div class="drill-down-view" id="drillDownView">
+            <div class="drill-down-header">
+                <div class="drill-down-title" id="drillDownTitle">Department View</div>
+                <button class="back-button" id="backButton">← Back to Hierarchy</button>
             </div>
-            <form id="settingsForm" onsubmit="saveSettings(event)">
-                <div class="settings-group">
-                    <div class="settings-group-title">Company Information</div>
-                    <div class="form-group">
-                        <label class="form-label">Company Name</label>
-                        <input type="text" class="form-input" id="settingsCompanyName">
-                    </div>
-                </div>
-                <div class="settings-group">
-                    <div class="settings-group-title">Position Hierarchy</div>
-                    <div class="form-group">
-                        <label class="form-label">Position Levels (comma separated, highest to lowest)</label>
-                        <input type="text" class="form-input" id="settingsPositions" placeholder="Director, Manager, Supervisor, Lead, Employee">
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeSettingsModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Settings</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Confirm Modal -->
-    <div class="modal-overlay" id="confirmModal">
-        <div class="modal">
-            <div class="confirm-dialog">
-                <div class="confirm-icon" id="confirmIcon">⚠️</div>
-                <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
-                <p class="confirm-message" id="confirmMessage">Are you sure you want to proceed?</p>
-                <div class="form-actions" style="justify-content: center;">
-                    <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
-                </div>
+            <div class="drill-down-content" id="drillDownContent"></div>
+            <div class="pagination-container" id="paginationContainer" style="display: none;">
+                <button class="pagination-button" id="prevButton">‹</button>
+                <div class="pagination-info" id="paginationInfo"></div>
+                <button class="pagination-button" id="nextButton">›</button>
+                <input type="number" class="page-jump-input" id="pageJumpInput" min="1" placeholder="1">
+                <button class="page-jump-button" id="pageJumpButton">Go</button>
             </div>
         </div>
     </div>
-
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
+    
     <script>
-        // ==================== DATA STORE ====================
-        const STORAGE_KEY = 'customEmployeeBoard';
+        // LOGIN FUNCTIONALITY
+        const CORRECT_PASSCODE = "demo";
+        let isLoggedIn = false;
 
-        let appData = {
-            settings: {
-                companyName: 'Employee Board',
-                positionLevels: ['Director', 'Manager', 'Supervisor', 'Lead', 'Specialist', 'Employee', 'Associate']
-            },
-            departments: [],
-            employees: []
-        };
+        function initLogin() {
+            const loginScreen = document.getElementById("loginScreen");
+            const passcodeInput = document.getElementById("passcodeInput");
+            const loginButton = document.getElementById("loginButton");
+            const loginError = document.getElementById("loginError");
 
-        // ==================== DEFAULT DATA ====================
-        const defaultData = {
-            settings: {
-                companyName: 'Employee Board',
-                positionLevels: ['Director', 'Manager', 'Supervisor', 'Lead', 'Specialist', 'Employee', 'Associate']
-            },
-            departments: [
-                { id: 1, name: 'Management', color: '#f39c12', description: 'Executive leadership' },
-                { id: 2, name: 'Engineering', color: '#3498db', description: 'Software development' },
-                { id: 3, name: 'Marketing', color: '#9b59b6', description: 'Marketing and communications' },
-                { id: 4, name: 'Sales', color: '#27ae60', description: 'Sales and business development' },
-                { id: 5, name: 'Operations', color: '#e74c3c', description: 'Operations and logistics' },
-                { id: 6, name: 'Human Resources', color: '#1abc9c', description: 'HR and recruitment' }
-            ],
-            employees: [
-                { id: 1, name: 'John Smith', position: 'Director', department: 'Management', parentId: null, shift: '', email: 'john@company.com', phone: '' },
-                { id: 2, name: 'Sarah Johnson', position: 'Manager', department: 'Engineering', parentId: 1, shift: '', email: 'sarah@company.com', phone: '' },
-                { id: 3, name: 'Mike Brown', position: 'Manager', department: 'Marketing', parentId: 1, shift: '', email: 'mike@company.com', phone: '' },
-                { id: 4, name: 'Emily Davis', position: 'Manager', department: 'Sales', parentId: 1, shift: '', email: 'emily@company.com', phone: '' },
-                { id: 5, name: 'David Wilson', position: 'Supervisor', department: 'Engineering', parentId: 2, shift: 'Day Shift', email: '', phone: '' },
-                { id: 6, name: 'Lisa Anderson', position: 'Supervisor', department: 'Engineering', parentId: 2, shift: 'Night Shift', email: '', phone: '' },
-                { id: 7, name: 'James Taylor', position: 'Lead', department: 'Marketing', parentId: 3, shift: '', email: '', phone: '' },
-                { id: 8, name: 'Jennifer Martinez', position: 'Employee', department: 'Engineering', parentId: 5, shift: 'Day Shift', email: '', phone: '' },
-                { id: 9, name: 'Robert Garcia', position: 'Employee', department: 'Engineering', parentId: 5, shift: 'Day Shift', email: '', phone: '' },
-                { id: 10, name: 'Amanda Lee', position: 'Employee', department: 'Marketing', parentId: 7, shift: '', email: '', phone: '' }
-            ]
-        };
-
-        // ==================== INITIALIZATION ====================
-        function init() {
-            loadData();
-            renderAll();
-            setupEventListeners();
-            updateStats();
-        }
-
-        function loadData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    appData = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Error loading data:', e);
-                    appData = JSON.parse(JSON.stringify(defaultData));
+            function attemptLogin() {
+                const enteredPasscode = passcodeInput.value.trim();
+                
+                if (enteredPasscode === CORRECT_PASSCODE) {
+                    isLoggedIn = true;
+                    loginScreen.classList.add("hidden");
+                    passcodeInput.value = "";
+                    loginError.classList.remove("show");
+                    
+                    // AUTO-REDIRECT TO HIERARCHY VIEW - Initialize immediately
+                    setTimeout(() => {
+                        initHierarchyView();
+                    }, 600); // Slightly longer delay to ensure login screen is fully hidden
+                } else {
+                    loginError.classList.add("show");
+                    passcodeInput.value = "";
+                    passcodeInput.focus();
+                    
+                    // Hide error after 3 seconds
+                    setTimeout(() => {
+                        loginError.classList.remove("show");
+                    }, 3000);
                 }
-            } else {
-                appData = JSON.parse(JSON.stringify(defaultData));
             }
-            document.getElementById('companyName').textContent = appData.settings.companyName;
-        }
 
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-            updateStats();
-        }
-
-        function renderAll() {
-            renderEmployeesGrid();
-            renderHierarchyTree();
-            renderDepartmentCards();
-            renderDeptList();
-            populateDepartmentSelects();
-            populateManagerSelect();
-            populateFilterSelects();
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        function setupEventListeners() {
-            // View toggle
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', () => switchView(btn.dataset.view));
-            });
-
-            // Admin toggle
-            document.getElementById('adminToggle').addEventListener('click', toggleAdminPanel);
-
-            // Secret admin toggle (click company name 5 times)
-            let clickCount = 0;
-            let clickTimer;
-            document.getElementById('companyName').addEventListener('click', () => {
-                clickCount++;
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => clickCount = 0, 2000);
-                if (clickCount >= 5) {
-                    toggleAdminPanel();
-                    clickCount = 0;
+            loginButton.addEventListener("click", attemptLogin);
+            
+            passcodeInput.addEventListener("keypress", function(e) {
+                if (e.key === "Enter") {
+                    attemptLogin();
                 }
             });
 
-            // Keyboard shortcut (Ctrl+Shift+A)
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                    e.preventDefault();
-                    toggleAdminPanel();
-                }
-            });
-
-            // Search and filter
-            document.getElementById('searchBox').addEventListener('input', filterEmployees);
-            document.getElementById('deptFilter').addEventListener('change', filterEmployees);
-            document.getElementById('positionFilter').addEventListener('change', filterEmployees);
-
-            // Close modals on overlay click
-            document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) {
-                        overlay.classList.remove('active');
-                    }
-                });
-            });
-
-            // ESC key to close modals
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
-                }
-            });
+            // Focus on input when page loads
+            passcodeInput.focus();
         }
 
-        // ==================== VIEW SWITCHING ====================
-        function switchView(view) {
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.view === view);
-            });
-
-            document.getElementById('gridView').classList.toggle('active', view === 'grid');
-            document.getElementById('hierarchyView').classList.toggle('active', view === 'hierarchy');
-            document.getElementById('departmentView').classList.toggle('active', view === 'departments');
-        }
-
-        // ==================== ADMIN PANEL ====================
-        let isAdminMode = false;
-
-        function toggleAdminPanel() {
-            isAdminMode = !isAdminMode;
-            document.getElementById('adminSidebar').classList.toggle('open', isAdminMode);
-            document.getElementById('adminToggle').classList.toggle('active', isAdminMode);
-            document.querySelectorAll('.employee-card').forEach(card => {
-                card.classList.toggle('admin-mode', isAdminMode);
-            });
-            showToast(isAdminMode ? 'Admin mode enabled' : 'Admin mode disabled', 'info');
-        }
-
-        // ==================== STATS ====================
-        function updateStats() {
-            document.getElementById('totalEmployees').textContent = appData.employees.length;
-            document.getElementById('totalDepartments').textContent = appData.departments.length;
-        }
-
-        // ==================== EMPLOYEE GRID ====================
-        function renderEmployeesGrid() {
-            const grid = document.getElementById('employeesGrid');
-
-            if (appData.employees.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-state-icon">👥</div>
-                        <div class="empty-state-title">No Employees Yet</div>
-                        <div class="empty-state-text">Add your first employee to get started</div>
-                        <button class="btn btn-primary" onclick="openEmployeeModal()">Add Employee</button>
-                    </div>
-                `;
-                return;
+        // DEMO Employee data with placeholder names and avatars
+        const employees = [
+            // THREE CO-EQUAL TOP-LEVEL LEADERS (parentId: null)
+            { "id": 1, "name": "John Doe", "position": "Manager, Operations", "department": "Management", "parentId": null, "shift": "", "dept_color": "#95a5a6", "photo": null },
+            { "id": 6, "name": "Sarah Smith", "position": "Director, Supply Chain", "department": "Warehouse", "parentId": null, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            { "id": 8, "name": "Mike Johnson", "position": "Manager, Maintenance, Facility", "department": "Maintenance", "parentId": null, "shift": "", "dept_color": "#34495e", "photo": null },
+            
+            // EXECUTIVE TEAM (reordered: Robert first, then Michael, Oscar, Ash, Jane, Lisa)
+            { "id": 205, "name": "Robert Wilson", "position": "Sr. Director, Operations", "department": "Executive", "parentId": null, "shift": "", "dept_color": "#8e44ad", "photo": null },
+            { "id": 201, "name": "Michael Brown", "position": "Director, Supply Chain Planning Operations Management", "department": "Executive", "parentId": null, "shift": "", "dept_color": "#8e44ad", "photo": null },
+            { "id": 204, "name": "Oscar Davis", "position": "Production Planner", "department": "Executive", "parentId": null, "shift": "", "dept_color": "#8e44ad", "photo": null },
+            { "id": 200, "name": "Ashley Miller", "position": "Product Manager", "department": "Executive", "parentId": null, "shift": "", "dept_color": "#8e44ad", "photo": null },
+            { "id": 202, "name": "Jane Garcia", "position": "Sr. People & Culture Partner", "department": "Executive", "parentId": null, "shift": "", "dept_color": "#8e44ad", "photo": null },
+            { "id": 203, "name": "Lisa Rodriguez", "position": "Sr. P&C Administrator", "department": "Executive", "parentId": null, "shift": "", "dept_color": "#8e44ad", "photo": null },
+            
+            // Managers under John (3 total)
+            { "id": 2, "name": "David Wilson", "position": "Manager, Kitchen", "department": "Kitchen", "parentId": 1, "shift": "", "dept_color": "#f39c12", "photo": null },
+            { "id": 140, "name": "Lisa Brown", "position": "Manager, Extraction", "department": "Extraction", "parentId": 1, "shift": "", "dept_color": "#e67e22", "photo": null },
+            { "id": 3, "name": "James Davis", "position": "Manager, Production", "department": "Packaging", "parentId": 1, "shift": "", "dept_color": "#e74c3c", "photo": null },
+            
+            // Manager under Sarah (1 total)
+            { "id": 16, "name": "Emma Thompson", "position": "Manager, Inventory", "department": "Warehouse", "parentId": 6, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            
+            // Supervisors under John (2 total)
+            { "id": 4, "name": "Kevin Lee", "position": "Supervisor, Processing", "department": "Processing Lab", "parentId": 1, "shift": "", "dept_color": "#3498db", "photo": null },
+            { "id": 5, "name": "Carlos Martinez", "position": "Supervisor, Processing", "department": "Processing Lab", "parentId": 1, "shift": "", "dept_color": "#3498db", "photo": null },
+            
+            // Supervisors under their respective managers
+            { "id": 17, "name": "Patricia White", "position": "Supervisor, Logistics", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            { "id": 9, "name": "Daniel Taylor", "position": "Supervisor, Maintenance, Facility", "department": "Maintenance", "parentId": 8, "shift": "", "dept_color": "#34495e", "photo": null },
+            
+            // Quality Specialist
+            { "id": 7, "name": "Maria Lopez", "position": "Quality Specialist", "department": "Quality", "parentId": 140, "shift": "", "dept_color": "#9b59b6", "photo": null },
+            
+            // Department Leads
+            { "id": 11, "name": "Jennifer Clark", "position": "Lead, Kitchen", "department": "Kitchen", "parentId": 2, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 12, "name": "Nathan Walker", "position": "Lead, Kitchen", "department": "Kitchen", "parentId": 2, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            
+            // Packaging Supervisors
+            { "id": 13, "name": "Jessica Hall", "position": "Supervisor, Production", "department": "Packaging", "parentId": 3, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 14, "name": "Maria Anderson", "position": "Supervisor, Production", "department": "Packaging", "parentId": 3, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 15, "name": "Samantha Thomas", "position": "Supervisor, Production", "department": "Packaging", "parentId": 3, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            
+            // Quality Employees (alphabetized by position)
+            { "id": 134, "name": "Elena Roberts", "position": "Lead Quality Control Technician", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6", "photo": null },
+            { "id": 18, "name": "Grace Turner", "position": "Quality Assurance Associate", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6", "photo": null },
+            { "id": 135, "name": "Maria Phillips", "position": "Quality Control Technician", "department": "Quality", "parentId": 7, "shift": "", "dept_color": "#9b59b6", "photo": null },
+            
+            // Extraction Employees (alphabetized by position)
+            { "id": 141, "name": "Ryan Mitchell", "position": "Lead Extraction Technician", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22", "photo": null },
+            { "id": 143, "name": "Anthony Parker", "position": "Extraction Technician", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22", "photo": null },
+            { "id": 145, "name": "Carlos Torres", "position": "Extraction Technician", "department": "Extraction", "parentId": 140, "shift": "2nd Shift", "dept_color": "#e67e22", "photo": null },
+            { "id": 144, "name": "Jack Stevens", "position": "Extraction Technician", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22", "photo": null },
+            { "id": 146, "name": "Jennifer Moore", "position": "Extraction Technician", "department": "Extraction", "parentId": 140, "shift": "2nd Shift", "dept_color": "#e67e22", "photo": null },
+            { "id": 142, "name": "Miguel Gonzalez", "position": "Extraction Technician", "department": "Extraction", "parentId": 140, "shift": "1st Shift", "dept_color": "#e67e22", "photo": null },
+            
+            // Kitchen Employees - Alphabetized by position within shifts
+            // 1st Shift Kitchen Technicians (alphabetized)
+            { "id": 19, "name": "Fatima Hassan", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 24, "name": "Isabella Cooper", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 25, "name": "Ivan Baker", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 26, "name": "Katelyn Hughes", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 21, "name": "Nicole Carter", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 22, "name": "Raymond Green", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 23, "name": "William Foster", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 20, "name": "Yuki Tanaka", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 11, "shift": "1st Shift", "dept_color": "#f39c12", "photo": null },
+            
+            // 2nd Shift Kitchen Technicians (alphabetized)
+            { "id": 35, "name": "Albert Brooks", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 34, "name": "Elizabeth Adams", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 32, "name": "Francisco Rivera", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 28, "name": "Jake Roberts", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 36, "name": "Jason Lewis", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 27, "name": "Larry Collins", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 31, "name": "Linda Murphy", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            { "id": 30, "name": "Michelle Guerra", "position": "Kitchen Technician", "department": "Kitchen", "parentId": 12, "shift": "2nd Shift", "dept_color": "#f39c12", "photo": null },
+            
+            // Packaging Employees
+            { "id": 44, "name": "Adam Valdez", "position": "Lead Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 80, "name": "Alexander Fisher", "position": "Lead Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 42, "name": "Andrew Garcia", "position": "Lead Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 43, "name": "Angel Rodriguez", "position": "Lead Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 41, "name": "Betty Campbell", "position": "Lead Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 38, "name": "Linda Blake", "position": "Lead Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 40, "name": "Maria Silva", "position": "Lead Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 39, "name": "Yasmin Porter", "position": "Lead Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            
+            // Packaging 2nd Shift Lead Technicians (alphabetized)
+            { "id": 87, "name": "Aaron Rodriguez", "position": "Lead Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 88, "name": "Alberto Mesa", "position": "Lead Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            
+            // Packaging Inventory Coordinators (alphabetized)
+            { "id": 47, "name": "Charlotte Parks", "position": "Lead Inventory Coordinator", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 89, "name": "Zoe Martinez", "position": "Inventory Coordinator", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            
+            // Packaging Production Technicians (alphabetized by shift, then name) - First 50 employees
+            { "id": 102, "name": "Adrian Lynch", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 46, "name": "Alberto Cruz", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 33, "name": "Albert Rivera", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 37, "name": "Anna Fernandez", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 91, "name": "Ana Santos", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 76, "name": "Annie Duncan", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 101, "name": "Bianca Bell", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 103, "name": "Bertha Rogers", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 77, "name": "Carmen Blanco", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 50, "name": "Carolina Santos", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 75, "name": "Diana Dominguez", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 100, "name": "Dorothy Morgan", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 72, "name": "Emily Gonzalez", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 92, "name": "Gloria Gutierrez", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 54, "name": "Grace Reynolds", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 63, "name": "Gabriel Garcia", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 52, "name": "Helen Price", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 78, "name": "Harold Rodriguez", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 55, "name": "Jorge Lozano", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 64, "name": "Jorge Rivera", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 94, "name": "Jorge Acosta", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 71, "name": "Jose Patterson", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 90, "name": "Josephine Adams", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 96, "name": "Karen Abbott", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 68, "name": "Katherine Graham", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 51, "name": "Laura Sanchez", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 66, "name": "Margaret Fisher", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 56, "name": "Martha Correia", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 60, "name": "Mary Valdez", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 95, "name": "Maria Amador", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 79, "name": "Maria Peña", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 49, "name": "Maria Vega", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 61, "name": "Melissa Carter", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 93, "name": "Mario Hernandez", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 53, "name": "Martha Bennett", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 57, "name": "Max Plaza", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 58, "name": "Monica Marrero", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 74, "name": "Maya Gonzalez", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 67, "name": "Michelle Carter", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 70, "name": "Miranda Espinoza", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 62, "name": "Rosa Contreras", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 97, "name": "Ruth Garcia", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 105, "name": "Sarah Mitchell", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 48, "name": "Sally Rodriguez", "position": "Production Technician", "department": "Packaging", "parentId": 14, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 99, "name": "Sandra Bailey", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 104, "name": "Susan Coronado", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 59, "name": "Yvette Barnes", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 98, "name": "Yasmin Rodriguez", "position": "Production Technician", "department": "Packaging", "parentId": 15, "shift": "2nd Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 73, "name": "Yvonne Carter", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 69, "name": "Yolanda Gonzalez", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            { "id": 65, "name": "Zelda Carter", "position": "Production Technician", "department": "Packaging", "parentId": 13, "shift": "1st Shift", "dept_color": "#e74c3c", "photo": null },
+            
+            // Processing Lab Employees
+            { "id": 118, "name": "Caroline Collins", "position": "Lead Lab Technician", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db", "photo": null },
+            { "id": 121, "name": "Joshua Lewis", "position": "Lead Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 2", "dept_color": "#3498db", "photo": null },
+            { "id": 119, "name": "Luis Acevedo", "position": "Lead Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db", "photo": null },
+            { "id": 117, "name": "Michael Scott", "position": "Lead Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db", "photo": null },
+            
+            // HPLC Technician
+            { "id": 139, "name": "Miguel Collins", "position": "HPLC Technician", "department": "Processing Lab", "parentId": 4, "shift": "Former Analytical Lab", "dept_color": "#3498db", "photo": null },
+            
+            // Lab Associates
+            { "id": 120, "name": "Maria Paz", "position": "Lab Associate", "department": "Processing Lab", "parentId": 5, "shift": "Shift 1", "dept_color": "#3498db", "photo": null },
+            
+            // Lab Technicians (alphabetized)
+            { "id": 29, "name": "Alex Ventura", "position": "Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db", "photo": null },
+            { "id": 150, "name": "Angela Adams", "position": "Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 1", "dept_color": "#3498db", "photo": null },
+            { "id": 122, "name": "Armando Hernandez", "position": "Lab Technician", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db", "photo": null },
+            { "id": 151, "name": "Danny Rodriguez", "position": "Lab Technician", "department": "Processing Lab", "parentId": 5, "shift": "Shift 2", "dept_color": "#3498db", "photo": null },
+            { "id": 126, "name": "Diego Perez", "position": "Lab Technician", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db", "photo": null },
+            { "id": 125, "name": "Karla Cruz", "position": "Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 3", "dept_color": "#3498db", "photo": null },
+            { "id": 123, "name": "Melissa Lopez", "position": "Lab Technician", "department": "Processing Lab", "parentId": 4, "shift": "Shift 2", "dept_color": "#3498db", "photo": null },
+            { "id": 10, "name": "Natalie Zhang", "position": "Lab Technician", "department": "Processing Lab", "parentId": 5, "shift": "Former Analytical Lab", "dept_color": "#3498db", "photo": null },
+            { "id": 124, "name": "Randy Castro", "position": "Lab Technician", "department": "Processing Lab", "parentId": 5, "shift": "Shift 3", "dept_color": "#3498db", "photo": null },
+            
+            // Warehouse Employees
+            { "id": 128, "name": "Jorge Ferguson", "position": "Lead Logistics Coordinator", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            { "id": 127, "name": "Reginald Knight", "position": "Lead Logistics Coordinator", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            
+            // Logistics Coordinators (alphabetized)
+            { "id": 130, "name": "Ivan Cameron", "position": "Logistics Coordinator", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            { "id": 129, "name": "Robert Ross", "position": "Logistics Coordinator", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            
+            // Delivery Driver
+            { "id": 131, "name": "Steven Wilson", "position": "Delivery Driver", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            
+            // Warehouse Technicians (alphabetized)
+            { "id": 132, "name": "Gary Rodriguez", "position": "Warehouse Technician", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            { "id": 133, "name": "Natalie Martinez", "position": "Warehouse Technician", "department": "Warehouse", "parentId": 16, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            { "id": 152, "name": "Yandy Miranda", "position": "Warehouse Technician", "department": "Warehouse", "parentId": 17, "shift": "", "dept_color": "#2ecc71", "photo": null },
+            
+            // Maintenance Employees
+            { "id": 136, "name": "Jose Miranda", "position": "HVAC Technician", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e", "photo": null },
+            { "id": 137, "name": "Jose Acosta", "position": "Maintenance Technician", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e", "photo": null },
+            { "id": 138, "name": "Victor Rodriguez", "position": "Maintenance Technician", "department": "Maintenance", "parentId": 9, "shift": "", "dept_color": "#34495e", "photo": null }
+        ];
+        
+        let screenWidth = 1280;
+        let screenHeight = 690;
+        let isDrillDownActive = false;
+        let currentDepartment = null;
+        let currentPage = 1;
+        let employeesPerPage = 8; // Updated to 8 for 4x2 grid
+        
+        // Updated department names order: Executive → Extraction → Processing → Kitchen → Packaging → Warehouse → Maintenance → Quality
+        const departmentNames = ["Executive", "Extraction", "Processing Lab", "Kitchen", "Packaging", "Warehouse", "Maintenance", "Quality"];
+        let createdConnections = new Set();
+        
+        // SMART name wrapping for compact cards
+        function wrapLongName(name) {
+            const parts = name.split(' ');
+            
+            // For names with 3+ parts, break after first name
+            if (parts.length >= 3 && name.length > 18) {
+                return parts[0] + '<br>' + parts.slice(1).join(' ');
             }
-
-            grid.innerHTML = appData.employees.map(emp => {
-                const dept = appData.departments.find(d => d.name === emp.department);
-                const manager = appData.employees.find(e => e.id === emp.parentId);
-                const deptColor = dept ? dept.color : '#95a5a6';
-                const initials = emp.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-
-                return `
-                    <div class="employee-card ${isAdminMode ? 'admin-mode' : ''}" style="border-left-color: ${deptColor};" data-id="${emp.id}" data-dept="${emp.department}" data-position="${emp.position}">
-                        <div class="card-actions">
-                            <button class="card-action-btn edit" onclick="editEmployee(${emp.id})" title="Edit">✎</button>
-                            <button class="card-action-btn delete" onclick="confirmDeleteEmployee(${emp.id})" title="Delete">×</button>
-                        </div>
-                        <div class="card-header">
-                            <div class="card-photo">${initials}</div>
-                            <div class="card-info">
-                                <div class="card-name">${emp.name}</div>
-                                <div class="card-position">${emp.position}</div>
-                            </div>
-                        </div>
-                        <div class="card-details">
-                            <div class="card-detail">
-                                <span class="card-detail-icon">🏢</span>
-                                <span class="dept-badge" style="background: ${deptColor};">${emp.department}</span>
-                            </div>
-                            ${manager ? `<div class="card-detail"><span class="card-detail-icon">👤</span> Reports to: ${manager.name}</div>` : ''}
-                            ${emp.shift ? `<div class="card-detail"><span class="card-detail-icon">⏰</span> ${emp.shift}</div>` : ''}
-                            ${emp.email ? `<div class="card-detail"><span class="card-detail-icon">✉</span> ${emp.email}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterEmployees() {
-            const search = document.getElementById('searchBox').value.toLowerCase();
-            const deptFilter = document.getElementById('deptFilter').value;
-            const positionFilter = document.getElementById('positionFilter').value;
-
-            document.querySelectorAll('#employeesGrid .employee-card').forEach(card => {
-                const name = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
-                const dept = card.dataset.dept;
-                const position = card.dataset.position;
-
-                const matchesSearch = name.includes(search);
-                const matchesDept = !deptFilter || dept === deptFilter;
-                const matchesPosition = !positionFilter || position === positionFilter;
-
-                card.style.display = matchesSearch && matchesDept && matchesPosition ? '' : 'none';
-            });
-        }
-
-        // ==================== HIERARCHY TREE ====================
-        function renderHierarchyTree() {
-            const container = document.getElementById('hierarchyTree');
-            const topLevel = appData.employees.filter(e => !e.parentId);
-
-            if (topLevel.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🌳</div>
-                        <div class="empty-state-title">No Hierarchy Yet</div>
-                        <div class="empty-state-text">Add employees to build your organization chart</div>
-                    </div>
-                `;
-                return;
+            
+            // For 2-part names that are long
+            if (parts.length === 2 && name.length > 20) {
+                return parts[0] + '<br>' + parts[1];
             }
-
-            container.innerHTML = topLevel.map(emp => renderTreeNode(emp, true)).join('');
+            
+            return name;
         }
 
-        function renderTreeNode(employee, isRoot = false) {
-            const dept = appData.departments.find(d => d.name === employee.department);
-            const deptColor = dept ? dept.color : '#95a5a6';
-            const initials = employee.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-            const children = appData.employees.filter(e => e.parentId === employee.id);
-
-            return `
-                <div class="tree-node ${isRoot ? 'tree-root' : ''}">
-                    <div class="tree-card" style="border-left-color: ${deptColor};">
-                        <div class="tree-card-photo">${initials}</div>
-                        <div class="tree-card-info">
-                            <div class="tree-card-name">${employee.name}</div>
-                            <div class="tree-card-position">${employee.position} - ${employee.department}</div>
-                        </div>
-                    </div>
-                    ${children.length > 0 ? `
-                        <div class="tree-children">
-                            ${children.map(child => renderTreeNode(child)).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        // ==================== DEPARTMENT VIEW ====================
-        function renderDepartmentCards() {
-            const container = document.getElementById('deptCardsGrid');
-
-            if (appData.departments.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-state-icon">🏢</div>
-                        <div class="empty-state-title">No Departments Yet</div>
-                        <div class="empty-state-text">Add departments to organize your team</div>
-                        <button class="btn btn-primary" onclick="openDepartmentModal()">Add Department</button>
-                    </div>
-                `;
-                return;
+        // NEW: Smart position wrapping for long titles
+        function wrapLongPosition(position) {
+            // If position contains a comma, wrap at the comma
+            if (position.includes(', ')) {
+                return position.replace(', ', ',<br>');
             }
-
-            container.innerHTML = appData.departments.map(dept => {
-                const count = appData.employees.filter(e => e.department === dept.name).length;
-                return `
-                    <div class="dept-card" style="border-top-color: ${dept.color};" onclick="filterByDepartment('${dept.name}')">
-                        <div class="dept-card-icon" style="background: ${dept.color};">🏢</div>
-                        <div class="dept-card-name">${dept.name}</div>
-                        <div class="dept-card-count">${count} employee${count !== 1 ? 's' : ''}</div>
-                    </div>
-                `;
-            }).join('');
+            
+            return position;
         }
 
-        function filterByDepartment(deptName) {
-            document.getElementById('deptFilter').value = deptName;
-            switchView('grid');
-            filterEmployees();
-        }
-
-        // ==================== SIDEBAR DEPT LIST ====================
-        function renderDeptList() {
-            const container = document.getElementById('deptList');
-            container.innerHTML = appData.departments.map(dept => `
-                <div class="dept-item">
-                    <div class="dept-item-left">
-                        <div class="dept-color-dot" style="background: ${dept.color};"></div>
-                        <span>${dept.name}</span>
-                    </div>
-                    <div class="dept-item-actions">
-                        <button class="dept-item-btn edit" onclick="editDepartment(${dept.id})" title="Edit">✎</button>
-                        <button class="dept-item-btn delete" onclick="confirmDeleteDepartment(${dept.id})" title="Delete">×</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ==================== POPULATE SELECTS ====================
-        function populateDepartmentSelects() {
-            const selects = [document.getElementById('employeeDepartment')];
-            selects.forEach(select => {
-                const currentValue = select.value;
-                select.innerHTML = '<option value="">Select Department</option>' +
-                    appData.departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
-                select.value = currentValue;
-            });
-        }
-
-        function populateManagerSelect(excludeId = null) {
-            const select = document.getElementById('employeeManager');
-            const currentValue = select.value;
-
-            const options = appData.employees
-                .filter(e => e.id !== excludeId)
-                .map(e => `<option value="${e.id}">${e.name} (${e.position})</option>`)
-                .join('');
-
-            select.innerHTML = '<option value="">None (Top Level)</option>' + options;
-            select.value = currentValue;
-        }
-
-        function populateFilterSelects() {
-            const deptFilter = document.getElementById('deptFilter');
-            const positionFilter = document.getElementById('positionFilter');
-
-            deptFilter.innerHTML = '<option value="">All Departments</option>' +
-                appData.departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
-
-            const positions = [...new Set(appData.employees.map(e => e.position))];
-            positionFilter.innerHTML = '<option value="">All Positions</option>' +
-                positions.map(p => `<option value="${p}">${p}</option>`).join('');
-        }
-
-        // ==================== EMPLOYEE MODAL ====================
-        function openEmployeeModal(employee = null) {
-            document.getElementById('employeeModalTitle').textContent = employee ? 'Edit Employee' : 'Add Employee';
-            document.getElementById('employeeForm').reset();
-
-            populateDepartmentSelects();
-            populateManagerSelect(employee?.id);
-
-            if (employee) {
-                document.getElementById('employeeId').value = employee.id;
-                document.getElementById('employeeName').value = employee.name;
-                document.getElementById('employeePosition').value = employee.position;
-                document.getElementById('employeeDepartment').value = employee.department;
-                document.getElementById('employeeManager').value = employee.parentId || '';
-                document.getElementById('employeeShift').value = employee.shift || '';
-                document.getElementById('employeeEmail').value = employee.email || '';
-                document.getElementById('employeePhone').value = employee.phone || '';
-            } else {
-                document.getElementById('employeeId').value = '';
-            }
-
-            document.getElementById('employeeModal').classList.add('active');
-        }
-
-        function closeEmployeeModal() {
-            document.getElementById('employeeModal').classList.remove('active');
-        }
-
-        function editEmployee(id) {
-            const employee = appData.employees.find(e => e.id === id);
-            if (employee) openEmployeeModal(employee);
-        }
-
-        function saveEmployee(e) {
-            e.preventDefault();
-
-            const id = document.getElementById('employeeId').value;
-            const employee = {
-                id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('employeeName').value.trim(),
-                position: document.getElementById('employeePosition').value.trim(),
-                department: document.getElementById('employeeDepartment').value,
-                parentId: document.getElementById('employeeManager').value ? parseInt(document.getElementById('employeeManager').value) : null,
-                shift: document.getElementById('employeeShift').value.trim(),
-                email: document.getElementById('employeeEmail').value.trim(),
-                phone: document.getElementById('employeePhone').value.trim()
+        // Calculate compact text dimensions
+        function measureTextDimensions(text, fontSize) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.font = `${fontSize}px Arial`;
+            const metrics = context.measureText(text);
+            return {
+                width: metrics.width,
+                height: fontSize * 1.2 // Approximate height
             };
-
-            if (id) {
-                const index = appData.employees.findIndex(e => e.id === parseInt(id));
-                if (index !== -1) appData.employees[index] = employee;
-                showToast('Employee updated successfully', 'success');
-            } else {
-                appData.employees.push(employee);
-                showToast('Employee added successfully', 'success');
+        }
+        
+        function calculateScreenDimensions() {
+            const container = document.querySelector(".chart-container");
+            if (container) {
+                screenWidth = container.clientWidth || 1280;
+                screenHeight = container.clientHeight || 690;
             }
-
-            saveData();
-            renderAll();
-            closeEmployeeModal();
         }
-
-        function confirmDeleteEmployee(id) {
-            const employee = appData.employees.find(e => e.id === id);
-            if (!employee) return;
-
-            const hasReports = appData.employees.some(e => e.parentId === id);
-
-            document.getElementById('confirmTitle').textContent = 'Delete Employee';
-            document.getElementById('confirmMessage').textContent = hasReports
-                ? `Are you sure you want to delete ${employee.name}? This employee has direct reports who will become top-level.`
-                : `Are you sure you want to delete ${employee.name}?`;
-            document.getElementById('confirmIcon').textContent = '⚠️';
-            document.getElementById('confirmBtn').onclick = () => deleteEmployee(id);
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        function deleteEmployee(id) {
-            // Remove parent reference from reports
-            appData.employees.forEach(e => {
-                if (e.parentId === id) e.parentId = null;
-            });
-
-            appData.employees = appData.employees.filter(e => e.id !== id);
-            saveData();
-            renderAll();
-            closeConfirmModal();
-            showToast('Employee deleted', 'success');
-        }
-
-        // ==================== DEPARTMENT MODAL ====================
-        function openDepartmentModal(department = null) {
-            document.getElementById('departmentModalTitle').textContent = department ? 'Edit Department' : 'Add Department';
-            document.getElementById('departmentForm').reset();
-
-            if (department) {
-                document.getElementById('departmentId').value = department.id;
-                document.getElementById('departmentName').value = department.name;
-                document.getElementById('departmentColor').value = department.color;
-                document.getElementById('departmentDescription').value = department.description || '';
-            } else {
-                document.getElementById('departmentId').value = '';
-                document.getElementById('departmentColor').value = '#3498db';
-            }
-
-            updateColorPreview();
-            document.getElementById('departmentModal').classList.add('active');
-        }
-
-        function closeDepartmentModal() {
-            document.getElementById('departmentModal').classList.remove('active');
-        }
-
-        function editDepartment(id) {
-            const department = appData.departments.find(d => d.id === id);
-            if (department) openDepartmentModal(department);
-        }
-
-        function updateColorPreview() {
-            const color = document.getElementById('departmentColor').value;
-            document.getElementById('colorPreview').style.background = color;
-        }
-
-        function saveDepartment(e) {
-            e.preventDefault();
-
-            const id = document.getElementById('departmentId').value;
-            const oldName = id ? appData.departments.find(d => d.id === parseInt(id))?.name : null;
-
-            const department = {
-                id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('departmentName').value.trim(),
-                color: document.getElementById('departmentColor').value,
-                description: document.getElementById('departmentDescription').value.trim()
-            };
-
-            if (id) {
-                const index = appData.departments.findIndex(d => d.id === parseInt(id));
-                if (index !== -1) {
-                    appData.departments[index] = department;
-                    // Update employees with old department name
-                    if (oldName && oldName !== department.name) {
-                        appData.employees.forEach(e => {
-                            if (e.department === oldName) e.department = department.name;
-                        });
-                    }
+        
+        function calculateOptimalSizing() {
+            calculateScreenDimensions();
+            
+            const padding = 10;
+            const isSmallScreen = screenWidth < 1400;
+            
+            // IMPROVED CARD DIMENSIONS - INCREASED HEIGHT BY ~5% FOR BETTER TEXT VISIBILITY
+            const photoSize = isSmallScreen ? 45 : 55;
+            const baseTextWidth = isSmallScreen ? 85 : 105; // Slightly wider for better text
+            const heightIncrease = 23; // Increased from 18 to 23 for even better text visibility (5% increase)
+            
+            const cardDimensions = {
+                "Manager, Operations": {
+                    photoSize: photoSize + 10,
+                    textWidth: baseTextWidth + 25,
+                    height: photoSize + 20 + heightIncrease
+                },
+                "Director, Supply Chain": {
+                    photoSize: photoSize + 10,
+                    textWidth: baseTextWidth + 25,
+                    height: photoSize + 20 + heightIncrease
+                },
+                "Manager, Maintenance, Facility": {
+                    photoSize: photoSize + 10,
+                    textWidth: baseTextWidth + 35, // Increased for longer title
+                    height: photoSize + 20 + heightIncrease
+                },
+                "Manager, Kitchen": {
+                    photoSize: photoSize,
+                    textWidth: baseTextWidth + 15,
+                    height: photoSize + 12 + heightIncrease
+                },
+                "Manager, Extraction": {
+                    photoSize: photoSize,
+                    textWidth: baseTextWidth + 15,
+                    height: photoSize + 12 + heightIncrease
+                },
+                "Manager, Production": {
+                    photoSize: photoSize,
+                    textWidth: baseTextWidth + 15,
+                    height: photoSize + 12 + heightIncrease
+                },
+                "Manager, Inventory": {
+                    photoSize: photoSize,
+                    textWidth: baseTextWidth + 15,
+                    height: photoSize + 12 + heightIncrease
+                },
+                "Supervisor, Processing": {
+                    photoSize: photoSize - 2,
+                    textWidth: baseTextWidth + 10,
+                    height: photoSize + 10 + heightIncrease
+                },
+                "Supervisor, Production": {
+                    photoSize: photoSize - 2,
+                    textWidth: baseTextWidth + 10,
+                    height: photoSize + 10 + heightIncrease
+                },
+                "Supervisor, Logistics": {
+                    photoSize: photoSize - 2,
+                    textWidth: baseTextWidth + 10,
+                    height: photoSize + 10 + heightIncrease
+                },
+                "Supervisor, Maintenance, Facility": {
+                    photoSize: photoSize - 2,
+                    textWidth: baseTextWidth + 20, // Increased for longer title
+                    height: photoSize + 10 + heightIncrease
+                },
+                "Lead, Kitchen": {
+                    photoSize: photoSize - 5,
+                    textWidth: baseTextWidth + 5,
+                    height: photoSize + 8 + heightIncrease
+                },
+                "Quality Specialist": {
+                    photoSize: photoSize,
+                    textWidth: baseTextWidth + 15,
+                    height: photoSize + 12 + heightIncrease
+                },
+                "Department": {
+                    width: Math.min(120, screenWidth * 0.09),
+                    height: Math.min(100, screenHeight * 0.095)
                 }
-                showToast('Department updated successfully', 'success');
-            } else {
-                appData.departments.push(department);
-                showToast('Department added successfully', 'success');
+            };
+            
+            return cardDimensions;
+        }
+        
+        // IMPROVED PROCESS FLOW POSITIONING WITH BETTER SPACING AND THREE TOP-LEVEL LEADERS
+        function calculateProcessFlowLayout() {
+            const padding = 15;
+            const cardDimensions = calculateOptimalSizing();
+            const isSmallScreen = screenWidth < 1400;
+            
+            // Position THREE CO-EQUAL TOP-LEVEL LEADERS
+            const john = employees.find(emp => emp.name === "John Doe");
+            const sarah = employees.find(emp => emp.name === "Sarah Smith");
+            const mike = employees.find(emp => emp.name === "Mike Johnson");
+            
+            if (john) {
+                const johnDims = cardDimensions["Manager, Operations"];
+                const johnWidth = johnDims.photoSize + johnDims.textWidth + 20;
+                john.x_pos = (screenWidth - johnWidth) / 2;
+                john.y_pos = padding;
+                john.cardWidth = johnWidth;
+                john.cardHeight = johnDims.height;
+            }
+            
+            // RESPONSIVE PROCESS FLOW ZONES - SHIFTED EXTRACTION LEFT BY 5%
+            const availableWidth = screenWidth - (padding * 2);
+            const numZones = 6; // extraction, processing, kitchen, packaging, warehouse, maintenance
+            const zoneWidth = availableWidth / numZones;
+            const extractionShift = screenWidth * 0.05; // 5% left shift for extraction zone
+            
+            const processZones = {
+                extraction: { 
+                    x_start: padding - extractionShift, // MOVED LEFT BY 5%
+                    width: zoneWidth 
+                },
+                processing: { 
+                    x_start: padding + zoneWidth - extractionShift * 0.5, // Slight adjustment
+                    width: zoneWidth 
+                },
+                kitchen: { 
+                    x_start: padding + (zoneWidth * 2), 
+                    width: zoneWidth 
+                },
+                packaging: { 
+                    x_start: padding + (zoneWidth * 3), 
+                    width: zoneWidth 
+                },
+                warehouse: { 
+                    x_start: padding + (zoneWidth * 4), 
+                    width: zoneWidth 
+                },
+                maintenance: { 
+                    x_start: padding + (zoneWidth * 5), 
+                    width: zoneWidth 
+                }
+            };
+            
+            // Position Sarah in warehouse zone, Mike in maintenance zone
+            if (sarah) {
+                const sarahDims = cardDimensions["Director, Supply Chain"];
+                const sarahWidth = sarahDims.photoSize + sarahDims.textWidth + 20;
+                sarah.x_pos = processZones.warehouse.x_start + (processZones.warehouse.width - sarahWidth) / 2;
+                sarah.y_pos = padding;
+                sarah.cardWidth = sarahWidth;
+                sarah.cardHeight = sarahDims.height;
+                sarah.x_pos = Math.max(padding, Math.min(sarah.x_pos, screenWidth - padding - sarahWidth));
+            }
+            
+            if (mike) {
+                const mikeDims = cardDimensions["Manager, Maintenance, Facility"];
+                const mikeWidth = mikeDims.photoSize + mikeDims.textWidth + 20;
+                mike.x_pos = processZones.maintenance.x_start + (processZones.maintenance.width - mikeWidth) / 2;
+                mike.y_pos = padding;
+                mike.cardWidth = mikeWidth;
+                mike.cardHeight = mikeDims.height;
+                mike.x_pos = Math.max(padding, Math.min(mike.x_pos, screenWidth - padding - mikeWidth));
+            }
+            
+            const topLevelY = padding + (john ? john.cardHeight : 80) + (isSmallScreen ? 20 : 30);
+            
+            // Position employees in process flow zones - ONLY UNDER JOHN
+            const johnDirectReports = employees.filter(emp => emp.parentId === 1 && !emp.position.includes("Supervisor"));
+            
+            johnDirectReports.forEach(emp => {
+                const dims = cardDimensions[emp.position] || cardDimensions["Manager, Production"];
+                emp.cardWidth = dims.photoSize + dims.textWidth + 20;
+                emp.cardHeight = dims.height;
+                
+                switch(emp.department) {
+                    case "Extraction":
+                        emp.x_pos = processZones.extraction.x_start + (processZones.extraction.width - emp.cardWidth) / 2;
+                        emp.y_pos = topLevelY;
+                        break;
+                    case "Kitchen":
+                        emp.x_pos = processZones.kitchen.x_start + (processZones.kitchen.width - emp.cardWidth) / 2;
+                        emp.y_pos = topLevelY;
+                        break;
+                    case "Packaging":
+                        emp.x_pos = processZones.packaging.x_start + (processZones.packaging.width - emp.cardWidth) / 2;
+                        emp.y_pos = topLevelY;
+                        break;
+                }
+                
+                // Ensure cards stay within screen bounds
+                emp.x_pos = Math.max(padding, Math.min(emp.x_pos, screenWidth - padding - emp.cardWidth));
+            });
+            
+            // QUALITY SPECIALIST POSITIONING - UNDER EXTRACTION IN VERTICAL FLOW
+            const maria = employees.find(emp => emp.name === "Maria Lopez");
+            const lisa = employees.find(emp => emp.name === "Lisa Brown");
+            
+            if (maria && lisa) {
+                const dims = cardDimensions[maria.position] || cardDimensions["Quality Specialist"];
+                maria.cardWidth = dims.photoSize + dims.textWidth + 20;
+                maria.cardHeight = dims.height;
+                
+                // Position Maria under the extraction department card in vertical flow
+                maria.x_pos = processZones.extraction.x_start + (processZones.extraction.width - maria.cardWidth) / 2;
+                maria.y_pos = topLevelY + lisa.cardHeight + cardDimensions.Department.height + 60; // Under extraction dept card
+                maria.x_pos = Math.max(padding, Math.min(maria.x_pos, screenWidth - padding - maria.cardWidth));
+            }
+            
+            // POSITION KEVIN AND CARLOS AT SECOND LEVEL WITH OTHER SUPERVISORS
+            const kevin = employees.find(emp => emp.name === "Kevin Lee");
+            const carlos = employees.find(emp => emp.name === "Carlos Martinez");
+            
+            const secondLevelY = topLevelY + cardDimensions["Manager, Production"].height + (isSmallScreen ? 20 : 35); // Increased spacing
+            
+            if (kevin && carlos) {
+                const dims = cardDimensions["Supervisor, Processing"];
+                kevin.cardWidth = dims.photoSize + dims.textWidth + 20;
+                kevin.cardHeight = dims.height;
+                carlos.cardWidth = dims.photoSize + dims.textWidth + 20;
+                carlos.cardHeight = dims.height;
+                
+                // Position them side by side in processing zone
+                const totalWidth = kevin.cardWidth + carlos.cardWidth + 10;
+                let startX = processZones.processing.x_start + (processZones.processing.width - totalWidth) / 2;
+                
+                kevin.x_pos = Math.max(padding, startX);
+                kevin.y_pos = secondLevelY;
+                carlos.x_pos = Math.max(padding, kevin.x_pos + kevin.cardWidth + 10);
+                carlos.y_pos = secondLevelY;
+                
+                // Ensure cards stay within screen bounds
+                kevin.x_pos = Math.min(kevin.x_pos, screenWidth - padding - kevin.cardWidth);
+                carlos.x_pos = Math.min(carlos.x_pos, screenWidth - padding - carlos.cardWidth);
             }
 
-            saveData();
-            renderAll();
-            closeDepartmentModal();
-        }
-
-        function confirmDeleteDepartment(id) {
-            const department = appData.departments.find(d => d.id === id);
-            if (!department) return;
-
-            const employeeCount = appData.employees.filter(e => e.department === department.name).length;
-
-            document.getElementById('confirmTitle').textContent = 'Delete Department';
-            document.getElementById('confirmMessage').textContent = employeeCount > 0
-                ? `Are you sure you want to delete ${department.name}? ${employeeCount} employee(s) in this department will have no department.`
-                : `Are you sure you want to delete ${department.name}?`;
-            document.getElementById('confirmIcon').textContent = '⚠️';
-            document.getElementById('confirmBtn').onclick = () => deleteDepartment(id);
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        function deleteDepartment(id) {
-            const department = appData.departments.find(d => d.id === id);
-            if (department) {
-                // Clear department from employees
-                appData.employees.forEach(e => {
-                    if (e.department === department.name) e.department = '';
-                });
-            }
-
-            appData.departments = appData.departments.filter(d => d.id !== id);
-            saveData();
-            renderAll();
-            closeConfirmModal();
-            showToast('Department deleted', 'success');
-        }
-
-        // ==================== SETTINGS MODAL ====================
-        function openSettingsModal() {
-            document.getElementById('settingsCompanyName').value = appData.settings.companyName;
-            document.getElementById('settingsPositions').value = appData.settings.positionLevels.join(', ');
-            document.getElementById('settingsModal').classList.add('active');
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
-
-        function saveSettings(e) {
-            e.preventDefault();
-
-            appData.settings.companyName = document.getElementById('settingsCompanyName').value.trim() || 'Employee Board';
-            appData.settings.positionLevels = document.getElementById('settingsPositions').value
-                .split(',')
-                .map(p => p.trim())
-                .filter(p => p);
-
-            document.getElementById('companyName').textContent = appData.settings.companyName;
-
-            saveData();
-            closeSettingsModal();
-            showToast('Settings saved successfully', 'success');
-        }
-
-        // ==================== CONFIRM MODAL ====================
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-        }
-
-        function confirmReset() {
-            document.getElementById('confirmTitle').textContent = 'Reset All Data';
-            document.getElementById('confirmMessage').textContent = 'This will reset all data to default. This action cannot be undone. Are you sure?';
-            document.getElementById('confirmIcon').textContent = '🔄';
-            document.getElementById('confirmBtn').onclick = resetData;
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        function resetData() {
-            appData = JSON.parse(JSON.stringify(defaultData));
-            saveData();
-            document.getElementById('companyName').textContent = appData.settings.companyName;
-            renderAll();
-            closeConfirmModal();
-            showToast('Data reset to default', 'success');
-        }
-
-        // ==================== IMPORT/EXPORT ====================
-        function exportData() {
-            const dataStr = JSON.stringify(appData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `employee-board-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            showToast('Data exported successfully', 'success');
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const imported = JSON.parse(e.target.result);
-
-                    // Validate structure
-                    if (!imported.departments || !imported.employees) {
-                        throw new Error('Invalid data structure');
+            // IMPROVED SECOND-LEVEL POSITIONING WITH BETTER SPACING
+            const secondLevel = employees.filter(emp => 
+                (emp.position.includes("Supervisor") || emp.position.includes("Manager") || emp.position.includes("Lead")) && 
+                emp.parentId !== null && emp.parentId !== 1 && emp.parentId !== 140 && // Exclude Maria (parentId 140) and direct John reports
+                emp.name !== "Kevin Lee" && emp.name !== "Carlos Martinez" // Exclude already positioned supervisors
+            );
+            
+            const groupedByParent = {};
+            secondLevel.forEach(emp => {
+                if (!groupedByParent[emp.parentId]) {
+                    groupedByParent[emp.parentId] = [];
+                }
+                groupedByParent[emp.parentId].push(emp);
+            });
+            
+            Object.keys(groupedByParent).forEach(parentId => {
+                const group = groupedByParent[parentId];
+                const parent = employees.find(emp => emp.id === parseInt(parentId));
+                
+                if (parent && parent.x_pos !== undefined) {
+                    group.forEach((child, index) => {
+                        const dims = cardDimensions[child.position] || cardDimensions["Supervisor, Production"];
+                        child.cardWidth = dims.photoSize + dims.textWidth + 20;
+                        child.cardHeight = dims.height;
+                        
+                        // IMPROVED SPACING FOR KITCHEN LEADS - Move them further down
+                        if (parent.name === "David Wilson") {
+                            const adjustedY = secondLevelY + 150; // Increased spacing
+                            if (group.length === 1) {
+                                child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
+                                child.y_pos = adjustedY;
+                            } else {
+                                const spacing = 10;
+                                const totalWidth = group.reduce((sum, c) => {
+                                    const cDims = cardDimensions[c.position] || cardDimensions["Lead, Kitchen"];
+                                    return sum + cDims.photoSize + cDims.textWidth + 20;
+                                }, 0) + (group.length - 1) * spacing;
+                                
+                                let startX = parent.x_pos + (parent.cardWidth - totalWidth) / 2;
+                                let currentX = startX;
+                                
+                                group.forEach((c, i) => {
+                                    c.x_pos = Math.max(padding, currentX);
+                                    c.y_pos = adjustedY;
+                                    currentX += c.cardWidth + spacing;
+                                    c.x_pos = Math.min(c.x_pos, screenWidth - padding - c.cardWidth);
+                                });
+                            }
+                        }
+                        // EMMA (Manager under Sarah) - Move further down
+                        else if (parent.name === "Sarah Smith") {
+                            const adjustedY = secondLevelY + 160; // INCREASED from 140 to 160 for better spacing
+                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
+                            child.y_pos = adjustedY;
+                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
+                        }
+                        // PATRICIA (Supervisor under Emma) - Move further down relative to Emma
+                        else if (parent.name === "Emma Thompson") {
+                            const emmaEmp = employees.find(e => e.name === "Emma Thompson");
+                            const thirdLevelY = (emmaEmp.y_pos || secondLevelY + 160) + emmaEmp.cardHeight + 45; // INCREASED from 35 to 45
+                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
+                            child.y_pos = thirdLevelY;
+                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
+                        }
+                        // DANIEL (Supervisor under Mike)
+                        else if (parent.name === "Mike Johnson") {
+                            const adjustedY = secondLevelY + 140; // Increased spacing
+                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
+                            child.y_pos = adjustedY;
+                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
+                        }
+                        // PACKAGING SUPERVISORS - Move them down more to give James space
+                        else if (parent.name === "James Davis" && group.length === 3) {
+                            const adjustedY = secondLevelY + 50; // Increased spacing from packaging manager
+                            const spacing = 10;
+                            const totalWidth = group.reduce((sum, c) => {
+                                const cDims = cardDimensions[c.position] || cardDimensions["Supervisor, Production"];
+                                return sum + cDims.photoSize + cDims.textWidth + 20;
+                            }, 0) + (group.length - 1) * spacing;
+                            
+                            let startX = parent.x_pos + (parent.cardWidth - totalWidth) / 2;
+                            let currentX = startX;
+                            
+                            group.forEach((c, i) => {
+                                c.x_pos = Math.max(padding, currentX);
+                                c.y_pos = adjustedY;
+                                currentX += c.cardWidth + spacing;
+                                c.x_pos = Math.min(c.x_pos, screenWidth - padding - c.cardWidth);
+                            });
+                        }
+                        // DEFAULT POSITIONING for other groups
+                        else if (group.length === 1) {
+                            child.x_pos = parent.x_pos + (parent.cardWidth - child.cardWidth) / 2;
+                            child.y_pos = secondLevelY;
+                            child.x_pos = Math.max(padding, Math.min(child.x_pos, screenWidth - padding - child.cardWidth));
+                        } else {
+                            const spacing = 10;
+                            const totalWidth = group.reduce((sum, c) => {
+                                const cDims = cardDimensions[c.position] || cardDimensions["Supervisor, Production"];
+                                return sum + cDims.photoSize + cDims.textWidth + 20;
+                            }, 0) + (group.length - 1) * spacing;
+                            
+                            let startX = parent.x_pos + (parent.cardWidth - totalWidth) / 2;
+                            let currentX = startX;
+                            
+                            group.forEach((c, i) => {
+                                c.x_pos = Math.max(padding, currentX);
+                                c.y_pos = secondLevelY;
+                                currentX += c.cardWidth + spacing;
+                                c.x_pos = Math.min(c.x_pos, screenWidth - padding - c.cardWidth);
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // DEPARTMENT CARD POSITIONING WITH VERTICAL EXTRACTION/QUALITY FLOW
+            const baseGap = isSmallScreen ? 15 : 20;
+            const deptY = Math.max(secondLevelY + cardDimensions["Supervisor, Production"].height + baseGap - 40, screenHeight - cardDimensions["Department"].height - 25);
+            window.departmentSummaries = [];
+            
+            departmentNames.forEach((deptName) => {
+                const deptEmployees = employees.filter(emp => emp.department === deptName && !emp.position.includes("Manager") && !emp.position.includes("Supervisor") && !emp.position.includes("Lead") && emp.position !== "Quality Specialist");
+                
+                if (deptEmployees.length > 0) {
+                    let avgX;
+                    let positionY = deptY;
+                    
+                    switch(deptName) {
+                        case "Executive":
+                            // Skip adding Executive to the regular department cards since it has its own special card
+                            return;
+                        case "Extraction":
+                            avgX = processZones.extraction.x_start + processZones.extraction.width / 2;
+                            // Extraction department card positioned under Lisa Brown
+                            positionY = topLevelY + cardDimensions["Manager, Extraction"].height + 25;
+                            break;
+                        case "Processing Lab":
+                            avgX = processZones.processing.x_start + processZones.processing.width / 2;
+                            break;
+                        case "Kitchen":
+                            avgX = processZones.kitchen.x_start + processZones.kitchen.width / 2;
+                            break;
+                        case "Packaging":
+                            avgX = processZones.packaging.x_start + processZones.packaging.width / 2;
+                            break;
+                        case "Warehouse":
+                            avgX = processZones.warehouse.x_start + processZones.warehouse.width / 2;
+                            break;
+                        case "Maintenance":
+                            avgX = processZones.maintenance.x_start + processZones.maintenance.width / 2;
+                            break;
+                        case "Quality":
+                            // Quality department card positioned under Maria in extraction zone
+                            avgX = processZones.extraction.x_start + processZones.extraction.width / 2;
+                            positionY = maria ? maria.y_pos + maria.cardHeight + 25 : deptY + cardDimensions.Department.height + 20;
+                            break;
+                        default:
+                            avgX = (screenWidth) / 2;
                     }
-
-                    appData = {
-                        settings: imported.settings || defaultData.settings,
-                        departments: imported.departments,
-                        employees: imported.employees
+                    
+                    const deptSummary = {
+                        name: deptName,
+                        employee_count: deptEmployees.length,
+                        x_pos: avgX - cardDimensions.Department.width / 2,
+                        y_pos: positionY,
+                        width: cardDimensions.Department.width,
+                        height: cardDimensions.Department.height,
+                        color: deptEmployees[0].dept_color
                     };
-
-                    saveData();
-                    document.getElementById('companyName').textContent = appData.settings.companyName;
-                    renderAll();
-                    showToast('Data imported successfully', 'success');
-                } catch (err) {
-                    showToast('Error importing data: Invalid file format', 'error');
+                    
+                    deptSummary.x_pos = Math.max(padding, Math.min(deptSummary.x_pos, screenWidth - padding - cardDimensions.Department.width));
+                    
+                    window.departmentSummaries.push(deptSummary);
                 }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
+            });
+            
+            window.currentCardDimensions = cardDimensions;
         }
-
-        // ==================== TOAST NOTIFICATIONS ====================
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span> ${message}`;
-            container.appendChild(toast);
-
+        
+        // IMPROVED CARD CREATION WITH BETTER TEXT DISPLAY AND POSITION WRAPPING
+        function createEmployeeCard(employee, cardDimensions) {
+            const card = document.createElement("div");
+            
+            const dimensions = cardDimensions[employee.position] || cardDimensions["Manager, Production"];
+            const cardWidth = employee.cardWidth || (dimensions.photoSize + dimensions.textWidth + 20);
+            const cardHeight = employee.cardHeight || dimensions.height;
+            
+            // Use department-based class instead of position-based
+            const deptClass = `dept-${employee.department.toLowerCase().replace(/\s+/g, '-')}-card`;
+            const positionClass = `${employee.position.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '')}-card`;
+            
+            card.className = `employee-card ${deptClass} ${positionClass}`;
+            card.style.left = employee.x_pos + "px";
+            card.style.top = employee.y_pos + "px";
+            card.style.width = cardWidth + "px";
+            card.style.height = cardHeight + "px";
+            
+            // PHOTO SECTION - Auto size
+            const photoSection = document.createElement("div");
+            photoSection.className = "card-photo-section";
+            
+            const textSection = document.createElement("div");
+            textSection.className = "card-text-section";
+            
+            // PHOTO
+            const photoSize = dimensions.photoSize;
+            
+            const photo = document.createElement("img");
+            photo.className = "card-photo";
+            
+            // Use placeholder avatar for all photos
+            photo.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='3' ry='3'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.12}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.78}' rx='${photoSize*0.18}' ry='${photoSize*0.12}' fill='%23bdc3c7'/></svg>`;
+            
+            photo.alt = employee.name;
+            photo.style.width = photoSize + "px";
+            photo.style.height = photoSize + "px";
+            
+            photoSection.appendChild(photo);
+            
+            // TEXT CONTENT - IMPROVED VISIBILITY WITH POSITION WRAPPING
+            const wrappedName = wrapLongName(employee.name);
+            
+            // Employee Name (PRIMARY)
+            const nameDiv = document.createElement("div");
+            nameDiv.className = "card-name";
+            nameDiv.innerHTML = wrappedName;
+            textSection.appendChild(nameDiv);
+            
+            // Job Title (SECONDARY - right under name)
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "card-title";
+            titleDiv.textContent = employee.position;
+            textSection.appendChild(titleDiv);
+            
+            card.appendChild(photoSection);
+            card.appendChild(textSection);
+            
+            return card;
+        }
+        
+        function createDepartmentCard(deptData, cardDimensions) {
+            const card = document.createElement("div");
+            const dimensions = cardDimensions["Department"];
+            
+            card.className = `department-card dept-${deptData.name.toLowerCase().replace(/\s+/g, "-")}`;
+            card.style.left = deptData.x_pos + "px";
+            card.style.top = deptData.y_pos + "px";
+            card.style.width = dimensions.width + "px";
+            card.style.height = dimensions.height + "px";
+            
+            const isSmallScreen = screenWidth < 1400;
+            const titleSize = Math.max(isSmallScreen ? 8 : 10, Math.min(isSmallScreen ? 10 : 13, dimensions.width / 12));
+            const countSize = Math.max(isSmallScreen ? 7 : 9, Math.min(isSmallScreen ? 9 : 11, dimensions.width / 14));
+            
+            card.innerHTML = `
+                <div class="dept-title" style="font-size: ${titleSize}px;">${deptData.name}</div>
+                <div class="dept-count" style="font-size: ${countSize}px;">(${deptData.employee_count}) employees</div>
+            `;
+            
+            card.addEventListener("click", () => openDrillDown(deptData.name));
+            
+            return card;
+        }
+        
+        // PAGINATION FUNCTIONS - For all large departments
+        function updatePagination(totalEmployees) {
+            const paginationContainer = document.getElementById("paginationContainer");
+            const paginationInfo = document.getElementById("paginationInfo");
+            const prevButton = document.getElementById("prevButton");
+            const nextButton = document.getElementById("nextButton");
+            const pageJumpInput = document.getElementById("pageJumpInput");
+            
+            // Show pagination for any department with more than 8 employees
+            if (totalEmployees <= employeesPerPage) {
+                paginationContainer.style.display = "none";
+                return;
+            }
+            
+            const totalPages = Math.ceil(totalEmployees / employeesPerPage);
+            paginationContainer.style.display = "flex";
+            paginationInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+            
+            pageJumpInput.max = totalPages;
+            pageJumpInput.value = currentPage;
+        }
+        
+        function goToPage(page, totalEmployees) {
+            const totalPages = Math.ceil(totalEmployees / employeesPerPage);
+            currentPage = Math.max(1, Math.min(page, totalPages));
+            layoutDrillDownEmployees(employees.filter(emp => emp.department === currentDepartment), document.getElementById("drillDownContent"));
+        }
+        
+        // Connection line functions remain the same...
+        function generateConnectionLines(cardDimensions) {
+            const chartContainer = document.getElementById("orgChart");
+            if (!chartContainer) return;
+            
+            createdConnections.clear();
+            
+            // JOHN'S DIRECT REPORTS - UPDATED TO EXCLUDE SARAH AND MIKE
+            const john = employees.find(emp => emp.name === "John Doe");
+            const johnDirectReportNames = [
+                "Lisa Brown", "David Wilson", "James Davis", 
+                "Kevin Lee", "Carlos Martinez"
+            ];
+            
+            johnDirectReportNames.forEach(name => {
+                const employee = employees.find(emp => emp.name === name);
+                if (employee && employee.x_pos !== undefined && john.x_pos !== undefined) {
+                    const connectionKey = `${john.id}->${employee.id}`;
+                    if (!createdConnections.has(connectionKey)) {
+                        const connectionElements = createJohnConnection(john, employee, cardDimensions);
+                        connectionElements.forEach(element => chartContainer.appendChild(element));
+                        createdConnections.add(connectionKey);
+                    }
+                }
+            });
+            
+            // SARAH'S DIRECT REPORTS
+            const sarah = employees.find(emp => emp.name === "Sarah Smith");
+            const sarahDirectReportNames = ["Emma Thompson"];
+            
+            sarahDirectReportNames.forEach(name => {
+                const employee = employees.find(emp => emp.name === name);
+                if (employee && employee.x_pos !== undefined && sarah.x_pos !== undefined) {
+                    const connectionKey = `${sarah.id}->${employee.id}`;
+                    if (!createdConnections.has(connectionKey)) {
+                        const connectionElements = createSarahConnection(sarah, employee, cardDimensions);
+                        connectionElements.forEach(element => chartContainer.appendChild(element));
+                        createdConnections.add(connectionKey);
+                    }
+                }
+            });
+            
+            // MIKE'S DIRECT REPORTS
+            const mike = employees.find(emp => emp.name === "Mike Johnson");
+            const mikeDirectReportNames = ["Daniel Taylor"];
+            
+            mikeDirectReportNames.forEach(name => {
+                const employee = employees.find(emp => emp.name === name);
+                if (employee && employee.x_pos !== undefined && mike.x_pos !== undefined) {
+                    const connectionKey = `${mike.id}->${employee.id}`;
+                    if (!createdConnections.has(connectionKey)) {
+                        const connectionElements = createMikeConnection(mike, employee, cardDimensions);
+                        connectionElements.forEach(element => chartContainer.appendChild(element));
+                        createdConnections.add(connectionKey);
+                    }
+                }
+            });
+            
+            // CONNECTION FROM LISA TO MARIA (EXTRACTION TO QUALITY)
+            const lisa = employees.find(emp => emp.name === "Lisa Brown");
+            const maria = employees.find(emp => emp.name === "Maria Lopez");
+            if (lisa && maria && lisa.x_pos !== undefined && maria.x_pos !== undefined) {
+                const connectionKey = `${lisa.id}->${maria.id}`;
+                if (!createdConnections.has(connectionKey)) {
+                    const connectionElements = createIndividualConnection(lisa, maria, cardDimensions, "department");
+                    connectionElements.forEach(element => chartContainer.appendChild(element));
+                    createdConnections.add(connectionKey);
+                }
+            }
+            
+            // MANAGER/DIRECTOR CONNECTIONS - WITH DEPARTMENT COLORS FOR SAME-DEPT CONNECTIONS
+            const managerConnections = [
+                { manager: "James Davis", reports: ["Jessica Hall", "Maria Anderson", "Samantha Thomas"] },
+                { manager: "David Wilson", reports: ["Jennifer Clark", "Nathan Walker"] },
+                { manager: "Emma Thompson", reports: ["Patricia White"] }
+            ];
+            
+            managerConnections.forEach(({ manager, reports }) => {
+                const managerEmp = employees.find(emp => emp.name === manager);
+                reports.forEach(reportName => {
+                    const reportEmp = employees.find(emp => emp.name === reportName);
+                    if (managerEmp && reportEmp && managerEmp.x_pos !== undefined && reportEmp.x_pos !== undefined) {
+                        const connectionKey = `${managerEmp.id}->${reportEmp.id}`;
+                        if (!createdConnections.has(connectionKey)) {
+                            let lineType = "regular";
+                            if (managerEmp.department === reportEmp.department) {
+                                lineType = "department"; // Use department color for same-department connections
+                            }
+                            const connectionElements = createIndividualConnection(managerEmp, reportEmp, cardDimensions, lineType);
+                            connectionElements.forEach(element => chartContainer.appendChild(element));
+                            createdConnections.add(connectionKey);
+                        }
+                    }
+                });
+            });
+            
+            // Create lines to department cards
+            const leadershipRoles = employees.filter(emp => 
+                (emp.position.includes("Supervisor") || emp.position.includes("Manager") || emp.position === "Quality Specialist") && 
+                emp.x_pos !== undefined
+            );
+            
+            leadershipRoles.forEach(leader => {
+                if (window.departmentSummaries) {
+                    const deptCard = window.departmentSummaries.find(dept => dept.name === leader.department);
+                    if (deptCard) {
+                        const lines = createOptimizedSupervisorToDeptLines(leader, deptCard, cardDimensions);
+                        lines.forEach(line => chartContainer.appendChild(line));
+                    }
+                }
+            });
+        }
+        
+        // Connection line creation functions (updated with new names)
+        function createJohnConnection(john, target, cardDimensions) {
+            const elements = [];
+            
+            if (john.x_pos === undefined || target.x_pos === undefined) {
+                return elements;
+            }
+            
+            const johnX = john.x_pos + (john.cardWidth || 100) / 2;
+            const johnY = john.y_pos + (john.cardHeight || 60);
+            const targetX = target.x_pos + (target.cardWidth || 100) / 2;
+            const targetY = target.y_pos;
+            
+            const isSmallScreen = screenWidth < 1400;
+            const lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
+            const lineClass = "hierarchy-line-plant-manager";
+            
+            // HORIZONTAL FIRST, THEN VERTICAL ROUTING
+            const horizontalY = johnY + 20; // Distance down from John before going horizontal
+            
+            // Step 1: Vertical line down from John
+            const verticalLine1 = document.createElement("div");
+            verticalLine1.className = lineClass;
+            verticalLine1.style.left = (johnX - lineWidth/2) + "px";
+            verticalLine1.style.top = johnY + "px";
+            verticalLine1.style.width = lineWidth + "px";
+            verticalLine1.style.height = 20 + "px"; // Fixed distance down
+            elements.push(verticalLine1);
+            
+            // Step 2: Horizontal line to target's X position
+            const horizontalLine = document.createElement("div");
+            horizontalLine.className = lineClass;
+            const horizontalStart = Math.min(johnX, targetX);
+            const horizontalEnd = Math.max(johnX, targetX);
+            horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
+            horizontalLine.style.top = (horizontalY - lineWidth/2) + "px";
+            horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
+            horizontalLine.style.height = lineWidth + "px";
+            elements.push(horizontalLine);
+            
+            // Step 3: Vertical line down to target
+            const verticalLine2 = document.createElement("div");
+            verticalLine2.className = lineClass;
+            verticalLine2.style.left = (targetX - lineWidth/2) + "px";
+            verticalLine2.style.top = horizontalY + "px";
+            verticalLine2.style.width = lineWidth + "px";
+            verticalLine2.style.height = (targetY - horizontalY) + "px";
+            elements.push(verticalLine2);
+            
+            return elements;
+        }
+        
+        function createSarahConnection(sarah, target, cardDimensions) {
+            const elements = [];
+            
+            if (sarah.x_pos === undefined || target.x_pos === undefined) {
+                return elements;
+            }
+            
+            const sarahX = sarah.x_pos + (sarah.cardWidth || 100) / 2;
+            const sarahY = sarah.y_pos + (sarah.cardHeight || 60);
+            const targetX = target.x_pos + (target.cardWidth || 100) / 2;
+            const targetY = target.y_pos;
+            
+            const isSmallScreen = screenWidth < 1400;
+            const lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
+            
+            // Direct vertical connection for Sarah to Emma using warehouse green colors
+            const verticalLine = document.createElement("div");
+            verticalLine.className = "connection-line";
+            verticalLine.style.background = "linear-gradient(180deg, rgba(46, 204, 113, 0.9), rgba(46, 204, 113, 0.7))"; // Warehouse green
+            verticalLine.style.boxShadow = "0 2px 4px rgba(46, 204, 113, 0.3)";
+            verticalLine.style.left = (sarahX - lineWidth/2) + "px";
+            verticalLine.style.top = sarahY + "px";
+            verticalLine.style.width = lineWidth + "px";
+            verticalLine.style.height = (targetY - sarahY) + "px";
+            elements.push(verticalLine);
+            
+            return elements;
+        }
+        
+        function createMikeConnection(mike, target, cardDimensions) {
+            const elements = [];
+            
+            if (mike.x_pos === undefined || target.x_pos === undefined) {
+                return elements;
+            }
+            
+            const mikeX = mike.x_pos + (mike.cardWidth || 100) / 2;
+            const mikeY = mike.y_pos + (mike.cardHeight || 60);
+            const targetX = target.x_pos + (target.cardWidth || 100) / 2;
+            const targetY = target.y_pos;
+            
+            const isSmallScreen = screenWidth < 1400;
+            const lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
+            const lineClass = "hierarchy-line-maintenance";
+            
+            // Direct vertical connection for Mike to Daniel
+            const verticalLine = document.createElement("div");
+            verticalLine.className = lineClass;
+            verticalLine.style.left = (mikeX - lineWidth/2) + "px";
+            verticalLine.style.top = mikeY + "px";
+            verticalLine.style.width = lineWidth + "px";
+            verticalLine.style.height = (targetY - mikeY) + "px";
+            elements.push(verticalLine);
+            
+            return elements;
+        }
+        
+        function createIndividualConnection(parent, child, cardDimensions, lineType) {
+            const elements = [];
+            
+            if (parent.x_pos === undefined || child.x_pos === undefined) {
+                return elements;
+            }
+            
+            const parentX = parent.x_pos + (parent.cardWidth || 100) / 2;
+            const parentY = parent.y_pos + (parent.cardHeight || 60);
+            const childX = child.x_pos + (child.cardWidth || 100) / 2;
+            const childY = child.y_pos;
+            
+            const isSmallScreen = screenWidth < 1400;
+            let lineWidth;
+            let lineClass;
+            let customBackground = null;
+            
+            if (lineType === "plant-manager") {
+                lineWidth = Math.max(isSmallScreen ? 2 : 3, Math.min(isSmallScreen ? 3 : 4, Math.round(screenWidth / 400)));
+                lineClass = "hierarchy-line-plant-manager";
+            } else if (lineType === "director") {
+                lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 500)));
+                lineClass = "hierarchy-line-director";
+            } else if (lineType === "department") {
+                lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 600)));
+                lineClass = "connection-line";
+                customBackground = `linear-gradient(180deg, ${parent.dept_color}CC, ${parent.dept_color}80)`;
+            } else {
+                lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 600)));
+                lineClass = "connection-line";
+            }
+            
+            if (Math.abs(parentX - childX) <= 15) {
+                const verticalLine = document.createElement("div");
+                verticalLine.className = lineClass;
+                if (customBackground) {
+                    verticalLine.style.background = customBackground;
+                }
+                verticalLine.style.left = (parentX - lineWidth/2) + "px";
+                verticalLine.style.top = parentY + "px";
+                verticalLine.style.width = lineWidth + "px";
+                verticalLine.style.height = (childY - parentY) + "px";
+                elements.push(verticalLine);
+            } else {
+                const midY = parentY + (childY - parentY) * 0.5;
+                
+                const verticalLine1 = document.createElement("div");
+                verticalLine1.className = lineClass;
+                if (customBackground) {
+                    verticalLine1.style.background = customBackground;
+                }
+                verticalLine1.style.left = (parentX - lineWidth/2) + "px";
+                verticalLine1.style.top = parentY + "px";
+                verticalLine1.style.width = lineWidth + "px";
+                verticalLine1.style.height = (midY - parentY) + "px";
+                elements.push(verticalLine1);
+                
+                const horizontalLine = document.createElement("div");
+                horizontalLine.className = lineClass;
+                if (customBackground) {
+                    horizontalLine.style.background = `linear-gradient(90deg, ${parent.dept_color}80, ${parent.dept_color}80)`;
+                }
+                const horizontalStart = Math.min(parentX, childX);
+                const horizontalEnd = Math.max(parentX, childX);
+                horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
+                horizontalLine.style.top = (midY - lineWidth/2) + "px";
+                horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
+                horizontalLine.style.height = lineWidth + "px";
+                elements.push(horizontalLine);
+                
+                const verticalLine2 = document.createElement("div");
+                verticalLine2.className = lineClass;
+                if (customBackground) {
+                    verticalLine2.style.background = customBackground;
+                }
+                verticalLine2.style.left = (childX - lineWidth/2) + "px";
+                verticalLine2.style.top = midY + "px";
+                verticalLine2.style.width = lineWidth + "px";
+                verticalLine2.style.height = (childY - midY) + "px";
+                elements.push(verticalLine2);
+            }
+            
+            return elements;
+        }
+        
+        function createOptimizedSupervisorToDeptLines(supervisor, deptCard, cardDimensions) {
+            const lines = [];
+            
+            const supervisorX = supervisor.x_pos + (supervisor.cardWidth || 100) / 2;
+            const supervisorY = supervisor.y_pos + (supervisor.cardHeight || 60);
+            const deptX = deptCard.x_pos + deptCard.width / 2;
+            const deptY = deptCard.y_pos;
+            
+            const isSmallScreen = screenWidth < 1400;
+            const lineWidth = Math.max(isSmallScreen ? 1 : 2, Math.min(isSmallScreen ? 2 : 3, Math.round(screenWidth / 600)));
+            
+            if (Math.abs(supervisorX - deptX) <= 25) {
+                const verticalLine = document.createElement("div");
+                verticalLine.className = "connection-line";
+                verticalLine.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`;
+                verticalLine.style.left = (supervisorX - lineWidth/2) + "px";
+                verticalLine.style.top = supervisorY + "px";
+                verticalLine.style.width = lineWidth + "px";
+                verticalLine.style.height = (deptY - supervisorY) + "px";
+                lines.push(verticalLine);
+            } else {
+                const midY = supervisorY + (deptY - supervisorY) * 0.6;
+                
+                const verticalLine1 = document.createElement("div");
+                verticalLine1.className = "connection-line";
+                verticalLine1.style.background = `linear-gradient(180deg, ${supervisor.dept_color}CC, ${supervisor.dept_color}80)`;
+                verticalLine1.style.left = (supervisorX - lineWidth/2) + "px";
+                verticalLine1.style.top = supervisorY + "px";
+                verticalLine1.style.width = lineWidth + "px";
+                verticalLine1.style.height = (midY - supervisorY) + "px";
+                lines.push(verticalLine1);
+                
+                const horizontalLine = document.createElement("div");
+                horizontalLine.className = "connection-line";
+                horizontalLine.style.background = `linear-gradient(90deg, ${supervisor.dept_color}80, ${supervisor.dept_color}80)`;
+                const horizontalStart = Math.min(supervisorX, deptX);
+                const horizontalEnd = Math.max(supervisorX, deptX);
+                horizontalLine.style.left = (horizontalStart - lineWidth/2) + "px";
+                horizontalLine.style.top = (midY - lineWidth/2) + "px";
+                horizontalLine.style.width = (horizontalEnd - horizontalStart + lineWidth) + "px";
+                horizontalLine.style.height = lineWidth + "px";
+                lines.push(horizontalLine);
+                
+                const verticalLine2 = document.createElement("div");
+                verticalLine2.className = "connection-line";
+                verticalLine2.style.background = `linear-gradient(180deg, ${supervisor.dept_color}80, ${supervisor.dept_color}CC)`;
+                verticalLine2.style.left = (deptX - lineWidth/2) + "px";
+                verticalLine2.style.top = midY + "px";
+                verticalLine2.style.width = lineWidth + "px";
+                verticalLine2.style.height = (deptY - midY) + "px";
+                lines.push(verticalLine2);
+            }
+            
+            return lines;
+        }
+        
+        function initHierarchyView() {
+            if (!isLoggedIn) return;
+            
+            calculateProcessFlowLayout();
+            
+            const chartContainer = document.getElementById("orgChart");
+            chartContainer.innerHTML = "";
+            
+            const cardDimensions = window.currentCardDimensions;
+            
+            generateConnectionLines(cardDimensions);
+            
+            employees.forEach(emp => {
+                if (!emp.position.includes("Technician") && !emp.position.includes("Associate") && !emp.position.includes("Driver") && !emp.position.includes("Coordinator") && emp.x_pos !== undefined && emp.department !== "Executive") {
+                    const card = createEmployeeCard(emp, cardDimensions);
+                    chartContainer.appendChild(card);
+                }
+            });
+            
+            if (window.departmentSummaries) {
+                window.departmentSummaries.forEach(deptData => {
+                    const card = createDepartmentCard(deptData, cardDimensions);
+                    chartContainer.appendChild(card);
+                });
+            }
+        }
+        
+        function openDrillDown(departmentName) {
+            currentDepartment = departmentName;
+            currentPage = 1; // Reset to first page
+            isDrillDownActive = true;
+            
+            const hierarchyView = document.getElementById("hierarchyView");
+            const drillDownView = document.getElementById("drillDownView");
+            const drillDownTitle = document.getElementById("drillDownTitle");
+            const drillDownContent = document.getElementById("drillDownContent");
+            
+            hierarchyView.classList.add("hidden");
+            drillDownView.classList.add("active");
+            
+            const deptEmployees = employees.filter(emp => emp.department === departmentName);
+            const deptLeadership = deptEmployees.filter(emp => 
+                emp.position.includes("Manager") || 
+                emp.position.includes("Director") || 
+                emp.position.includes("Supervisor") || 
+                emp.position.includes("Lead") || 
+                emp.position === "Quality Specialist"
+            );
+            const deptStaff = deptEmployees.filter(emp => 
+                !emp.position.includes("Manager") && 
+                !emp.position.includes("Director") && 
+                !emp.position.includes("Supervisor") && 
+                !emp.position.includes("Lead") && 
+                emp.position !== "Quality Specialist"
+            );
+            
+            drillDownTitle.textContent = `${departmentName} Department (${deptStaff.length} Staff${deptLeadership.length > 0 ? ` + ${deptLeadership.length} Leadership` : ''})`;
+            
+            layoutDrillDownEmployees(deptEmployees, drillDownContent);
+        }
+        
+        // ENHANCED DRILL-DOWN LAYOUT - Implements smart adaptive layouts based on department size
+        function layoutDrillDownEmployees(deptMembers, container) {
+            container.innerHTML = "";
+            
+            const availableWidth = screenWidth - 60;
+            const availableHeight = screenHeight - 120;
+            const totalEmployees = deptMembers.length;
+            
+            // Update pagination (only shows for Packaging and other large departments)
+            updatePagination(totalEmployees);
+            
+            let membersToShow = deptMembers;
+            
+            // PAGINATION FOR LARGE DEPARTMENTS (8 per page in 4x2 grid)
+            if (totalEmployees > employeesPerPage) {
+                const startIndex = (currentPage - 1) * employeesPerPage;
+                const endIndex = Math.min(startIndex + employeesPerPage, totalEmployees);
+                membersToShow = deptMembers.slice(startIndex, endIndex);
+            }
+            
+            // Create wrapper for perfect centering
+            const gridWrapper = document.createElement("div");
+            gridWrapper.style.position = "absolute";
+            gridWrapper.style.width = "100%";
+            gridWrapper.style.height = "100%";
+            gridWrapper.style.display = "flex";
+            gridWrapper.style.justifyContent = "center";
+            gridWrapper.style.alignItems = "center";
+            
+            const gridContainer = document.createElement("div");
+            gridContainer.className = "drill-down-grid";
+            
+            // SMART LAYOUT DETECTION BASED ON DEPARTMENT SIZE
+            let layoutConfig = {};
+            const currentSize = membersToShow.length;
+            
+            if (currentSize <= 3) {
+                // TINY (1-3 people): Single row showcase with HUGE photos
+                layoutConfig = {
+                    type: "single-row",
+                    cols: currentSize,
+                    rows: 1,
+                    cardWidth: 320,
+                    cardHeight: 380,
+                    photoSize: 200,
+                    gap: 40
+                };
+            } else if (currentSize <= 4) {
+                // SMALL (4 people): 2×2 grid with very large photos
+                layoutConfig = {
+                    type: "2x2-grid",
+                    cols: 2,
+                    rows: 2,
+                    cardWidth: 300,
+                    cardHeight: 350,
+                    photoSize: 180,
+                    gap: 30
+                };
+            } else if (currentSize <= 6) {
+                // SMALL-MEDIUM (5-6 people): 3×2 grid with large photos
+                layoutConfig = {
+                    type: "3x2-grid",
+                    cols: 3,
+                    rows: 2,
+                    cardWidth: 280,
+                    cardHeight: 320,
+                    photoSize: 150,
+                    gap: 25
+                };
+            } else if (currentSize <= 8) {
+                // MEDIUM-LARGE (7-8 people): 4×2 grid with good-sized photos
+                layoutConfig = {
+                    type: "4x2-grid",
+                    cols: 4,
+                    rows: 2,
+                    cardWidth: 250,
+                    cardHeight: 300,
+                    photoSize: 130,
+                    gap: 20
+                };
+            } else if (currentSize <= 9) {
+                // LARGE (9 people): 3×3 grid
+                layoutConfig = {
+                    type: "3x3-grid",
+                    cols: 3,
+                    rows: 3,
+                    cardWidth: 260,
+                    cardHeight: 280,
+                    photoSize: 120,
+                    gap: 20
+                };
+            } else if (currentSize <= 12) {
+                // EXTRA LARGE (10-12 people): 4×3 grid
+                layoutConfig = {
+                    type: "4x3-grid",
+                    cols: 4,
+                    rows: 3,
+                    cardWidth: 230,
+                    cardHeight: 260,
+                    photoSize: 100,
+                    gap: 18
+                };
+            } else {
+                // For any remaining cases: 4×4 grid
+                layoutConfig = {
+                    type: "4x4-grid",
+                    cols: 4,
+                    rows: Math.ceil(currentSize / 4),
+                    cardWidth: 220,
+                    cardHeight: 250,
+                    photoSize: 90,
+                    gap: 15
+                };
+            }
+            
+            // Apply grid layout
+            gridContainer.style.gridTemplateColumns = `repeat(${layoutConfig.cols}, ${layoutConfig.cardWidth}px)`;
+            gridContainer.style.gridTemplateRows = `repeat(${layoutConfig.rows}, ${layoutConfig.cardHeight}px)`;
+            gridContainer.style.gap = `${layoutConfig.gap}px`;
+            gridContainer.style.width = "auto";
+            gridContainer.style.height = "auto";
+            
+            // Create cards with enhanced layout
+            membersToShow.forEach((member) => {
+                const card = createEnhancedDrillDownCard(member, layoutConfig);
+                gridContainer.appendChild(card);
+            });
+            
+            gridWrapper.appendChild(gridContainer);
+            container.appendChild(gridWrapper);
+        }
+        
+        // Helper function to create enhanced drill-down employee cards with SQUARE photos
+        function createEnhancedDrillDownCard(member, layoutConfig) {
+            const card = document.createElement("div");
+            card.className = "drill-employee-card";
+            
+            card.style.width = layoutConfig.cardWidth + "px";
+            card.style.height = layoutConfig.cardHeight + "px";
+            card.style.position = "relative";
+            
+            // Enhanced styling for leadership roles
+            const isLeadership = member.position.includes("Manager") || 
+                                member.position.includes("Director") || 
+                                member.position.includes("Supervisor") || 
+                                member.position.includes("Lead") || 
+                                member.position === "Quality Specialist";
+            
+            if (isLeadership) {
+                card.style.border = `4px solid ${member.dept_color}`;
+                card.style.background = "linear-gradient(145deg, #fff3cd, #ffeaa7)";
+                card.style.boxShadow = `0 8px 25px ${member.dept_color}40`;
+            } else {
+                card.style.border = `3px solid ${member.dept_color}`;
+            }
+            
+            const photoSection = document.createElement("div");
+            photoSection.className = "drill-card-photo-section";
+            
+            const textSection = document.createElement("div");
+            textSection.className = "drill-card-text-section";
+            
+            const photoSize = layoutConfig.photoSize;
+            
+            const photo = document.createElement("img");
+            photo.className = "drill-card-photo";
+            
+            // Use placeholder avatar for all photos
+            photo.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='${photoSize}' height='${photoSize}' viewBox='0 0 ${photoSize} ${photoSize}'><rect width='${photoSize}' height='${photoSize}' fill='%23ecf0f1' rx='8'/><circle cx='${photoSize/2}' cy='${photoSize*0.35}' r='${photoSize*0.15}' fill='%23bdc3c7'/><ellipse cx='${photoSize/2}' cy='${photoSize*0.75}' rx='${photoSize*0.25}' ry='${photoSize*0.15}' fill='%23bdc3c7'/></svg>`;
+            
+            photo.alt = member.name;
+            photo.style.width = photoSize + "px";
+            photo.style.height = photoSize + "px";
+            
+            photoSection.appendChild(photo);
+            
+            // Scale text based on card size
+            const nameFontSize = Math.max(16, Math.min(20, layoutConfig.cardWidth / 14));
+            const titleFontSize = Math.max(13, Math.min(16, layoutConfig.cardWidth / 17));
+            const shiftFontSize = Math.max(11, Math.min(13, layoutConfig.cardWidth / 20));
+            
+            const nameDiv = document.createElement("div");
+            nameDiv.className = "drill-card-name";
+            nameDiv.style.fontSize = nameFontSize + "px";
+            nameDiv.textContent = member.name;
+            textSection.appendChild(nameDiv);
+            
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "drill-card-title";
+            titleDiv.style.fontSize = titleFontSize + "px";
+            titleDiv.textContent = member.position;
+            textSection.appendChild(titleDiv);
+            
+            if (member.shift) {
+                const shiftDiv = document.createElement("div");
+                shiftDiv.className = "drill-card-shift";
+                shiftDiv.style.fontSize = shiftFontSize + "px";
+                shiftDiv.textContent = member.shift;
+                textSection.appendChild(shiftDiv);
+            }
+            
+            card.appendChild(photoSection);
+            card.appendChild(textSection);
+            
+            return card;
+        }
+        
+        function closeDrillDown() {
+            const hierarchyView = document.getElementById("hierarchyView");
+            const drillDownView = document.getElementById("drillDownView");
+            
+            if (hierarchyView && drillDownView) {
+                hierarchyView.classList.remove("hidden");
+                drillDownView.classList.remove("active");
+            }
+            
+            isDrillDownActive = false;
+            currentDepartment = null;
+            currentPage = 1;
+        }
+        
+        // Navigation controls - Updated for new order including Executive
+        document.addEventListener("keydown", function(e) {
+            switch(e.key) {
+                case "Escape":
+                    e.preventDefault();
+                    if (isDrillDownActive) {
+                        closeDrillDown();
+                    }
+                    break;
+                    
+                case "0": if (!isDrillDownActive) openDrillDown("Executive"); break;
+                case "1": if (!isDrillDownActive) openDrillDown("Extraction"); break;
+                case "2": if (!isDrillDownActive) openDrillDown("Processing Lab"); break;
+                case "3": if (!isDrillDownActive) openDrillDown("Kitchen"); break;
+                case "4": if (!isDrillDownActive) openDrillDown("Packaging"); break;
+                case "5": if (!isDrillDownActive) openDrillDown("Warehouse"); break;
+                case "6": if (!isDrillDownActive) openDrillDown("Maintenance"); break;
+                case "7": if (!isDrillDownActive) openDrillDown("Quality"); break;
+            }
+        });
+        
+        window.addEventListener("resize", function() {
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // ==================== INITIALIZE APP ====================
-        document.addEventListener('DOMContentLoaded', init);
+                if (!isDrillDownActive) {
+                    initHierarchyView();
+                }
+            }, 200);
+        });
+        
+        // Initialize
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize login first
+            initLogin();
+            
+            const backButton = document.getElementById("backButton");
+            if (backButton) {
+                backButton.addEventListener("click", closeDrillDown);
+            }
+            
+            // Executive card click handler
+            const executiveCard = document.getElementById("executiveCard");
+            if (executiveCard) {
+                executiveCard.addEventListener("click", () => openDrillDown("Executive"));
+            }
+            
+            // Pagination event listeners
+            const prevButton = document.getElementById("prevButton");
+            const nextButton = document.getElementById("nextButton");
+            const pageJumpButton = document.getElementById("pageJumpButton");
+            const pageJumpInput = document.getElementById("pageJumpInput");
+            
+            if (prevButton) {
+                prevButton.addEventListener("click", () => {
+                    if (currentPage > 1) {
+                        const deptMembers = employees.filter(emp => emp.department === currentDepartment);
+                        goToPage(currentPage - 1, deptMembers.length);
+                    }
+                });
+            }
+            
+            if (nextButton) {
+                nextButton.addEventListener("click", () => {
+                    const deptMembers = employees.filter(emp => emp.department === currentDepartment);
+                    const totalPages = Math.ceil(deptMembers.length / employeesPerPage);
+                    if (currentPage < totalPages) {
+                        goToPage(currentPage + 1, deptMembers.length);
+                    }
+                });
+            }
+            
+            if (pageJumpButton && pageJumpInput) {
+                pageJumpButton.addEventListener("click", () => {
+                    const targetPage = parseInt(pageJumpInput.value);
+                    if (targetPage && targetPage > 0) {
+                        const deptMembers = employees.filter(emp => emp.department === currentDepartment);
+                        goToPage(targetPage, deptMembers.length);
+                    }
+                });
+                
+                pageJumpInput.addEventListener("keypress", (e) => {
+                    if (e.key === "Enter") {
+                        pageJumpButton.click();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
